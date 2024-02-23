@@ -1,6 +1,6 @@
 # wefood_front
 
-A new Flutter project.
+A new Flutter project - wefood.
 
 ## Getting Started
 
