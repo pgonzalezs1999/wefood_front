@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wefood/models/auth_model.dart';
 import 'package:wefood/models/exceptions.dart';
+import 'package:wefood/models/user_model.dart';
 import 'package:wefood/services/auth/middleware.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/types.dart';
@@ -24,7 +25,6 @@ class Api {
     String imageUrl = 'assets/images/logo.jpg',
   }) {
     FocusScope.of(context).unfocus();
-    print('ERROR TYPE: ${error.runtimeType}');
     if(handledErrors.any((e) => e.runtimeType == error.runtimeType)) {
       title = error.titleMessage;
       description = error.descriptionMessage ?? '';
@@ -98,14 +98,65 @@ class Api {
         MaterialPageRoute(builder: (context) => const Home()),
       );
     } catch(error) {
-      print('ERROR $error');
       onError();
-      print(error is NoSuchMethodError);
       if(error is NoSuchMethodError) {
         _displayError(context: context, error: WefoodUnauthorizedException());
       } else {
         _displayError(context: context, error: error);
       }
+    }
+  }
+
+  static Future<UserModel> getProfile() async {
+    try {
+      final response = await Middleware.endpoint(
+        name: 'getProfile',
+        type: HttpType.get,
+      );
+      UserModel userModel = UserModel.fromJson(response['message']);
+      return userModel;
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static updateUsername({
+    required String username,
+  }) async {
+    try {
+      dynamic response = await Middleware.endpoint(
+          name: 'updateUsername',
+          type: HttpType.post,
+          body: {
+            'username': username,
+          }
+      );
+      print('CONTINUA BIEN POR EL API(): $response');
+      return response;
+    } catch(error) {
+      print('ERROR EN API(): $error');
+      throw Exception(error);
+    }
+  }
+
+  static updateRealName({
+    required String name,
+    required String surname,
+  }) async {
+    try {
+      dynamic response = await Middleware.endpoint(
+        name: 'updateRealName',
+        type: HttpType.post,
+        body: {
+          'real_name': name,
+          'real_surname': surname,
+        }
+      );
+      print('CONTINUA BIEN POR EL API(): $response');
+      return response;
+    } catch(error) {
+      print('ERROR EN API(): $error');
+      throw Exception(error);
     }
   }
 }

@@ -2,7 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:wefood/components/wefood_screen.dart';
 import 'package:wefood/services/secure_storage.dart';
-import 'package:wefood/main.dart';
+import 'package:wefood/views/user_explore.dart';
+import 'package:wefood/views/user_profile.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -17,9 +18,20 @@ class _HomeState extends State<Home> {
   DateTime? accessTokenExpiresAt;
   int? accessTokenMinutesLeft;
   late Timer _timer;
+  int _selectedScreenIndex = 0;
+  final List<Widget> _screens = [
+    const UserExplore(),
+    const UserProfile(),
+  ];
+
+  void _onScreenTapped(int index) {
+    setState(() {
+      _selectedScreenIndex = index;
+    });
+  }
 
   void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 60), (timer) {
     _showPopup();
     });
   }
@@ -27,7 +39,7 @@ class _HomeState extends State<Home> {
   void _showPopup() {
     final snackBar = SnackBar(
       content: Text('El JWT caduca en $accessTokenMinutesLeft minutos'),
-      duration: const Duration(seconds: 2), // Duración del SnackBar
+      duration: const Duration(seconds: 5),
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
@@ -52,18 +64,6 @@ class _HomeState extends State<Home> {
     setState(() {});
   }
 
-  void _navigateToMain() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const MyApp()),
-    );
-  }
-
-  void _deleteToken() async {
-    await UserSecureStorage().delete(key: 'accessToken');
-    await UserSecureStorage().delete(key: 'accessTokenExpiresAt');
-  }
-
   @override
   void initState() {
     super.initState();
@@ -74,26 +74,23 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home'),
-      ),
-      body: WefoodScreen(
-        child: Center(
-          child: Column(
-            children: [
-              Text('Estás dentro de la app! JWT: $accessToken'),
-              ElevatedButton(
-                  onPressed: () {
-                    // Endpoint logout
-                    _deleteToken();
-                    _navigateToMain();
-                  },
-                  child: const Text('CERRAR SESIÓN'),
-              ),
-            ],
+    return WefoodScreen(
+      canPop: false,
+      body: _screens[_selectedScreenIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+            label: 'Explora',
           ),
-        ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Perfil',
+          ),
+        ],
+        currentIndex: _selectedScreenIndex,
+        selectedItemColor: Colors.amber[800],
+        onTap: _onScreenTapped,
       ),
     );
   }

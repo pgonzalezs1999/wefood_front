@@ -52,6 +52,7 @@ class Middleware {
     try {
       switch(type) {
         case HttpType.get:
+          print('HACIENDO GET DE: $url CON HEADER: $auth');
           response = await get(
             url: url,
             auth: auth,
@@ -64,42 +65,15 @@ class Middleware {
             body: body,
             auth: auth,
           ).timeout(timeOutDuration);
-          print('HA RESPONDIDO: $response, QUE ES DE TIPO: ${response.runtimeType}');
           break;
         default:
           throw Exception("Unsupported HTTP method");
       }
-      return _processResponse(response);
-    } on SocketException {
-      throw WefoodApiNotRespondingException();
-    } on TimeoutException {
-      throw WefoodApiNotRespondingException();
-    } on UnauthorizedException {
-      throw WefoodUnauthorizedException();
+      print('DEVUELVE EL JSON DECODE: ${jsonDecode(utf8.decode(response.bodyBytes))}');
+      return jsonDecode(utf8.decode(response.bodyBytes));
     } catch(error) {
       print('ERROR: $error');
-      WefoodDefaultException();
-    }
-  }
-
-  static dynamic _processResponse(http.Response response) {
-    final responseJson = jsonDecode(utf8.decode(response.bodyBytes));
-    print('STATUS CODE: ${responseJson['code']}');
-    switch(responseJson['code']) {
-      case 200:
-      case 201:
-        print('RESPONSE_JSON: $responseJson, de tipo ${responseJson.runtimeType}');
-        return responseJson;
-      case 401:
-        print('HA DETECTADO EL 401');
-        throw WefoodUnauthorizedException();
-      case 400:
-      case 403:
-      case 422:
-        WefoodDefaultException();
-      case 500:
-      default:
-        WefoodDefaultException();
+      return error;
     }
   }
 }

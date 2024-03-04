@@ -3,14 +3,16 @@ import 'package:wefood/types.dart';
 
 class WefoodInput extends StatefulWidget {
   final InputType type;
-  final Function(String)? onChanged;
+  final Function(String) onChanged;
   final String labelText;
+  final String? initialText;
 
   const WefoodInput({
     super.key,
     this.type = InputType.normal,
     required this.onChanged,
     required this.labelText,
+    this.initialText,
   });
 
   @override
@@ -30,7 +32,8 @@ class WefoodInputState extends State<WefoodInput> {
     return TextFormField(
       keyboardType: TextInputType.visiblePassword,
       obscureText: _obscureText,
-      onChanged: (text) => widget.onChanged!(text),
+      onChanged: (text) => widget.onChanged(text),
+      initialValue: widget.initialText,
       decoration: InputDecoration(
         labelText: widget.labelText,
         focusedBorder: OutlineInputBorder(
