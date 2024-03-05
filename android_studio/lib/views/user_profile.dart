@@ -3,7 +3,6 @@ import 'package:wefood/components/profile_name.dart';
 import 'package:wefood/components/wefood_navigation_screen.dart';
 import 'package:wefood/main.dart';
 import 'package:wefood/services/secure_storage.dart';
-import 'package:wefood/services/auth/api/api.dart';
 
 class UserProfile extends StatefulWidget {
   const UserProfile({super.key});
@@ -29,42 +28,33 @@ class _UserProfileState extends State<UserProfile> {
   @override
   Widget build(BuildContext context) {
     return WefoodNavigationScreen(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.only(
-                  right: MediaQuery.of(context).size.width * 0.05,
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(1000),
-                  child: SizedBox.fromSize(
-                    size: Size.fromRadius(MediaQuery.of(context).size.width * 0.1),
-                    child: Image.asset('assets/images/logo.jpg'),
-                  ),
+      children: [
+        Row(
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.only(
+                right: MediaQuery.of(context).size.width * 0.05,
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(1000),
+                child: SizedBox.fromSize(
+                  size: Size.fromRadius(MediaQuery.of(context).size.width * 0.1),
+                  child: Image.asset('assets/images/logo.jpg'),
                 ),
               ),
-              const ProfileName(),
-            ],
-          ),
-          ElevatedButton(
-            onPressed: () {
-              // TODO Endpoint logout
-              _deleteToken();
-              _navigateToMain();
-            },
-            child: const Text('CERRAR SESIÓN'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Api.getProfile();
-            },
-            child: const Text('VER PROFILE INFO'),
-          ),
-        ],
-      ),
+            ),
+            const ProfileName(),
+          ],
+        ),
+        ElevatedButton(
+          onPressed: () {
+            // TODO Endpoint logout
+            _deleteToken();
+            _navigateToMain();
+          },
+          child: const Text('CERRAR SESIÓN'),
+        ),
+      ],
     );
   }
 }

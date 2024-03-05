@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 class WefoodNavigationScreen extends StatefulWidget {
-  final Widget body;
+  final List<Widget> children;
 
   const WefoodNavigationScreen({
     super.key,
-    required this.body,
+    required this.children,
   });
 
   @override
@@ -16,14 +16,16 @@ class _WefoodNavigationScreenState extends State<WefoodNavigationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      constraints: BoxConstraints(
-        minHeight: MediaQuery.of(context).size.height,
-      ),
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height * 0.9, // TODO arreglar esto: es una cutrada
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        child: widget.body,
+        scrollDirection: Axis.vertical,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: widget.children,
+        ),
       ),
     );
   }

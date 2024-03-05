@@ -29,6 +29,8 @@ class Api {
       title = error.titleMessage;
       description = error.descriptionMessage ?? '';
       imageUrl = error.imageUrl ?? '';
+    } else if(error.runtimeType == String) {
+      title = error;
     }
     showDialog(
       context: context,
@@ -84,26 +86,27 @@ class Api {
         },
         needsAccessToken: false,
       );
-      AuthModel authModel = AuthModel.fromParameters(
-          response['access_token'],
-          response['expires_in']
-      );
-      await UserSecureStorage().write(key: 'accessToken', value: authModel.accessToken!);
-      await UserSecureStorage().writeDateTime(
-          key: 'accessTokenExpiresAt',
-          value: DateTime.now().add(Duration(seconds: authModel.expiresAt!))
-      );
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const Home()),
-      );
+      if(response['access_token'] == null) {
+        onError();
+        _displayError(context: context, error: response['error']);
+      } else {
+        AuthModel authModel = AuthModel.fromParameters(
+            response['access_token'],
+            response['expires_in']
+        );
+        await UserSecureStorage().write(key: 'accessToken', value: authModel.accessToken!);
+        await UserSecureStorage().writeDateTime(
+            key: 'accessTokenExpiresAt',
+            value: DateTime.now().add(Duration(seconds: authModel.expiresAt!))
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const Home()),
+        );
+      }
     } catch(error) {
       onError();
-      if(error is NoSuchMethodError) {
-        _displayError(context: context, error: WefoodUnauthorizedException());
-      } else {
-        _displayError(context: context, error: error);
-      }
+      _displayError(context: context, error: error);
     }
   }
 
