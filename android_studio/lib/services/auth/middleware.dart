@@ -1,16 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
-import 'package:get/get_connect/http/src/exceptions/exceptions.dart';
 import 'package:http/http.dart' as http;
 import 'package:wefood/environment.dart';
-import 'package:wefood/models/exceptions.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/types.dart';
 
 class Middleware {
 
-  static const Duration timeOutDuration = Duration(seconds: 5);
+  static const Duration timeOutDuration = Duration(seconds: 20);
 
   static Future get({
     required Uri url,
@@ -52,14 +49,14 @@ class Middleware {
     try {
       switch(type) {
         case HttpType.get:
-          print('HACIENDO GET DE: $url CON HEADER: $auth');
+          print('HACIENDO GET DE: $url');
           response = await get(
             url: url,
             auth: auth,
           ).timeout(timeOutDuration);
           break;
         case HttpType.post:
-          print('HACIENDO POST DE: $url CON HEADER: $auth Y BODY: $body');
+          print('HACIENDO POST DE: $url CON BODY: $body');
           response = await post(
             url: url,
             body: body,
@@ -69,10 +66,10 @@ class Middleware {
         default:
           throw Exception("Unsupported HTTP method");
       }
-      print('DEVUELVE EL JSON DECODE: ${jsonDecode(utf8.decode(response.bodyBytes))}');
+      print('$name DEVUELVE EL JSON DECODE: ${jsonDecode(utf8.decode(response.bodyBytes))}');
       return jsonDecode(utf8.decode(response.bodyBytes));
     } catch(error) {
-      print('ERROR: $error');
+      print('ERROR EN $name: $error');
       return error;
     }
   }

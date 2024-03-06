@@ -17,26 +17,26 @@ class ProfileNameState extends State<ProfileName> {
   Widget build(BuildContext context) {
     return FutureBuilder<UserModel>(
       future: Api.getProfile(),
-      builder: (BuildContext context, AsyncSnapshot<UserModel> userData) {
-        if(userData.hasError) {
+      builder: (BuildContext context, AsyncSnapshot<UserModel> response) {
+        if(response.hasError) {
           resultWidget = Container(
             margin: EdgeInsets.symmetric(
               vertical: MediaQuery.of(context).size.height * 0.05,
             ),
             child: const Text('Error'),
           );
-        } else if(userData.hasData) {
+        } else if(response.hasData) {
           resultWidget = Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if(userData.data?.realName != null) EditableField(
-                feedbackText: '¡Hola de nuevo, ${userData.data!.realName!}!',
+              if(response.data?.realName != null) EditableField(
+                feedbackText: '¡Hola de nuevo, ${response.data!.realName!}!',
                 firstTopic: 'nombre',
-                firstInitialValue: userData.data!.realName!,
+                firstInitialValue: response.data!.realName!,
                 firstMinimumLength: 6,
                 firstMaximumLength: 50,
                 secondTopic: 'apellidos',
-                secondInitialValue: userData.data!.realSurname,
+                secondInitialValue: response.data!.realSurname,
                 secondMinimumLength: 6,
                 secondMaximumLength: 50,
                 onSave: (newValue, newSecondValue) async {
@@ -44,22 +44,20 @@ class ProfileNameState extends State<ProfileName> {
                     name: newValue,
                     surname: newSecondValue!,
                   );
-                  print('CONTINUA BIEN POR PROFILE_NAME: $response');
                   setState(() {});
                   return response;
                 },
               ),
-              if(userData.data?.realName != null) EditableField(
-                feedbackText: 'Usuario: ${userData.data!.username}',
+              if(response.data?.realName != null) EditableField(
+                feedbackText: 'Usuario: ${response.data!.username}',
                 firstTopic: 'usuario',
-                firstInitialValue: userData.data!.username,
+                firstInitialValue: response.data!.username,
                 firstMinimumLength: 5,
                 firstMaximumLength: 50,
                 onSave: (newValue, newSecondValue) async {
                   dynamic response = await Api.updateUsername(
                     username: newValue,
                   );
-                  print('CONTINUA BIEN POR PROFILE_NAME: $response');
                   setState(() {});
                   return response;
                 },

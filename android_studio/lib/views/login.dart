@@ -33,9 +33,6 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return WefoodScreen(
-      appBar: AppBar(
-        title: const Text('Login'),
-      ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.center,

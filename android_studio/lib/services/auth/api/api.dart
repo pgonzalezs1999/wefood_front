@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wefood/models/auth_model.dart';
 import 'package:wefood/models/exceptions.dart';
+import 'package:wefood/models/explore_model.dart';
 import 'package:wefood/models/user_model.dart';
 import 'package:wefood/services/auth/middleware.dart';
 import 'package:wefood/services/secure_storage.dart';
@@ -134,10 +135,8 @@ class Api {
             'username': username,
           }
       );
-      print('CONTINUA BIEN POR EL API(): $response');
       return response;
     } catch(error) {
-      print('ERROR EN API(): $error');
       throw Exception(error);
     }
   }
@@ -155,10 +154,61 @@ class Api {
           'real_surname': surname,
         }
       );
-      print('CONTINUA BIEN POR EL API(): $response');
       return response;
     } catch(error) {
-      print('ERROR EN API(): $error');
+      throw Exception(error);
+    }
+  }
+
+  static Future<List<ExploreModel>> getFavouriteProducts() async {
+    try {
+      dynamic response = await Middleware.endpoint(
+        name: 'getFavouriteProducts',
+        type: HttpType.get,
+      );
+      List<ExploreModel> products = (response['products'] as List<dynamic>).map((product) => ExploreModel.fromJson(product)).toList();
+      return products;
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static Future<List<ExploreModel>> getNearbyBusinesses({
+    required double longitude,
+    required double latitude,
+  }) async {
+    try {
+      dynamic response = await Middleware.endpoint(
+        name: 'getNearbyBusinesses',
+        type: HttpType.post,
+        body: {
+          'longitude': longitude.toString(),
+          'latitude': latitude.toString(),
+        }
+      );
+      List<ExploreModel> products = (response['products'] as List<dynamic>).map((product) => ExploreModel.fromJson(product)).toList();
+      return products;
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static Future<List<ExploreModel>> getRecommendedProducts({
+    required double longitude,
+    required double latitude,
+  }) async {
+    try {
+      dynamic response = await Middleware.endpoint(
+          name: 'getRecommendedProducts',
+          type: HttpType.post,
+          body: {
+            'longitude': longitude.toString(),
+            'latitude': latitude.toString(),
+          }
+      );
+      List<ExploreModel> products = (response['products'] as List<dynamic>).map((product) => ExploreModel.fromJson(product)).toList();
+      return products;
+    } catch(error) {
       throw Exception(error);
     }
   }
