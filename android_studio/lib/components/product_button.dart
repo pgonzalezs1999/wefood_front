@@ -1,29 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:wefood/components/product_tag.dart';
+import 'package:wefood/models/product_expanded_model.dart';
+import 'package:wefood/views/product.dart';
 
 class ProductButton extends StatefulWidget {
 
-  final List<String>? tags;
-  final bool isFavourite;
-  final String title;
-  final double rate;
-  final double price;
-  final String currency;
-  final DateTime startTime;
-  final DateTime endTime;
+  final ProductExpandedModel productExpanded;
   final bool? horizontalScroll;
 
   const ProductButton({
     super.key,
-    this.tags,
-    required this.isFavourite,
-    required this. title,
-    required this.rate,
-    required this.price,
-    required this.currency,
-    required this.startTime,
-    required this.endTime,
     this.horizontalScroll,
+    required this.productExpanded,
   });
 
   @override
@@ -50,7 +38,12 @@ class _ProductButtonState extends State<ProductButton> {
         : null,
       child: GestureDetector(
         onTap: () {
-
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Product(
+                id: widget.productExpanded.product.id,
+            )),
+          );
         },
         child: Card(
           shape: RoundedRectangleBorder(
@@ -78,11 +71,16 @@ class _ProductButtonState extends State<ProductButton> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
-                          if(widget.tags != null) Row(
-                            children: widget.tags!.map((tag) => ProductTag(title: tag)).toList(),
+                          Row(
+                            children: <Widget>[
+                              if(widget.productExpanded.product.vegetarian == true) const ProductTag(title: 'Vegetariano'),
+                              if(widget.productExpanded.product.vegan == true) const ProductTag(title: 'Vegano'),
+                              if(widget.productExpanded.product.bakery == true) const ProductTag(title: 'Bollería'),
+                              if(widget.productExpanded.product.fresh == true) const ProductTag(title: 'Frescos'),
+                              if(widget.productExpanded.product.vegetarian == false && widget.productExpanded.product.vegan == false && widget.productExpanded.product.bakery == false && widget.productExpanded.product.fresh == false) const Text(''),
+                            ],
                           ),
-                          if(widget.tags == null) const Text(''),
-                          if(widget.isFavourite == true) Container(
+                          if(widget.productExpanded.isFavourite == true) Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(999),
                               color: Colors.white.withOpacity(0.5),
@@ -104,13 +102,13 @@ class _ProductButtonState extends State<ProductButton> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(widget.title),
+                          Text(widget.productExpanded.business?.name ?? ''),
                           Row(
                             children: [
-                              Text('${widget.rate} '),
+                              Text('${widget.productExpanded.business?.rate ?? 0} '),
                               const Icon(Icons.star, size: 15),
-                              Text(' | ${widget.price} ${widget.currency} | '
-                                '${widget.startTime.hour}:${widget.startTime.minute}h-${widget.endTime.hour}:${widget.endTime.minute}h'
+                              Text(' | ${widget.productExpanded.product.price} Sol/. | '
+                                '${widget.productExpanded.product.startingHour?.hour}:${widget.productExpanded.product.startingHour?.minute}h-${widget.productExpanded.product.endingHour?.hour}:${widget.productExpanded.product.endingHour?.minute}h'
                               ),
                             ],
                           ),

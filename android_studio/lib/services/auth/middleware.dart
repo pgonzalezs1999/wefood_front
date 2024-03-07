@@ -66,10 +66,8 @@ class Middleware {
         default:
           throw Exception("Unsupported HTTP method");
       }
-      print('$name DEVUELVE EL JSON DECODE: ${jsonDecode(utf8.decode(response.bodyBytes))}');
       return jsonDecode(utf8.decode(response.bodyBytes));
     } catch(error) {
-      print('ERROR EN $name: $error');
       return error;
     }
   }

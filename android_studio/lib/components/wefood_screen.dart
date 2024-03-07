@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:wefood/environment.dart';
 
 class WefoodScreen extends StatefulWidget {
   final AppBar? appBar;
@@ -7,6 +8,8 @@ class WefoodScreen extends StatefulWidget {
   final BottomNavigationBar? bottomNavigationBar;
   final bool? canPop;
   final Function(bool)? onPopInvoked;
+  final bool ignoreHorizontalPadding;
+  final bool ignoreVerticalPadding;
 
   const WefoodScreen({
     super.key,
@@ -15,6 +18,8 @@ class WefoodScreen extends StatefulWidget {
     this.bottomNavigationBar,
     this.canPop,
     this.onPopInvoked,
+    this.ignoreHorizontalPadding = false,
+    this.ignoreVerticalPadding = false
   });
 
   @override
@@ -49,7 +54,7 @@ class _WefoodScreenState extends State<WefoodScreen> {
       );
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -62,9 +67,9 @@ class _WefoodScreenState extends State<WefoodScreen> {
             minHeight: MediaQuery.of(context).size.height,
           ),
           padding: EdgeInsets.only(
-            top: MediaQuery.of(context).size.height * 0.05,
-            left: MediaQuery.of(context).size.width * 0.05,
-            right: MediaQuery.of(context).size.width * 0.05,
+            top: widget.ignoreVerticalPadding ? 0 : MediaQuery.of(context).size.height * Environment.defaultVerticalMargin,
+            left: widget.ignoreHorizontalPadding ? 0 : MediaQuery.of(context).size.width * Environment.defaultHorizontalMargin,
+            right: widget.ignoreHorizontalPadding ? 0 : MediaQuery.of(context).size.width * Environment.defaultHorizontalMargin,
           ),
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),

@@ -37,8 +37,12 @@ class _ProductTagState extends State<ProductTag> {
 
     return Container(
       decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.black,
+          width: 0.25,
+        ),
         borderRadius: BorderRadius.circular(999),
-        color: Colors.white.withOpacity(0.8),
+        color: Colors.white.withOpacity(0.75),
       ),
       padding: const EdgeInsets.symmetric(
         horizontal: 10,

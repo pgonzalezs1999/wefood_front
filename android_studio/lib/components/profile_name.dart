@@ -51,7 +51,7 @@ class ProfileNameState extends State<ProfileName> {
               if(response.data?.realName != null) EditableField(
                 feedbackText: 'Usuario: ${response.data!.username}',
                 firstTopic: 'usuario',
-                firstInitialValue: response.data!.username,
+                firstInitialValue: response.data!.username!,
                 firstMinimumLength: 5,
                 firstMaximumLength: 50,
                 onSave: (newValue, newSecondValue) async {

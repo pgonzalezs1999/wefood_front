@@ -12,7 +12,6 @@ class EditableField extends StatefulWidget {
   final String? secondInitialValue;
   final int? secondMinimumLength;
   final int? secondMaximumLength;
-
   final Function(String, String?) onSave;
 
   const EditableField({

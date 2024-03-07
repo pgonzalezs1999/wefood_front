@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wefood/models/auth_model.dart';
 import 'package:wefood/models/exceptions.dart';
-import 'package:wefood/models/explore_model.dart';
+import 'package:wefood/models/product_expanded_model.dart';
 import 'package:wefood/models/user_model.dart';
 import 'package:wefood/services/auth/middleware.dart';
 import 'package:wefood/services/secure_storage.dart';
@@ -160,20 +160,20 @@ class Api {
     }
   }
 
-  static Future<List<ExploreModel>> getFavouriteProducts() async {
+  static Future<List<ProductExpandedModel>> getFavouriteProducts() async {
     try {
       dynamic response = await Middleware.endpoint(
         name: 'getFavouriteProducts',
         type: HttpType.get,
       );
-      List<ExploreModel> products = (response['products'] as List<dynamic>).map((product) => ExploreModel.fromJson(product)).toList();
+      List<ProductExpandedModel> products = (response['products'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();
       return products;
     } catch(error) {
       throw Exception(error);
     }
   }
 
-  static Future<List<ExploreModel>> getNearbyBusinesses({
+  static Future<List<ProductExpandedModel>> getNearbyBusinesses({
     required double longitude,
     required double latitude,
   }) async {
@@ -186,14 +186,14 @@ class Api {
           'latitude': latitude.toString(),
         }
       );
-      List<ExploreModel> products = (response['products'] as List<dynamic>).map((product) => ExploreModel.fromJson(product)).toList();
+      List<ProductExpandedModel> products = (response['products'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();
       return products;
     } catch(error) {
       throw Exception(error);
     }
   }
 
-  static Future<List<ExploreModel>> getRecommendedProducts({
+  static Future<List<ProductExpandedModel>> getRecommendedProducts({
     required double longitude,
     required double latitude,
   }) async {
@@ -206,8 +206,23 @@ class Api {
             'latitude': latitude.toString(),
           }
       );
-      List<ExploreModel> products = (response['products'] as List<dynamic>).map((product) => ExploreModel.fromJson(product)).toList();
+      List<ProductExpandedModel> products = (response['products'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();
       return products;
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static Future<ProductExpandedModel> getProduct({
+    required int id,
+  }) async {
+    try {
+      dynamic response = await Middleware.endpoint(
+          name: 'getProduct/$id',
+          type: HttpType.get,
+      );
+      ProductExpandedModel product = ProductExpandedModel.fromJson(response);
+      return product;
     } catch(error) {
       throw Exception(error);
     }
