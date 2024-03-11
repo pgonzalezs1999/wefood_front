@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wefood/models/auth_model.dart';
 import 'package:wefood/models/exceptions.dart';
+import 'package:wefood/models/favourite_model.dart';
 import 'package:wefood/models/product_expanded_model.dart';
 import 'package:wefood/models/user_model.dart';
 import 'package:wefood/services/auth/middleware.dart';
@@ -21,10 +22,11 @@ class Api {
   static _displayError({
     required BuildContext context,
     required dynamic error,
-    String title = 'Error desconocido',
+    String title = '',
     String description = '',
     String imageUrl = 'assets/images/logo.jpg',
   }) {
+    title = error;
     FocusScope.of(context).unfocus();
     if(handledErrors.any((e) => e.runtimeType == error.runtimeType)) {
       title = error.titleMessage;
@@ -71,11 +73,11 @@ class Api {
     );
   }
 
-  static void login({
+  static Future<AuthModel?> login({
     required BuildContext context,
     required String username,
     required String password,
-    required Function() onError,
+    Function()? onError,
   }) async {
     try {
       final response = await Middleware.endpoint(
@@ -88,7 +90,9 @@ class Api {
         needsAccessToken: false,
       );
       if(response['access_token'] == null) {
-        onError();
+        if(onError != null) {
+          onError();
+        }
         _displayError(context: context, error: response['error']);
       } else {
         AuthModel authModel = AuthModel.fromParameters(
@@ -100,15 +104,25 @@ class Api {
             key: 'accessTokenExpiresAt',
             value: DateTime.now().add(Duration(seconds: authModel.expiresAt!))
         );
+        await UserSecureStorage().write(key: 'username', value: username);
+        await UserSecureStorage().write(key: 'password', value: password);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const Home()),
         );
+        return authModel;
       }
     } catch(error) {
-      onError();
+      if(onError != null) {
+        onError();
+      }
+      await UserSecureStorage().delete(key: 'accessToken');
+      await UserSecureStorage().delete(key: 'accessTokenExpiresAt');
+      await UserSecureStorage().delete(key: 'username');
+      await UserSecureStorage().delete(key: 'password');
       _displayError(context: context, error: error);
     }
+    return null;
   }
 
   static Future<UserModel> getProfile() async {
@@ -223,6 +237,53 @@ class Api {
       );
       ProductExpandedModel product = ProductExpandedModel.fromJson(response);
       return product;
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static Future<FavouriteModel> addFavourite({
+    required int idBusiness,
+  }) async {
+    try {
+      dynamic response = await Middleware.endpoint(
+        name: 'addFavourite',
+        type: HttpType.post,
+        body: {
+          'id_business': idBusiness.toString(),
+        }
+      );
+      FavouriteModel favourite = FavouriteModel.fromJson(response);
+      return favourite;
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static Future<FavouriteModel> removeFavourite({
+    required int idBusiness,
+  }) async {
+    try {
+      dynamic response = await Middleware.endpoint(
+          name: 'removeFavourite',
+          type: HttpType.post,
+          body: {
+            'id_business': idBusiness.toString(),
+          }
+      );
+      FavouriteModel favourite = FavouriteModel.fromJson(response['favourite']);
+      return favourite;
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static logout() async {
+    try {
+      await Middleware.endpoint(
+          name: 'logout',
+          type: HttpType.get,
+      );
     } catch(error) {
       throw Exception(error);
     }

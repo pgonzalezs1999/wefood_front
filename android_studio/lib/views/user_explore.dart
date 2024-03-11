@@ -39,12 +39,12 @@ class _UserExploreState extends State<UserExplore> {
           longitude: -77,
           latitude: -12.5,
         ), // TODO deshardcodear longitud y latitud
-        _exploreTitle('Cerca de tí'), // TODO que esto no exista si no tenemos su ubicación
+        _exploreTitle('Cerca de tí'), // TODO esto no debería existir si no tenemos su ubicación
         const ProductNearbyList(
             longitude: -77,
             latitude: -12.5,
         ), // TODO deshardcodear longitud y latitud
-        _exploreTitle('Tus favoritos'), // TODO que esto no exista si no tiene nada en favoritos
+        _exploreTitle('Tus favoritos'), // TODO esto no debería existir si no tiene nada en favoritos
         const ProductFavouriteList(),
       ],
     );

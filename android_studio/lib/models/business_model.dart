@@ -1,3 +1,4 @@
+import 'package:wefood/models/comment_expanded_model.dart';
 import 'package:wefood/models/comment_model.dart';
 
 class BusinessModel {
@@ -14,7 +15,7 @@ class BusinessModel {
   String? directions;
   bool? isValidated;
   double? rate;
-  List<CommentModel>? comments;
+  List<CommentExpandedModel>? comments;
 
   BusinessModel.fromJson(Map<String, dynamic> json):
     id = json['id'] as int?,
@@ -31,6 +32,6 @@ class BusinessModel {
     isValidated = (json['is_validated'] == 1),
     rate = (json['rate'])?.toDouble(),
     comments = json['comments'] != null
-      ? List<CommentModel>.from((json['comments'] as List<dynamic>).map((comment) => CommentModel.fromJson(comment as Map<String, dynamic>)))
+      ? List<CommentExpandedModel>.from((json['comments'] as List<dynamic>).map((comment) => CommentExpandedModel.fromJson(comment as Map<String, dynamic>)))
       : null;
 }

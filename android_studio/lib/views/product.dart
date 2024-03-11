@@ -1,15 +1,18 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:maps_launcher/maps_launcher.dart';
 import 'package:wefood/components/Comment.dart';
 import 'package:wefood/components/back_arrow.dart';
 import 'package:wefood/components/loading_icon.dart';
 import 'package:wefood/components/product_tag.dart';
 import 'package:wefood/components/wefood_screen.dart';
 import 'package:wefood/environment.dart';
-import 'package:wefood/models/comment_model.dart';
+import 'package:wefood/models/comment_expanded_model.dart';
+import 'package:wefood/models/favourite_model.dart';
 import 'package:wefood/models/product_expanded_model.dart';
 import 'package:wefood/services/auth/api/api.dart';
 
-class Product extends StatefulWidget { // TODO botón de GoogleMaps para calcular desde allí la ruta
+class Product extends StatefulWidget {
 
   final int id;
 
@@ -22,9 +25,24 @@ class Product extends StatefulWidget { // TODO botón de GoogleMaps para calcula
   State<Product> createState() => _ProductState();
 }
 
+
 class _ProductState extends State<Product> {
 
   Widget resultWidget = const LoadingIcon();
+  Widget favouriteIcon = const Icon(Icons.favorite_outline);
+  late ProductExpandedModel info;
+
+  _chooseFavouriteIcon(bool newState) {
+    setState(() {
+      if(newState == true) {
+        info.isFavourite = true;
+        favouriteIcon = const Icon(Icons.favorite);
+      } else {
+        info.isFavourite = false;
+        favouriteIcon = const Icon(Icons.favorite_outline);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +59,7 @@ class _ProductState extends State<Product> {
             child: const Text('Error'),
           );
         } else if(response.hasData) {
-          ProductExpandedModel info = response.data!;
+          info = response.data!;
           resultWidget = WefoodScreen(
             ignoreHorizontalPadding: true,
             ignoreVerticalPadding: true,
@@ -73,13 +91,26 @@ class _ProductState extends State<Product> {
                               ),
                               margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
                               padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
-                              child: Icon(
-                                (info.isFavourite == true) ? Icons.favorite : Icons.favorite_outline,
-                                size: MediaQuery.of(context).size.width * 0.06,
-                              ),
+                              child: (info.isFavourite == true)
+                                ? const Icon(Icons.favorite)
+                                : const Icon(Icons.favorite_outline),
                             ),
-                            onTap: () {
-                              // TODO llamar a añadir a favoritos
+                            onTap: () async {
+                              setState(() {
+                                favouriteIcon = const LoadingIcon();
+                              });
+                              try {
+                                late FavouriteModel favourite;
+                                if(info.isFavourite == true) {
+                                  _chooseFavouriteIcon(false);
+                                  favourite = await Api.removeFavourite(idBusiness: info.business!.id!);
+                                } else {
+                                  _chooseFavouriteIcon(true);
+                                  favourite = await Api.addFavourite(idBusiness: info.business!.id!);
+                                }
+                              } catch(e) {
+                                _chooseFavouriteIcon(info.isFavourite!);
+                              }
                             },
                           ),
                         ],
@@ -142,16 +173,43 @@ class _ProductState extends State<Product> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      if(info.product.description != null) Text(info.product.description!),
+                      if(info.business!.description != null) Text(info.business!.description!),
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                       Text('Precio: ${info.product.price} Sol/.'),
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                       Text('Hora de recogida: De ${_parseTime(info.product.startingHour)} a ${_parseTime(info.product.endingHour)} h'),
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                       Row(
                         children: <Widget>[
                           Text('Valoración: ${info.business?.rate}  '),
                         ] + _printStarts(info.business!.rate!),
                       ),
-                      Text('Ubicación: ${info.business?.directions}'),
-                      if(info.product.vegetarian == true || info.product.vegan == true || info.product.bakery == true || info.product.fresh == true) const Text('Categorías:'),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text('Ubicación: ${info.business?.directions}'),
+                          Card(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                              padding: const EdgeInsets.all(10),
+                              child: GestureDetector(
+                                child: const Icon(Icons.location_pin),
+                                onTap: () {
+                                  MapsLauncher.launchQuery(info.business!.directions ?? '');
+                                },
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                      if(info.product.vegetarian == true || info.product.vegan == true || info.product.bakery == true || info.product.fresh == true) Column(
+                        children: <Widget>[
+                          const Text('Categoría:'),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                        ],
+                      ),
                       Row(
                         children: <Widget>[
                           if(info.product.vegetarian == true) const ProductTag(title: 'Vegetariano'),
@@ -177,20 +235,7 @@ class _ProductState extends State<Product> {
                       const Divider(),
                       const Text('¿Qué opinan los compradores?'),
                       if(info.business?.comments != null && info.business!.comments!.isNotEmpty) Column(
-                        children: info.business!.comments!.map((CommentModel c) => Comment(comment: c)).toList(),
-                      ),
-                      Container(
-                        margin: EdgeInsets.symmetric(
-                          vertical: MediaQuery.of(context).size.height * 0.02,
-                        ),
-                        child: Center(
-                          child: ElevatedButton(
-                            child: const Text('VER MÁS OPINIONES'), // TODO mostrar esto solo si hay +10 comentarios (por lo tanto, trabajar los endpoints para eso)
-                            onPressed: () {
-
-                            },
-                          ),
-                        ),
+                        children: info.business!.comments!.map((CommentExpandedModel c) => Comment(comment: c)).toList(),
                       ),
                     ],
                   ),

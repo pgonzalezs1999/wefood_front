@@ -37,15 +37,30 @@ class _ProductNearbyListState extends State<ProductNearbyList> {
             child: const Text('Error'),
           );
         } else if(response.hasData) { // TODO devolver otra cosa si no hay cercanos o no nos da su ubi
-          resultWidget = SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: response.data!.map((ProductExpandedModel product) => ProductButton(
-                horizontalScroll: true,
-                productExpanded: product,
-              )).toList(),
-            ),
-          );
+          if(response.data!.isNotEmpty) {
+            resultWidget = SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: response.data!.map((ProductExpandedModel product) => ProductButton(
+                  horizontalScroll: true,
+                  productExpanded: product,
+                )).toList(),
+              ),
+            );
+          } else {
+            resultWidget = Align(
+              alignment: Alignment.center,
+              child: Card(
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: MediaQuery.of(context).size.width * 0.05,
+                      vertical: MediaQuery.of(context).size.width * 0.025,
+                    ),
+                    child: const Text('No hemos encontrado ofertas cerca...'),
+                ),
+              ),
+            );
+          }
         }
         return resultWidget;
       }

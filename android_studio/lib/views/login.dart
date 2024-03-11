@@ -5,6 +5,7 @@ import 'package:wefood/models/auth_model.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/types.dart';
 import 'package:sign_in_button/sign_in_button.dart';
+import 'package:wefood/views/home.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -76,7 +77,7 @@ class _LoginState extends State<Login> {
               setState(() {
                 authenticating = LoadingStatus.loading;
               });
-              Api.login(
+              AuthModel? auth = await Api.login(
                 context: context,
                 username: username,
                 password: password,

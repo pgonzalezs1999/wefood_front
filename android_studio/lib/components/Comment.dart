@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:wefood/components/product_tag.dart';
-import 'package:wefood/models/comment_model.dart';
-import 'package:wefood/views/product.dart';
+import 'package:wefood/models/comment_expanded_model.dart';
 
 class Comment extends StatefulWidget {
 
-  final CommentModel comment;
+  final CommentExpandedModel comment;
 
   const Comment({
     super.key,
@@ -25,22 +23,32 @@ class _CommentState extends State<Comment> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        ClipRRect(
-          borderRadius: BorderRadius.circular(999),
-          child: SizedBox.fromSize(
-            size: Size.fromRadius(MediaQuery.of(context).size.width * 0.05),
-            child: Image.asset('assets/images/logo.jpg'),
+    return Container(
+      margin: const EdgeInsets.only(
+        top: 20,
+      ),
+      child: Wrap(
+        spacing: 10,
+        children: <Widget>[
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: SizedBox.fromSize(
+              size: Size.fromRadius(MediaQuery.of(context).size.width * 0.05),
+              child: Image.asset(
+                'assets/images/logo.jpg',
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
-        ),
-        Column(
-          children: <Widget>[
-            Text('${widget.comment.idUser ?? 0}'),
-            Text(widget.comment.message ?? '0'),
-          ],
-        ),
-      ],
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(widget.comment.user?.username ?? 'Sin nombre'),
+              Text(widget.comment.content.message ?? 'Sin rate'),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

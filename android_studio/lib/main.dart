@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:wefood/models/auth_model.dart';
+import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/views/home.dart';
 import 'package:wefood/views/login.dart';
@@ -49,11 +51,35 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _getAccessToken() async {
-    String accessToken = await UserSecureStorage().read(key: 'accessToken') ?? '';
-    if(accessToken == '') {
-      _navigateToLogin();
-    } else {
+    String? accessToken = await UserSecureStorage().read(key: 'accessToken');
+    DateTime? expiresAt = await UserSecureStorage().readDateTime(key: 'accessTokenExpiresAt');
+    String? username = await UserSecureStorage().read(key: 'username');
+    String? password = await UserSecureStorage().read(key: 'password');
+    bool readyToLogin = false;
+    if(accessToken != null && accessToken != '') {
+      if(expiresAt != null && accessToken != '') {
+        if(DateTime.now().difference(expiresAt) > const Duration(milliseconds: 0)) {
+          readyToLogin = true;
+        }
+      }
+    }
+    if(readyToLogin == false) {
+      if(username != null && password != null) {
+        AuthModel? auth = await Api.login(
+          context: context,
+          username: username,
+          password: password,
+        );
+        if(auth != null) {
+          readyToLogin = true;
+        }
+      }
+    }
+
+    if(readyToLogin == true) {
       _navigateToHome();
+    } else {
+      _navigateToLogin();
     }
   }
 
