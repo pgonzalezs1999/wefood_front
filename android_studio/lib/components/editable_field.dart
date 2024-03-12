@@ -35,7 +35,7 @@ class EditableField extends StatefulWidget {
 class _EditableFieldState extends State<EditableField> {
   String newFirst = '';
   String? newSecond;
-  String errorFeedback = 'No se han hecho cambios';
+  String errorFeedback = '';
   bool confirmed = false;
 
   @override
@@ -62,13 +62,13 @@ class _EditableFieldState extends State<EditableField> {
         }
       }
       if(widget.firstMinimumLength != null && widget.firstMinimumLength! > newFirst.length) {
-        result = 'El ${widget.firstTopic} debe tener más de ${widget.firstMinimumLength} caracteres';
+        result = 'El campo ${widget.firstTopic} debe tener más de ${widget.firstMinimumLength} caracteres';
       } else if(widget.firstMaximumLength != null && widget.firstMaximumLength! < newFirst.length) {
-        result = 'El ${widget.firstTopic} debe tener menos de ${widget.firstMaximumLength} caracteres';
+        result = 'El campo ${widget.firstTopic} debe tener menos de ${widget.firstMaximumLength} caracteres';
       } else if(widget.secondMinimumLength != null && widget.secondMinimumLength! > newSecond!.length) {
-        result = 'El ${widget.secondTopic} debe tener más de ${widget.secondMinimumLength} caracteres';
+        result = 'El campo ${widget.secondTopic} debe tener más de ${widget.secondMinimumLength} caracteres';
       } else if(widget.secondMaximumLength != null && widget.secondMaximumLength! < newSecond!.length) {
-        result = 'El ${widget.secondTopic} debe tener menos de ${widget.secondMaximumLength} caracteres';
+        result = 'El campo ${widget.secondTopic} debe tener menos de ${widget.secondMaximumLength} caracteres';
       }
       setState(() {
         errorFeedback = result;
@@ -110,7 +110,7 @@ class _EditableFieldState extends State<EditableField> {
                                 setCanConfirm();
                               });
                             },
-                            labelText: 'Cambiar ${widget.firstTopic}:',
+                            labelText: '${(widget.firstInitialValue == '') ? 'Añadir' : 'Cambiar'} ${widget.firstTopic}',
                             initialText: widget.firstInitialValue,
                           ),
                           if(widget.secondInitialValue != null) Column(
@@ -125,7 +125,7 @@ class _EditableFieldState extends State<EditableField> {
                                     setCanConfirm();
                                   });
                                 },
-                                labelText: 'Cambiar ${widget.secondTopic}:',
+                                labelText: '${(widget.secondInitialValue == '') ? 'Añadir' : 'Cambiar'} ${widget.secondTopic}',
                                 initialText: widget.secondInitialValue,
                               ),
                             ],

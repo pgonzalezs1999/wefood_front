@@ -5,7 +5,7 @@ import 'package:wefood/models/auth_model.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/types.dart';
 import 'package:sign_in_button/sign_in_button.dart';
-import 'package:wefood/views/home.dart';
+import 'package:wefood/views/register_user.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -31,6 +31,13 @@ class _LoginState extends State<Login> {
     );
   }
 
+  void _navigateToRegisterUser() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const RegisterUser()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return WefoodScreen(
@@ -38,17 +45,23 @@ class _LoginState extends State<Login> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          Container(
-            width: MediaQuery.of(context).size.width * 0.5,
-            margin: EdgeInsets.symmetric(
-              vertical: MediaQuery.of(context).size.height * 0.025,
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.333,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                const Text('Bienvenido a'),
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.5,
+                  margin: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height * 0.01,
+                  ),
+                  child: Image.asset('assets/images/logo.png'),
+                ),
+              ],
             ),
-            child: Image.asset('assets/images/logo.jpg'),
-          ),
-          Text(
-              '¡Bienvenido a WeFood!',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
+          ) ,
           Container(
             margin: EdgeInsets.symmetric(
               vertical: MediaQuery.of(context).size.height * 0.025,
@@ -108,7 +121,7 @@ class _LoginState extends State<Login> {
               const Text('¿No tienes cuenta?'),
               TextButton(
                 onPressed: () {
-
+                  _navigateToRegisterUser();
                 },
                 child: const Text('Regístrate gratis'),
               ),

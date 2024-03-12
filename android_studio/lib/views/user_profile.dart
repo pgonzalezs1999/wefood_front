@@ -63,49 +63,51 @@ class _UserProfileState extends State<UserProfile> {
           children: <Widget>[
             SettingsElement(
               iconData: Icons.timelapse,
-              title: 'Pedidos pendientes',
+              title: 'Pedidos pendientes - FALTA',
               isFirst: true,
-              onTap: () {
-                // TODO falta esto
+              onTap: () async {
+                // TODO falta esto (quitar async y el mostrar accessToken)
+                String? at = await UserSecureStorage().read(key: 'accessToken');
+                print('ACCESS_TOKEN: $at');
               },
             ),
             SettingsElement(
               iconData: Icons.history,
-              title: 'Historial de pedidos',
+              title: 'Historial de pedidos - FALTA',
               onTap: () {
                 // TODO falta esto
               },
             ),
             SettingsElement(
               iconData: Icons.favorite,
-              title: 'Favoritos',
+              title: 'Favoritos - FALTA',
               onTap: () {
                 // TODO falta esto
               },
             ),
             SettingsElement(
               iconData: Icons.notifications,
-              title: 'Notificaciones',
+              title: 'Notificaciones - FALTA',
               onTap: () {
                 // TODO falta esto
               },
             ),
             SettingsElement(
               iconData: Icons.share,
-              title: 'Comparte la app',
+              title: 'Comparte la app - FALTA',
               onTap: () {
                 // TODO falta esto
               },
             ),SettingsElement(
               iconData: Icons.support_agent,
-              title: 'Contáctanos',
+              title: 'Contáctanos - FALTA',
               onTap: () {
                 // TODO falta esto
               },
             ),
             SettingsElement(
               iconData: Icons.business,
-              title: 'Términos y condiciones',
+              title: 'Términos y condiciones - FALTA',
               onTap: () {
                 // TODO falta esto
               },
@@ -132,7 +134,7 @@ class _UserProfileState extends State<UserProfile> {
             ),
             SettingsElement(
               iconData: Icons.delete,
-              title: 'Darme de baja',
+              title: 'Darme de baja - FALTA',
               onTap: () {
                 // TODO falta esto
               },

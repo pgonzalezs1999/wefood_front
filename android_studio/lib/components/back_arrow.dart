@@ -25,7 +25,7 @@ class _BackArrowState extends State<BackArrow> {
           size: MediaQuery.of(context).size.width * 0.06,
         ),
       ),
-      onTap: () => Navigator.pop(context),
+      onTap: () => Navigator.pop(context, true),
     );
   }
 }

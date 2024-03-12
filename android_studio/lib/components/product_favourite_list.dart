@@ -19,7 +19,6 @@ class _ProductFavouriteListState extends State<ProductFavouriteList> {
       future: Api.getFavouriteProducts(),
       builder: (BuildContext context, AsyncSnapshot<List<ProductExpandedModel>> response) {
         if(response.hasError) {
-          print('ERROR EN FAV_LIST: ${response.error}');
           resultWidget = Container(
             margin: EdgeInsets.symmetric(
               vertical: MediaQuery.of(context).size.height * 0.05,
@@ -27,15 +26,32 @@ class _ProductFavouriteListState extends State<ProductFavouriteList> {
             child: const Text('Error'),
           );
         } else if(response.hasData) { // TODO devolver otra cosa si no hay favoritos
-          resultWidget = SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: response.data!.map((ProductExpandedModel product) => ProductButton(
-                horizontalScroll: true,
-                productExpanded: product,
-              )).toList(),
-            ),
-          );
+          if(response.data!.isNotEmpty) {
+            resultWidget = SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: response.data!.map((ProductExpandedModel product) =>
+                    ProductButton(
+                      horizontalScroll: true,
+                      productExpanded: product,
+                    )).toList(),
+              ),
+            );
+          }
+          else {
+            resultWidget = Align( // TODO poner algo más currado
+              alignment: Alignment.center,
+              child: Card(
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: MediaQuery.of(context).size.width * 0.05,
+                    vertical: MediaQuery.of(context).size.width * 0.025,
+                  ),
+                  child: const Text('¡Añade productos a favoritos para encontrarlos más fácilmente!'),
+                ),
+              ),
+            );
+          }
         }
         return resultWidget;
       }

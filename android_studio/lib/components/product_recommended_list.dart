@@ -3,6 +3,7 @@ import 'package:wefood/components/loading_icon.dart';
 import 'package:wefood/components/product_button.dart';
 import 'package:wefood/models/product_expanded_model.dart';
 import 'package:wefood/services/auth/api/api.dart';
+import 'package:wefood/services/secure_storage.dart';
 
 class ProductRecommendedList extends StatefulWidget {
 
@@ -21,6 +22,7 @@ class ProductRecommendedList extends StatefulWidget {
 
 class _ProductRecommendedListState extends State<ProductRecommendedList> {
   Widget resultWidget = const LoadingIcon();
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<ProductExpandedModel>>(

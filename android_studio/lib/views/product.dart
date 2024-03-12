@@ -1,7 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:maps_launcher/maps_launcher.dart';
-import 'package:wefood/components/Comment.dart';
+import 'package:wefood/components/comment.dart';
 import 'package:wefood/components/back_arrow.dart';
 import 'package:wefood/components/loading_icon.dart';
 import 'package:wefood/components/product_tag.dart';

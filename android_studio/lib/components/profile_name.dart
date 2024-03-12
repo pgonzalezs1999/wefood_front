@@ -29,16 +29,16 @@ class ProfileNameState extends State<ProfileName> {
           resultWidget = Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if(response.data?.realName != null) EditableField(
-                feedbackText: '¡Hola de nuevo, ${response.data!.realName!}!',
+              EditableField(
+                feedbackText: (response.data?.realName != null) ? '¡Hola de nuevo, ${response.data!.realName!}!' : 'Añade tu nombre',
                 firstTopic: 'nombre',
-                firstInitialValue: response.data!.realName!,
-                firstMinimumLength: 6,
-                firstMaximumLength: 50,
+                firstInitialValue: (response.data?.realName != null) ? response.data!.realName! : '',
+                firstMinimumLength: 2,
+                firstMaximumLength: 30,
                 secondTopic: 'apellidos',
-                secondInitialValue: response.data!.realSurname,
-                secondMinimumLength: 6,
-                secondMaximumLength: 50,
+                secondInitialValue: (response.data?.realName != null) ? response.data!.realSurname : '',
+                secondMinimumLength: 2,
+                secondMaximumLength: 30,
                 onSave: (newValue, newSecondValue) async {
                   dynamic response = await Api.updateRealName(
                     name: newValue,

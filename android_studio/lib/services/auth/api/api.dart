@@ -131,6 +131,7 @@ class Api {
         name: 'getProfile',
         type: HttpType.get,
       );
+      print('RESPONSE DE GET_PROFILE: $response');
       UserModel userModel = UserModel.fromJson(response['message']);
       return userModel;
     } catch(error) {
@@ -273,6 +274,62 @@ class Api {
       );
       FavouriteModel favourite = FavouriteModel.fromJson(response['favourite']);
       return favourite;
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static Future<bool> checkUsernameAvailability({
+    required String username,
+  }) async {
+    try {
+      dynamic response = await Middleware.endpoint(
+          name: 'checkUsernameAvailability',
+          type: HttpType.post,
+          body: {
+            'username': username,
+          }
+      );
+      return response['availability'];
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static Future<bool> checkEmailAvailability({
+    required String email,
+  }) async {
+    try {
+      dynamic response = await Middleware.endpoint(
+          name: 'checkEmailAvailability',
+          type: HttpType.post,
+          body: {
+            'email': email.toString(),
+          }
+      );
+      return response['availability'];
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static Future<UserModel> signIn({
+    required String username,
+    required String email,
+    required String password,
+  }) async {
+    try {
+      dynamic response = await Middleware.endpoint(
+          name: 'signIn',
+          type: HttpType.post,
+          body: {
+            'username': username.toString(),
+            'email': email.toString(),
+            'password': password.toString(),
+          }
+      );
+      print('RESPONSE DE API.SIGN_IN: ${response['user']}');
+      return UserModel.fromJson(response['user']);
     } catch(error) {
       throw Exception(error);
     }

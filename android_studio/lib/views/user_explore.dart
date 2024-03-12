@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:wefood/components/product_favourite_list.dart';
-import 'package:wefood/components/product_button.dart';
 import 'package:wefood/components/product_nearby_list.dart';
 import 'package:wefood/components/product_recommended_list.dart';
 import 'package:wefood/components/search_input.dart';
@@ -15,6 +14,30 @@ class UserExplore extends StatefulWidget {
 
 class _UserExploreState extends State<UserExplore> {
 
+  Widget recommendedList = const ProductRecommendedList(
+    longitude: -77,
+    latitude: -12.5,
+  ); // TODO deshardcodear longitud y latitud
+  Widget nearbyList = const ProductNearbyList(
+  longitude: -77,
+  latitude: -12.5,
+  ); // TODO deshardcodear longitud y latitud
+  Widget favouriteList = const ProductFavouriteList();
+
+  _reloadLists() async {
+    setState(() {
+      recommendedList = const ProductRecommendedList(
+        longitude: -77,
+        latitude: -12.5,
+      ); // TODO deshardcodear longitud y latitud
+      nearbyList = const ProductNearbyList(
+        longitude: -77,
+        latitude: -12.5,
+      ); // TODO deshardcodear longitud y latitud
+      favouriteList = const ProductFavouriteList();
+    });
+  }
+
   Widget _exploreTitle(String title) {
     return Container(
       margin: const EdgeInsets.only(
@@ -27,6 +50,8 @@ class _UserExploreState extends State<UserExplore> {
 
   @override
   Widget build(BuildContext context) {
+    _reloadLists();
+
     return WefoodNavigationScreen(
       children: <Widget>[
         SearchInput(
@@ -35,17 +60,11 @@ class _UserExploreState extends State<UserExplore> {
             }
         ),
         _exploreTitle('Recomendados'),
-        const ProductRecommendedList(
-          longitude: -77,
-          latitude: -12.5,
-        ), // TODO deshardcodear longitud y latitud
-        _exploreTitle('Cerca de tí'), // TODO esto no debería existir si no tenemos su ubicación
-        const ProductNearbyList(
-            longitude: -77,
-            latitude: -12.5,
-        ), // TODO deshardcodear longitud y latitud
-        _exploreTitle('Tus favoritos'), // TODO esto no debería existir si no tiene nada en favoritos
-        const ProductFavouriteList(),
+        recommendedList,
+        _exploreTitle('Cerca de tí'),
+        nearbyList,
+        _exploreTitle('Tus favoritos'),
+        favouriteList,
       ],
     );
   }
