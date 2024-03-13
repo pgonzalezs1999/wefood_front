@@ -6,6 +6,7 @@ import 'package:wefood/components/wefood_popup.dart';
 import 'package:wefood/main.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/services/secure_storage.dart';
+import 'package:wefood/views/terms_and_conditions.dart';
 
 class UserProfile extends StatefulWidget {
   const UserProfile({super.key});
@@ -20,6 +21,13 @@ class _UserProfileState extends State<UserProfile> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const MyApp()),
+    );
+  }
+
+  void _navigateToTermsAndConditions() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const TermsAndConditions()),
     );
   }
 
@@ -107,9 +115,9 @@ class _UserProfileState extends State<UserProfile> {
             ),
             SettingsElement(
               iconData: Icons.business,
-              title: 'Términos y condiciones - FALTA',
+              title: 'Términos y condiciones',
               onTap: () {
-                // TODO falta esto
+                _navigateToTermsAndConditions();
               },
             ),
             SettingsElement(

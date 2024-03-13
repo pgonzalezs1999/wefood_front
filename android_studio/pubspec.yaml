@@ -18,6 +18,7 @@ dependencies:
   http: ^1.2.1
   sign_in_button: ^3.2.0
   maps_launcher: ^2.2.1
+  syncfusion_flutter_pdfviewer: ^24.2.8
 
 dev_dependencies:
   flutter_test:
@@ -30,6 +31,7 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/documents/terms_and_conditions.pdf
 
   # fonts:
   #   - family: Schyler

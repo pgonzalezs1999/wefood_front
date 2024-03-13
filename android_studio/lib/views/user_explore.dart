@@ -63,7 +63,7 @@ class _UserExploreState extends State<UserExplore> {
         recommendedList,
         _exploreTitle('Cerca de tí'),
         nearbyList,
-        _exploreTitle('Tus favoritos'),
+        _exploreTitle('Ofertas de tus favoritos'),
         favouriteList,
       ],
     );

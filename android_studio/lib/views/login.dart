@@ -6,6 +6,7 @@ import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/types.dart';
 import 'package:sign_in_button/sign_in_button.dart';
 import 'package:wefood/views/register_user.dart';
+import 'package:wefood/views/terms_and_conditions.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -35,6 +36,13 @@ class _LoginState extends State<Login> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const RegisterUser()),
+    );
+  }
+
+  void _navigateToTermsAndConditions() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const TermsAndConditions()),
     );
   }
 
@@ -133,7 +141,7 @@ class _LoginState extends State<Login> {
               const Text('¿Quieres listar tu negocio?'),
               TextButton(
                 onPressed: () {
-
+                  // TODO falta esto
                 },
                 child: const Text('Regístralo gratis'),
               ),
@@ -141,7 +149,7 @@ class _LoginState extends State<Login> {
           ),
           TextButton(
             onPressed: () {
-
+              _navigateToTermsAndConditions();
             },
             child: const Text('Términos y condiciones legales'),
           ),

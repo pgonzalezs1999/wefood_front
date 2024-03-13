@@ -9,6 +9,7 @@ import 'package:wefood/models/user_model.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/types.dart';
+import 'package:wefood/views/terms_and_conditions.dart';
 
 class RegisterUser extends StatefulWidget {
   const RegisterUser({super.key});
@@ -30,6 +31,13 @@ class _RegisterUserState extends State<RegisterUser> {
   String password = '';
   String confirmPassword = '';
   bool conditionsAccepted = false;
+
+  void _navigateToTermsAndConditions() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const TermsAndConditions()),
+    );
+  }
 
   bool _setError(String reason) {
     setState(() {
@@ -199,7 +207,7 @@ class _RegisterUserState extends State<RegisterUser> {
               const Text('He leído y acepto los'),
               TextButton(
                 onPressed: () {
-                  // TODO falta esto
+                  _navigateToTermsAndConditions();
                 },
                 style: TextButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
@@ -245,8 +253,6 @@ class _RegisterUserState extends State<RegisterUser> {
                     print('ERROR: $e');
                   });
                 }
-              } else {
-                // TODO explicar que pasa
               }
             },
             child: const Text('REGISTRARME'),

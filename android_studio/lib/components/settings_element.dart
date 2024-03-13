@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class SettingsElement extends StatefulWidget {
 
@@ -27,12 +28,13 @@ class _SettingsElementState extends State<SettingsElement> {
       onTap: widget.onTap,
       child: Container(
         decoration: BoxDecoration(
+          color: (widget.title.contains('FALTA')) ? Colors.red.withOpacity(0.15) : Colors.transparent,
           border: Border(
             top: (widget.isFirst != true)
-                ? const BorderSide(
-                  color: Color.fromRGBO(0, 0, 0, 0.25),
-                )
-                : BorderSide.none,
+              ? const BorderSide(
+                color: Color.fromRGBO(0, 0, 0, 0.25),
+              )
+              : BorderSide.none,
           ),
         ),
         padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
