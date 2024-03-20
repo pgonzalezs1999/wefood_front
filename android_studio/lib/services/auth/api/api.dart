@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wefood/models/auth_model.dart';
+import 'package:wefood/models/business_expanded_model.dart';
 import 'package:wefood/models/exceptions.dart';
 import 'package:wefood/models/favourite_model.dart';
 import 'package:wefood/models/product_expanded_model.dart';
@@ -330,6 +331,46 @@ class Api {
       );
       print('RESPONSE DE API.SIGN_IN: ${response['user']}');
       return UserModel.fromJson(response['user']);
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static Future<BusinessExpandedModel> createBusiness({
+    required String email,
+    required String password,
+    required int phonePrefix,
+    required int phone,
+    required String businessName,
+    required String businessDescription,
+    required String taxId,
+    required String directions,
+    required Image logoFile,
+    required int idCountry,
+    required double longitude,
+    required double latitude,
+  }) async {
+    try {
+      dynamic response = await Middleware.endpoint(
+          name: 'createBusiness',
+          type: HttpType.post,
+          body: {
+            'email': email.toString(),
+            'password': password.toString(),
+            'phone_prefix': phonePrefix.toString(),
+            'phone': phone.toString(),
+            'businessName': businessName.toString(),
+            'businessDescription': businessDescription.toString(),
+            'tax_id': taxId.toString(),
+            'directions': directions.toString(),
+            'logo_file': logoFile.toString(),
+            'id_country': idCountry.toString(),
+            'longitude': longitude.toString(),
+            'latitude': latitude.toString(),
+          }
+      );
+      print('RESPONSE DE API.CREATE_BUSINESS: $response');
+      return BusinessExpandedModel.fromJson(response);
     } catch(error) {
       throw Exception(error);
     }

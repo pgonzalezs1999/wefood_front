@@ -5,6 +5,7 @@ import 'package:wefood/models/auth_model.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/types.dart';
 import 'package:sign_in_button/sign_in_button.dart';
+import 'package:wefood/views/register_business.dart';
 import 'package:wefood/views/register_user.dart';
 import 'package:wefood/views/terms_and_conditions.dart';
 import 'dart:io';
@@ -47,6 +48,13 @@ class _LoginState extends State<Login> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const RegisterUser()),
+    );
+  }
+
+  void _navigateToRegisterBusiness() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const RegisterBusiness()),
     );
   }
 
@@ -152,7 +160,7 @@ class _LoginState extends State<Login> {
               const Text('¿Quieres listar tu negocio?'),
               TextButton(
                 onPressed: () {
-                  // TODO falta esto
+                  _navigateToRegisterBusiness();
                 },
                 child: const Text('Regístralo gratis'),
               ),
@@ -164,9 +172,6 @@ class _LoginState extends State<Login> {
             },
             child: const Text('Términos y condiciones legales'),
           ),
-          ElevatedButton(onPressed: () {
-            printIps();
-          }, child: const Text('VER IPS'))
         ],
       ),
     );

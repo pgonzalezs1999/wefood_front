@@ -5,31 +5,32 @@ import 'package:wefood/components/loading_icon.dart';
 import 'package:wefood/components/wefood_input.dart';
 import 'package:wefood/components/wefood_screen.dart';
 import 'package:wefood/models/auth_model.dart';
-import 'package:wefood/models/user_model.dart';
+import 'package:wefood/models/business_expanded_model.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/types.dart';
 import 'package:wefood/views/terms_and_conditions.dart';
 
-class RegisterUser extends StatefulWidget {
-  const RegisterUser({super.key});
+class RegisterBusiness extends StatefulWidget {
+  const RegisterBusiness({super.key});
 
   @override
-  State<RegisterUser> createState() => _RegisterUserState();
+  State<RegisterBusiness> createState() => _RegisterBusinessState();
 }
 
-class _RegisterUserState extends State<RegisterUser> {
+class _RegisterBusinessState extends State<RegisterBusiness> {
 
   LoadingStatus authenticating = LoadingStatus.unset;
-  LoadingStatus searchingUsernameAvailability = LoadingStatus.unset;
   LoadingStatus searchingEmailAvailability = LoadingStatus.unset;
   String error = '';
-  String username = '';
-  bool usernameIsAvailable = false;
   String email = '';
   bool emailIsAvailable = false;
   String password = '';
   String confirmPassword = '';
+  String businessName = '';
+  String ruc = '';
+  String location = '';
+  int? phone;
   bool conditionsAccepted = false;
 
   void _navigateToTermsAndConditions() {
@@ -48,13 +49,7 @@ class _RegisterUserState extends State<RegisterUser> {
 
   bool _readyToRegister() {
     bool result = true;
-    if(username.length < 5) {
-      result = _setError('El nombre de usuario debe tener 5 caracteres o más');
-    } else if(username.length > 30) {
-      result = _setError('El nombre de usuario debe tener 30 caracteres o menos');
-    } else if(usernameIsAvailable == false) {
-      result = _setError('Nombre de usuario no disponible');
-    } else if(email.isEmail == false) {
+    if(email.isEmail == false) {
       result = _setError('Formato de email no válido');
     } else if(emailIsAvailable == false) {
       result = _setError('Correo electrónico no disponible');
@@ -83,24 +78,11 @@ class _RegisterUserState extends State<RegisterUser> {
         children: <Widget>[
           const Align(
             alignment: Alignment.centerLeft,
-            child: BackArrow(),
-          ),
-          SizedBox(
-            height: MediaQuery.of(context).size.height * 0.15,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                const Text('Regístrate en'),
-                Container(
-                  width: MediaQuery.of(context).size.width * 0.5,
-                  margin: EdgeInsets.only(
-                    top: MediaQuery.of(context).size.height * 0.01,
-                  ),
-                  child: Image.asset('assets/images/logo.png'),
-                ),
-              ],
+            child: BackArrow(
+              margin: EdgeInsets.zero,
             ),
-          ) ,
+          ),
+          const Text('Antes de comenzar, necesitamos algo de información'),
           Container(
             margin: EdgeInsets.symmetric(
               vertical: MediaQuery.of(context).size.height * 0.025,
@@ -112,56 +94,35 @@ class _RegisterUserState extends State<RegisterUser> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     WefoodInput(
-                      labelText: 'Nombre de usuario',
+                      upperTitle: '¿A qué email pueden contactar sus clientes?',
+                      upperDescription: 'Será también el que use para iniciar sesión',
+                      labelText: 'Correo electrónico',
                       onChanged: (value) async {
                         setState(() {
                           error = '';
-                          searchingUsernameAvailability = LoadingStatus.loading;
+                          searchingEmailAvailability = LoadingStatus.loading;
                         });
                         bool available = false;
                         try {
-                          available = await Api.checkUsernameAvailability(username: value);
+                          available = await Api.checkEmailAvailability(email: value);
                         } catch(e) {
                           available = false;
                         }
                         setState(() {
-                          username = value;
-                          usernameIsAvailable = available;
-                          searchingUsernameAvailability = LoadingStatus.successful;
+                          email = value;
+                          emailIsAvailable = available;
+                          searchingEmailAvailability = LoadingStatus.successful;
                         });
                       },
                     ),
                     const SizedBox(height: 15),
-                    if(searchingUsernameAvailability == LoadingStatus.loading) const LoadingIcon(),
-                    if(searchingUsernameAvailability != LoadingStatus.loading && username != "") Text(
-                      (usernameIsAvailable == false)
+                    if(searchingEmailAvailability == LoadingStatus.loading) const LoadingIcon(),
+                    if(searchingEmailAvailability != LoadingStatus.loading && email != "") Text(
+                      (emailIsAvailable == false)
                         ? ("Nombre de usuario no disponible")
                         : "¡Nombre de usuario libre!"
                     ),
                   ],
-                ),
-                WefoodInput(
-                  labelText: 'Correo electrónico',
-                  onChanged: (value) async {
-                    setState(() {
-                      error = '';
-                      searchingEmailAvailability = LoadingStatus.loading;
-                      email = value;
-                    });
-                    bool available = false;
-                    if(email.isEmail) {
-                      try {
-                        available = await Api.checkEmailAvailability(email: value);
-                      } catch(e) {
-                        available = false;
-                      }
-                    }
-                    setState(() {
-                      email = value;
-                      emailIsAvailable = available;
-                      searchingEmailAvailability = LoadingStatus.successful;
-                    });
-                  },
                 ),
                 const SizedBox(height: 15),
                 if(searchingEmailAvailability == LoadingStatus.loading) const LoadingIcon(),
@@ -190,9 +151,56 @@ class _RegisterUserState extends State<RegisterUser> {
                     });
                   },
                 ),
+                WefoodInput(
+                  labelText: 'Nombre de su negocio',
+                  onChanged: (value) {
+                    setState(() {
+                      error = '';
+                      businessName = value;
+                    });
+                  },
+                ),
+                WefoodInput(
+                  labelText: 'RUC de su negocio',
+                  onChanged: (value) {
+                    setState(() {
+                      error = '';
+                      ruc = value;
+                    });
+                  },
+                ),
+                WefoodInput(
+                  labelText: 'Ubicación de su negocio',
+                  onChanged: (value) {
+                    setState(() {
+                      error = '';
+                      location = value;
+                    });
+                  },
+                ),
+                const Text('¿A qué teléfono pueden llamar sus clientes?'),
+                Row(
+                  children: [
+                    const Text('Prefijos'), // TODO cambiar a desplegable con la info de Api.getAllCountries
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: WefoodInput(
+                        onChanged: (value) {
+                          setState(() {
+                            error = '';
+                            phone = 0; // TODO limitar que el input solo acepte numeros
+                          });
+                        },
+                        labelText: 'Número en sí',
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
+          const Text('Añade una foto para dar más confianza a tus clientes:'),
+          Image.asset('assets/images/logo.png'), // TODO cambiar esto por algo para elegir y guardar una foto
           Row(
             children: <Widget>[
               Checkbox(
@@ -226,16 +234,25 @@ class _RegisterUserState extends State<RegisterUser> {
                   authenticating = LoadingStatus.loading;
                 });
                 try {
-                  UserModel user = await Api.signIn(
-                      username: username,
-                      email: email,
-                      password: password,
+                  BusinessExpandedModel business = await Api.createBusiness(
+                    email: email,
+                    password: password,
+                    businessName: 'Nombre del business hardcodeado',
+                    businessDescription: 'Descripción del business hardcodeada',
+                    phonePrefix: 123,
+                    phone: 123456789,
+                    directions: 'Calle hardcodeada nº 404 bajo B',
+                    idCountry: 12345,
+                    taxId: 'Tax id hardcodeado',
+                    logoFile: Image.asset('assets/images/logo.png'),
+                    latitude: 123.456,
+                    longitude: 123.456,
                   );
-                  UserSecureStorage().write(key: 'username', value: username);
+                  UserSecureStorage().write(key: 'username', value: email);
                   UserSecureStorage().write(key: 'password', value: password);
                   AuthModel? auth = await Api.login(
                       context: context,
-                      username: username,
+                      username: email,
                       password: password
                   );
                   authenticating = LoadingStatus.successful;
@@ -254,18 +271,6 @@ class _RegisterUserState extends State<RegisterUser> {
             child: const Text('REGISTRARME'),
           ),
           if(error != '') Text(error),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              const Text('¿Quieres listar tu negocio?'),
-              TextButton(
-                onPressed: () {
-                  // TODO falta esto
-                },
-                child: const Text('Regístralo gratis'),
-              ),
-            ],
-          ),
         ],
       ),
     );
