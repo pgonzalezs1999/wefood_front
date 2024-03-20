@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:wefood/commands/share_app.dart';
 import 'package:wefood/components/profile_name.dart';
 import 'package:wefood/components/settings_element.dart';
 import 'package:wefood/components/wefood_navigation_screen.dart';
@@ -88,7 +90,7 @@ class _UserProfileState extends State<UserProfile> {
             ),
             SettingsElement(
               iconData: Icons.favorite,
-              title: 'Favoritos - FALTA',
+              title: 'Productos favoritos - FALTA',
               onTap: () {
                 // TODO falta esto
               },
@@ -102,11 +104,12 @@ class _UserProfileState extends State<UserProfile> {
             ),
             SettingsElement(
               iconData: Icons.share,
-              title: 'Comparte la app - FALTA',
-              onTap: () {
-                // TODO falta esto
+              title: 'Comparte la app',
+              onTap: () async {
+                await shareApp(context);
               },
-            ),SettingsElement(
+            ),
+            SettingsElement(
               iconData: Icons.support_agent,
               title: 'Contáctanos - FALTA',
               onTap: () {

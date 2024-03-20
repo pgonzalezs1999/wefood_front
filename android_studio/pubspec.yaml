@@ -19,6 +19,7 @@ dependencies:
   sign_in_button: ^3.2.0
   maps_launcher: ^2.2.1
   syncfusion_flutter_pdfviewer: ^24.2.8
+  share_plus: ^7.0.2
 
 dev_dependencies:
   flutter_test:
