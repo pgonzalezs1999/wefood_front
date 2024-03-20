@@ -40,7 +40,7 @@ class _UserProfileState extends State<UserProfile> {
     );
   }
 
-  void _deleteToken() async {
+  void _deleteTokens() async {
     await UserSecureStorage().delete(key: 'accessToken');
     await UserSecureStorage().delete(key: 'accessTokenExpiresAt');
     await UserSecureStorage().delete(key: 'username');
@@ -124,6 +124,26 @@ class _UserProfileState extends State<UserProfile> {
               },
             ),
             SettingsElement(
+              iconData: Icons.logout,
+              title: 'Cerrar sesión',
+              onTap: () {
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return WefoodPopup(
+                        title: '¿Seguro que quieres cerrar sesión?',
+                        onYes: () async {
+                          await Api.logout();
+                          _deleteTokens();
+                          Navigator.pop(context);
+                          _navigateToMain();
+                        },
+                      );
+                    }
+                );
+              },
+            ),
+            SettingsElement(
               iconData: Icons.business,
               title: 'Términos y condiciones',
               onTap: () {
@@ -131,30 +151,24 @@ class _UserProfileState extends State<UserProfile> {
               },
             ),
             SettingsElement(
-              iconData: Icons.logout,
-              title: 'Cerrar sesión',
+              iconData: Icons.delete,
+              title: 'Darme de baja',
               onTap: () {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
                     return WefoodPopup(
-                      title: '¿Seguro que quieres cerrar sesión?',
+                      title: '¿Seguro que quieres darte de baja?',
+                      description: 'Perderás toda tu información y no podrás recuperarla más adelante.',
                       onYes: () async {
-                        await Api.logout();
-                        _deleteToken();
+                        await Api.signOut();
+                        _deleteTokens();
                         Navigator.pop(context);
                         _navigateToMain();
                       },
                     );
                   }
                 );
-              },
-            ),
-            SettingsElement(
-              iconData: Icons.delete,
-              title: 'Darme de baja - FALTA',
-              onTap: () {
-                // TODO falta esto
               },
             ),
           ],

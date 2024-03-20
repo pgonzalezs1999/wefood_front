@@ -345,4 +345,15 @@ class Api {
       throw Exception(error);
     }
   }
+
+  static signOut() async {
+    try {
+      await Middleware.endpoint(
+        name: 'signout',
+        type: HttpType.post,
+      );
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
 }
