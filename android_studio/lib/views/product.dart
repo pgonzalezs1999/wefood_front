@@ -10,6 +10,7 @@ import 'package:wefood/models/comment_expanded_model.dart';
 import 'package:wefood/models/favourite_model.dart';
 import 'package:wefood/models/product_expanded_model.dart';
 import 'package:wefood/services/auth/api/api.dart';
+import 'package:wefood/views/loading_screen.dart';
 
 class Product extends StatefulWidget {
 
@@ -27,7 +28,7 @@ class Product extends StatefulWidget {
 
 class _ProductState extends State<Product> {
 
-  Widget resultWidget = const LoadingIcon();
+  Widget resultWidget = const LoadingScreen();
   Widget favouriteIcon = const Icon(Icons.favorite_outline);
   late ProductExpandedModel info;
 

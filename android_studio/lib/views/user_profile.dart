@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:wefood/commands/share_app.dart';
 import 'package:wefood/components/profile_name.dart';
 import 'package:wefood/components/settings_element.dart';
@@ -8,6 +7,7 @@ import 'package:wefood/components/wefood_popup.dart';
 import 'package:wefood/main.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/services/secure_storage.dart';
+import 'package:wefood/views/favourites_screen.dart';
 import 'package:wefood/views/terms_and_conditions.dart';
 
 class UserProfile extends StatefulWidget {
@@ -23,6 +23,13 @@ class _UserProfileState extends State<UserProfile> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const MyApp()),
+    );
+  }
+
+  void _navigateToFavourites() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const FavouritesScreen()),
     );
   }
 
@@ -45,8 +52,8 @@ class _UserProfileState extends State<UserProfile> {
     return WefoodNavigationScreen(
       children: [
         Container(
-          margin: EdgeInsets.only(
-            bottom: MediaQuery.of(context).size.height * 0.01,
+          margin: const EdgeInsets.only(
+            bottom: 20,
           ),
           child: Row(
             children: <Widget>[
@@ -90,9 +97,9 @@ class _UserProfileState extends State<UserProfile> {
             ),
             SettingsElement(
               iconData: Icons.favorite,
-              title: 'Productos favoritos - FALTA',
+              title: 'Productos favoritos',
               onTap: () {
-                // TODO falta esto
+                _navigateToFavourites();
               },
             ),
             SettingsElement(

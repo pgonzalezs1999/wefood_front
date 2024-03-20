@@ -5,7 +5,13 @@ import 'package:wefood/models/product_expanded_model.dart';
 import 'package:wefood/services/auth/api/api.dart';
 
 class ProductFavouriteList extends StatefulWidget {
-  const ProductFavouriteList({super.key});
+
+  final Axis axis;
+
+  const ProductFavouriteList({
+    super.key,
+    this.axis = Axis.horizontal,
+  });
 
   @override
   State<ProductFavouriteList> createState() => _ProductFavouriteListState();
@@ -28,14 +34,22 @@ class _ProductFavouriteListState extends State<ProductFavouriteList> {
         } else if(response.hasData) { // TODO devolver otra cosa si no hay favoritos
           if(response.data!.isNotEmpty) {
             resultWidget = SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: response.data!.map((ProductExpandedModel product) =>
+              scrollDirection: widget.axis,
+              child: (widget.axis == Axis.horizontal)
+                ? Row(
+                  children: response.data!.map((ProductExpandedModel product) =>
                     ProductButton(
                       horizontalScroll: true,
                       productExpanded: product,
                     )).toList(),
-              ),
+                  )
+                : Column(
+                  children: response.data!.map((ProductExpandedModel product) =>
+                    ProductButton(
+                      horizontalScroll: false,
+                      productExpanded: product,
+                    )).toList(),
+                  ),
             );
           }
           else {
