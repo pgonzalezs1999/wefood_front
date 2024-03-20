@@ -7,6 +7,7 @@ import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/views/admin_management.dart';
 import 'package:wefood/views/business_management.dart';
 import 'package:wefood/views/business_profile.dart';
+import 'package:wefood/views/loading_screen.dart';
 import 'package:wefood/views/user_explore.dart';
 import 'package:wefood/views/user_profile.dart';
 
@@ -131,7 +132,7 @@ class _HomeState extends State<Home> {
             ),
           );
         } else {
-          return const Text('Hola'); // TODO a veces se ve negro mientras carga
+          return const LoadingScreen();
         }
       }
     );
