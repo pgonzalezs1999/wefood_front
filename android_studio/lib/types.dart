@@ -1,6 +1,7 @@
 enum InputType {
   normal,
   secret,
+  integer,
   date,
 }
 

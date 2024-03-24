@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:wefood/components/back_arrow.dart';
 import 'package:wefood/components/loading_icon.dart';
+import 'package:wefood/components/phone_input.dart';
 import 'package:wefood/components/wefood_input.dart';
 import 'package:wefood/components/wefood_screen.dart';
 import 'package:wefood/models/auth_model.dart';
 import 'package:wefood/models/business_expanded_model.dart';
+import 'package:wefood/models/country_model.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/types.dart';
@@ -22,15 +24,18 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
 
   LoadingStatus authenticating = LoadingStatus.unset;
   LoadingStatus searchingEmailAvailability = LoadingStatus.unset;
+  LoadingStatus searchingPhoneAvailability = LoadingStatus.unset;
   String error = '';
   String email = '';
   bool emailIsAvailable = false;
+  bool phoneIsAvailable = false;
   String password = '';
   String confirmPassword = '';
   String businessName = '';
   String ruc = '';
   String location = '';
-  int? phone;
+  int prefix = 51; // Perú
+  String phone = '';
   bool conditionsAccepted = false;
 
   void _navigateToTermsAndConditions() {
@@ -38,6 +43,13 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
       context,
       MaterialPageRoute(builder: (context) => const TermsAndConditions()),
     );
+  }
+
+  void onChangedPrefix(CountryModel country) {
+    setState(() {
+      error = '';
+      prefix = country.prefix;
+    });
   }
 
   bool _setError(String reason) {
@@ -50,7 +62,7 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
   bool _readyToRegister() {
     bool result = true;
     if(email.isEmail == false) {
-      result = _setError('Formato de email no válido');
+      result = _setError('Formato de correo no válido');
     } else if(emailIsAvailable == false) {
       result = _setError('Correo electrónico no disponible');
     } else if(password.length < 6) {
@@ -59,6 +71,14 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
       result = _setError('La contraseña debe tener 20 caracteres o menos');
     } else if(confirmPassword != password) {
       result = _setError('La contraseña y confirmar contraseña no coinciden');
+    } else if(phone == '') {
+      result = _setError('El campo teléfono es obligatorio');
+    } else if(int.parse(phone) < 9999999) {
+      result = _setError('El teléfono debe tener 8 dígitos o más');
+    } else if(int.parse(phone) > 1000000000000) {
+      result = _setError('El teléfono debe tener 12 dígitos o menos');
+    } else if(phoneIsAvailable == false) {
+      result = _setError('Teléfono no disponible');
     } else if(conditionsAccepted == false) {
       result = _setError('Necesitamos que aceptes los términos y condiciones para usar la app');
     } else {
@@ -76,16 +96,25 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              BackArrow(
+                margin: EdgeInsets.zero,
+              ),
+              Text('Registro de establecimiento'),
+            ],
+          ),
+          const SizedBox(
+            height: 10,
+          ),
           const Align(
             alignment: Alignment.centerLeft,
-            child: BackArrow(
-              margin: EdgeInsets.zero,
-            ),
+            child: Text('Antes de comenzar, necesitamos algo de información'),
           ),
-          const Text('Antes de comenzar, necesitamos algo de información'),
           Container(
-            margin: EdgeInsets.symmetric(
-              vertical: MediaQuery.of(context).size.height * 0.025,
+            margin: const EdgeInsets.symmetric(
+              vertical: 10,
             ),
             child: Wrap(
               runSpacing: MediaQuery.of(context).size.height * 0.025,
@@ -100,36 +129,36 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
                       onChanged: (value) async {
                         setState(() {
                           error = '';
-                          searchingEmailAvailability = LoadingStatus.loading;
-                        });
-                        bool available = false;
-                        try {
-                          available = await Api.checkEmailAvailability(email: value);
-                        } catch(e) {
-                          available = false;
-                        }
-                        setState(() {
                           email = value;
-                          emailIsAvailable = available;
-                          searchingEmailAvailability = LoadingStatus.successful;
+                          if(value.isEmail) {
+                            searchingEmailAvailability = LoadingStatus.loading;
+                          }
                         });
+                        if(value.isEmail) {
+                          bool available = false;
+                          try {
+                            available = await Api.checkEmailAvailability(email: value);
+                          } catch(e) {
+                            available = false;
+                          }
+                          setState(() {
+                            email = value;
+                            emailIsAvailable = available;
+                            searchingEmailAvailability = LoadingStatus.successful;
+                          });
+                        }
                       },
                     ),
                     const SizedBox(height: 15),
                     if(searchingEmailAvailability == LoadingStatus.loading) const LoadingIcon(),
-                    if(searchingEmailAvailability != LoadingStatus.loading && email != "") Text(
-                      (emailIsAvailable == false)
-                        ? ("Nombre de usuario no disponible")
-                        : "¡Nombre de usuario libre!"
+                    if(searchingEmailAvailability != LoadingStatus.loading && email != '') Text(
+                      (email.isEmail) ?
+                        (emailIsAvailable == false)
+                          ? 'Correo no disponible'
+                          : '¡Correo libre!'
+                        : 'Formato de correo incorrecto'
                     ),
                   ],
-                ),
-                const SizedBox(height: 15),
-                if(searchingEmailAvailability == LoadingStatus.loading) const LoadingIcon(),
-                if(searchingEmailAvailability != LoadingStatus.loading && email != "") Text(
-                  (emailIsAvailable == false)
-                    ? ("Correo electrónico no disponible")
-                    : "¡Correo electrónico libre!"
                 ),
                 WefoodInput(
                   labelText: 'Contraseña',
@@ -179,28 +208,39 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
                   },
                 ),
                 const Text('¿A qué teléfono pueden llamar sus clientes?'),
-                Row(
-                  children: [
-                    const Text('Prefijos'), // TODO cambiar a desplegable con la info de Api.getAllCountries
-                    const SizedBox(width: 20),
-                    Expanded(
-                      child: WefoodInput(
-                        onChanged: (value) {
-                          setState(() {
-                            error = '';
-                            phone = 0; // TODO limitar que el input solo acepte numeros
-                          });
-                        },
-                        labelText: 'Número en sí',
-                      ),
-                    ),
-                  ],
-                ),
+                PhoneInput(
+                  onChangedPrefix: onChangedPrefix,
+                  onChangedNumber: (String value) {
+                    setState(() {
+                      error = '';
+                      phone = value;
+                    });
+                  },
+                  // TODO meter aquí un onCheckAvailability y llamar al endpoint desde PhoneInput
+                )
               ],
             ),
           ),
           const Text('Añade una foto para dar más confianza a tus clientes:'),
-          Image.asset('assets/images/logo.png'), // TODO cambiar esto por algo para elegir y guardar una foto
+          Container(
+            padding: EdgeInsets.symmetric(
+              vertical: MediaQuery.of(context).size.height * 0.025,
+            ),
+            child: ClipRRect( // TODO cambiar esto por algo para elegir y guardar una foto
+              borderRadius: BorderRadius.circular(999),
+              child: SizedBox.fromSize(
+                size: Size.fromRadius(MediaQuery.of(context).size.width * 0.15),
+                child: Container(
+                  color: Colors.black.withOpacity(0.15),
+                  child: Icon(
+                    Icons.add,
+                    size: MediaQuery.of(context).size.width * 0.2,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+            ),
+          ),
           Row(
             children: <Widget>[
               Checkbox(
@@ -271,6 +311,9 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
             child: const Text('REGISTRARME'),
           ),
           if(error != '') Text(error),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.1,
+          )
         ],
       ),
     );

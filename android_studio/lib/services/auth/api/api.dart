@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wefood/models/auth_model.dart';
 import 'package:wefood/models/business_expanded_model.dart';
+import 'package:wefood/models/country_model.dart';
 import 'package:wefood/models/exceptions.dart';
 import 'package:wefood/models/favourite_model.dart';
 import 'package:wefood/models/product_expanded_model.dart';
@@ -309,6 +310,37 @@ class Api {
           }
       );
       return response['availability'];
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static Future<bool> checkPhoneAvailability({
+    required String email,
+  }) async {
+    try {
+      dynamic response = await Middleware.endpoint(
+          name: 'checkPhoneAvailability',
+          type: HttpType.post,
+          body: {
+            'phone': email.toString(),
+          }
+      );
+      return response['availability'];
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static Future<List<CountryModel>> getAllCountries() async {
+    try {
+      dynamic response = await Middleware.endpoint(
+        name: 'getAllCountries',
+        type: HttpType.get,
+        needsAccessToken: false,
+      );
+      List<CountryModel> countries = (response['message'] as List<dynamic>).map((country) => CountryModel.fromJson(country)).toList();
+      return countries;
     } catch(error) {
       throw Exception(error);
     }

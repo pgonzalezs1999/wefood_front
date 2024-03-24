@@ -39,9 +39,6 @@ class Middleware {
     body,
     bool needsAccessToken = true,
   }) async {
-    if(type == HttpType.get && needsAccessToken == false) {
-      Exception("All GET endpoints require an access token");
-    }
     String? accessToken = await UserSecureStorage().read(key: 'accessToken');
     final auth = needsAccessToken ? { 'Authorization': 'Bearer $accessToken' } : null;
     final Uri url = Uri.parse('${Environment.apiUrl}$name');

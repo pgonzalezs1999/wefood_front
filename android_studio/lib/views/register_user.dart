@@ -9,6 +9,7 @@ import 'package:wefood/models/user_model.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/types.dart';
+import 'package:wefood/views/register_business.dart';
 import 'package:wefood/views/terms_and_conditions.dart';
 
 class RegisterUser extends StatefulWidget {
@@ -31,6 +32,13 @@ class _RegisterUserState extends State<RegisterUser> {
   String password = '';
   String confirmPassword = '';
   bool conditionsAccepted = false;
+
+  void _navigateToRegisterBusiness() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const RegisterBusiness()),
+    );
+  }
 
   void _navigateToTermsAndConditions() {
     Navigator.push(
@@ -55,7 +63,7 @@ class _RegisterUserState extends State<RegisterUser> {
     } else if(usernameIsAvailable == false) {
       result = _setError('Nombre de usuario no disponible');
     } else if(email.isEmail == false) {
-      result = _setError('Formato de email no válido');
+      result = _setError('Formato de correo no válido');
     } else if(emailIsAvailable == false) {
       result = _setError('Correo electrónico no disponible');
     } else if(password.length < 6) {
@@ -260,7 +268,7 @@ class _RegisterUserState extends State<RegisterUser> {
               const Text('¿Quieres listar tu negocio?'),
               TextButton(
                 onPressed: () {
-                  // TODO falta esto
+                  _navigateToRegisterBusiness();
                 },
                 child: const Text('Regístralo gratis'),
               ),

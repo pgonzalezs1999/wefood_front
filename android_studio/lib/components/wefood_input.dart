@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:wefood/types.dart';
 
 class WefoodInput extends StatefulWidget {
@@ -39,7 +40,8 @@ class WefoodInputState extends State<WefoodInput> {
         if(widget.upperTitle != '') Text(widget.upperTitle),
         if(widget.upperDescription != '') Text(widget.upperDescription),
         TextFormField(
-          keyboardType: TextInputType.visiblePassword,
+          keyboardType: widget.type == InputType.integer ? TextInputType.number : TextInputType.visiblePassword,
+          inputFormatters: widget.type == InputType.integer ? <TextInputFormatter>[FilteringTextInputFormatter.digitsOnly] : null,
           obscureText: _obscureText,
           onChanged: (text) => widget.onChanged(text),
           initialValue: widget.initialText,
