@@ -63,7 +63,7 @@ class _RegisterUserState extends State<RegisterUser> {
     } else if(usernameIsAvailable == false) {
       result = _setError('Nombre de usuario no disponible');
     } else if(email.isEmail == false) {
-      result = _setError('Formato de correo no válido');
+      result = _setError('Formato de correo incorrecto');
     } else if(emailIsAvailable == false) {
       result = _setError('Correo electrónico no disponible');
     } else if(password.length < 6) {

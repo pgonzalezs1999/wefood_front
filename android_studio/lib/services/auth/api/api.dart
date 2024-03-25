@@ -316,14 +316,31 @@ class Api {
   }
 
   static Future<bool> checkPhoneAvailability({
-    required String email,
+    required String phone,
   }) async {
     try {
       dynamic response = await Middleware.endpoint(
           name: 'checkPhoneAvailability',
           type: HttpType.post,
           body: {
-            'phone': email.toString(),
+            'phone': phone.toString(),
+          }
+      );
+      return response['availability'];
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static Future<bool> checkTaxIdAvailability({
+    required String taxId,
+  }) async {
+    try {
+      dynamic response = await Middleware.endpoint(
+          name: 'checkTaxIdAvailability',
+          type: HttpType.post,
+          body: {
+            'tax_id': taxId.toString(),
           }
       );
       return response['availability'];

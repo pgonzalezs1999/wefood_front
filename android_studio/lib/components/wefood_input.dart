@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wefood/types.dart';
 
+List<String> positiveFeedback = [
+  '¡Correo libre!',
+  '¡RUC libre!',
+  '¡Teléfono libre!'
+];
+
 class WefoodInput extends StatefulWidget {
   final InputType type;
   final Function(String) onChanged;
@@ -9,6 +15,7 @@ class WefoodInput extends StatefulWidget {
   final String? initialText;
   final String upperTitle;
   final String upperDescription;
+  final String? errorText;
 
   const WefoodInput({
     super.key,
@@ -18,6 +25,7 @@ class WefoodInput extends StatefulWidget {
     this.initialText,
     this.upperTitle = '',
     this.upperDescription = '',
+    this.errorText,
   });
 
   @override
@@ -37,8 +45,22 @@ class WefoodInputState extends State<WefoodInput> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if(widget.upperTitle != '') Text(widget.upperTitle),
-        if(widget.upperDescription != '') Text(widget.upperDescription),
+        if(widget.upperTitle != '') Column(
+          children: <Widget>[
+            Text(widget.upperTitle),
+            const SizedBox(
+              height: 10,
+            ),
+          ],
+        ),
+        if(widget.upperDescription != '') Column(
+          children: <Widget>[
+            Text(widget.upperDescription),
+            const SizedBox(
+              height: 10,
+            ),
+          ],
+        ),
         TextFormField(
           keyboardType: widget.type == InputType.integer ? TextInputType.number : TextInputType.visiblePassword,
           inputFormatters: widget.type == InputType.integer ? <TextInputFormatter>[FilteringTextInputFormatter.digitsOnly] : null,
@@ -66,6 +88,22 @@ class WefoodInputState extends State<WefoodInput> {
             ) : null,
           ),
         ),
+        if(widget.errorText != null) Column(
+          children: <Widget>[
+            const SizedBox(
+              height: 10,
+            ),
+            Text(
+              widget.errorText!,
+              style: TextStyle(
+                color: (positiveFeedback.contains(widget.errorText))
+                  ? null
+                  : Colors.red,
+                fontWeight: FontWeight.bold,
+              ),
+            )
+          ],
+        )
       ],
     );
   }

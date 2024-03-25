@@ -1,5 +1,8 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:wefood/components/back_arrow.dart';
 import 'package:wefood/components/loading_icon.dart';
 import 'package:wefood/components/phone_input.dart';
@@ -21,22 +24,25 @@ class RegisterBusiness extends StatefulWidget {
 }
 
 class _RegisterBusinessState extends State<RegisterBusiness> {
-
   LoadingStatus authenticating = LoadingStatus.unset;
   LoadingStatus searchingEmailAvailability = LoadingStatus.unset;
   LoadingStatus searchingPhoneAvailability = LoadingStatus.unset;
+  LoadingStatus searchingRucAvailability = LoadingStatus.unset;
   String error = '';
   String email = '';
   bool emailIsAvailable = false;
   bool phoneIsAvailable = false;
+  bool rucIsAvailable = false;
   String password = '';
   String confirmPassword = '';
   String businessName = '';
+  String businessDescription = '';
   String ruc = '';
   String location = '';
   int prefix = 51; // Perú
   String phone = '';
   bool conditionsAccepted = false;
+  LatLng businessLocation = const LatLng(-12.063449, -77.014574); // TODO poner aquí la ubicación del usuario si nos la da
 
   void _navigateToTermsAndConditions() {
     Navigator.push(
@@ -62,7 +68,7 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
   bool _readyToRegister() {
     bool result = true;
     if(email.isEmail == false) {
-      result = _setError('Formato de correo no válido');
+      result = _setError('Formato de correo incorrecto');
     } else if(emailIsAvailable == false) {
       result = _setError('Correo electrónico no disponible');
     } else if(password.length < 6) {
@@ -71,6 +77,20 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
       result = _setError('La contraseña debe tener 20 caracteres o menos');
     } else if(confirmPassword != password) {
       result = _setError('La contraseña y confirmar contraseña no coinciden');
+    } else if(businessName.length < 6) {
+      result = _setError('El nombre del establecimiento debe tener 6 caracteres o más');
+    } else if(businessName.length > 100) {
+      result = _setError('El nombre del establecimiento es demasiado largo');
+    } else if(businessDescription.length < 6) {
+      result = _setError('La descripción del establecimiento debe tener 6 caracteres o más');
+    } else if(businessDescription.length > 255) {
+      result = _setError('La descripción del establecimiento es demasiado larga');
+    } else if(ruc.length < 6) {
+      result = _setError('El RUC es demasiado corto');
+    } else if(ruc.length > 50) {
+      result = _setError('El RUC es demasiado largo');
+    } else if(rucIsAvailable == false) {
+      result = _setError('RUC no disponible');
     } else if(phone == '') {
       result = _setError('El campo teléfono es obligatorio');
     } else if(int.parse(phone) < 9999999) {
@@ -148,16 +168,16 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
                           });
                         }
                       },
+                      errorText: (searchingEmailAvailability != LoadingStatus.loading && email != '')
+                        ? (email.isEmail)
+                          ? (emailIsAvailable == true)
+                            ? '¡Correo libre!'
+                            : 'Correo no disponible'
+                          : 'Formato de correo incorrecto'
+                        : null
                     ),
                     const SizedBox(height: 15),
                     if(searchingEmailAvailability == LoadingStatus.loading) const LoadingIcon(),
-                    if(searchingEmailAvailability != LoadingStatus.loading && email != '') Text(
-                      (email.isEmail) ?
-                        (emailIsAvailable == false)
-                          ? 'Correo no disponible'
-                          : '¡Correo libre!'
-                        : 'Formato de correo incorrecto'
-                    ),
                   ],
                 ),
                 WefoodInput(
@@ -181,43 +201,143 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
                   },
                 ),
                 WefoodInput(
-                  labelText: 'Nombre de su negocio',
+                  labelText: 'Nombre de su establecimiento',
                   onChanged: (value) {
                     setState(() {
                       error = '';
                       businessName = value;
                     });
                   },
+                  errorText: (businessName.isEmpty == false && businessName.length < 6)
+                    ? 'Nombre demasiado corto'
+                    : (businessName.isEmpty == false && businessName.length > 100)
+                      ? 'Nombre demasiado largo'
+                      : null,
+                ),
+                WefoodInput(
+                  upperDescription: 'Por si alguien aún no conoce su establecimiento, le recomendamos que añada una descripción',
+                  labelText: 'Descripción de su establecimiento',
+                  onChanged: (value) {
+                    setState(() {
+                      error = '';
+                      businessDescription = value;
+                    });
+                  },
+                  errorText: (businessDescription.isEmpty == false && businessDescription.length < 6)
+                    ? 'Descripción demasiado corta'
+                    : (businessDescription.isEmpty == false && businessDescription.length > 255)
+                      ? 'Descripción demasiado larga'
+                      : null,
                 ),
                 WefoodInput(
                   labelText: 'RUC de su negocio',
-                  onChanged: (value) {
+                  onChanged: (String value) async {
                     setState(() {
                       error = '';
                       ruc = value;
+                      if(6 < ruc.length && ruc.length < 50) {
+                        searchingRucAvailability = LoadingStatus.loading;
+                      }
                     });
+                    if(6 < ruc.length && ruc.length < 50) {
+                      bool available = false;
+                      try {
+                        available = await Api.checkTaxIdAvailability(taxId: ruc);
+                      } catch (e) {
+                        available = false;
+                      }
+                      setState(() {
+                        rucIsAvailable = available;
+                        searchingRucAvailability = LoadingStatus.successful;
+                      });
+                    }
                   },
+                  errorText: (searchingRucAvailability != LoadingStatus.loading && ruc.isEmpty == false)
+                  ? (ruc.length < 6)
+                    ? 'RUC demasiado corto'
+                    : (ruc.length > 50)
+                      ? 'RUC demasiado largo'
+                      : (rucIsAvailable == true)
+                        ? '¡RUC libre!'
+                        : 'RUC no disponible'
+                  : null,
                 ),
-                WefoodInput(
-                  labelText: 'Ubicación de su negocio',
-                  onChanged: (value) {
-                    setState(() {
-                      error = '';
-                      location = value;
-                    });
-                  },
+                const SizedBox(height: 15),
+                if(searchingRucAvailability == LoadingStatus.loading) const LoadingIcon(),
+
+
+
+
+
+
+
+                SizedBox(
+                  height: MediaQuery.of(context).size.width,
+                  width: MediaQuery.of(context).size.width,
+                  child: GoogleMap(
+                    gestureRecognizers: <Factory<OneSequenceGestureRecognizer>> {
+                      Factory<OneSequenceGestureRecognizer>(
+                        () => EagerGestureRecognizer() // Skip screen scroll on touch
+                      ),
+                    },
+                    initialCameraPosition: CameraPosition(
+                      target: businessLocation,
+                      zoom: 15,
+                    ),
+                    markers: {
+                      Marker(
+                        markerId: const MarkerId('location'),
+                        icon: BitmapDescriptor.defaultMarker,
+                        position: businessLocation,
+                      ),
+                    },
+                  ),
                 ),
+
+
+
+
+
+
+
+
+
+
                 const Text('¿A qué teléfono pueden llamar sus clientes?'),
                 PhoneInput(
                   onChangedPrefix: onChangedPrefix,
-                  onChangedNumber: (String value) {
+                  onChangedNumber: (String value) async {
                     setState(() {
                       error = '';
                       phone = value;
+                      if(9999999 < int.parse(phone) && int.parse(phone) < 1000000000000) {
+                        searchingPhoneAvailability = LoadingStatus.loading;
+                      }
                     });
+                    if(9999999 < int.parse(phone) && int.parse(phone) < 1000000000000) {
+                      bool available = false;
+                      try {
+                        available = await Api.checkPhoneAvailability(phone: phone);
+                      } catch(e) {
+                        available = false;
+                      }
+                      setState(() {
+                        phoneIsAvailable = available;
+                        searchingPhoneAvailability = LoadingStatus.successful;
+                      });
+                    }
                   },
-                  // TODO meter aquí un onCheckAvailability y llamar al endpoint desde PhoneInput
-                )
+                ),
+                if(searchingPhoneAvailability == LoadingStatus.loading) const LoadingIcon(),
+                if(searchingPhoneAvailability != LoadingStatus.loading && phone != '') Text(
+                  (int.parse(phone) < 9999999)
+                    ? 'Teléfono demasiado corto'
+                    : (int.parse(phone) > 1000000000000)
+                      ? 'Teléfono demasiado largo'
+                      : (phoneIsAvailable == false)
+                        ? 'Teléfono no disponible'
+                        : '¡Teléfono libre!'
+                ),
               ],
             ),
           ),
@@ -310,7 +430,13 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
             },
             child: const Text('REGISTRARME'),
           ),
-          if(error != '') Text(error),
+          const SizedBox(
+            height: 20,
+          ),
+          if(error != '') Text(
+            error,
+            textAlign: TextAlign.center,
+          ),
           SizedBox(
             height: MediaQuery.of(context).size.height * 0.1,
           )
