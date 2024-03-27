@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'package:wefood/components/loading_icon.dart';
 import 'package:wefood/components/phone_input.dart';
 import 'package:wefood/components/wefood_input.dart';
 import 'package:wefood/components/wefood_screen.dart';
+import 'package:wefood/environment.dart';
 import 'package:wefood/models/auth_model.dart';
 import 'package:wefood/models/business_expanded_model.dart';
 import 'package:wefood/models/country_model.dart';
@@ -17,6 +19,7 @@ import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/types.dart';
 import 'package:wefood/views/terms_and_conditions.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:http/http.dart' as http;
 
 class RegisterBusiness extends StatefulWidget {
   const RegisterBusiness({super.key});
@@ -44,7 +47,13 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
   int prefix = 51; // Perú
   String phone = '';
   bool conditionsAccepted = false;
-  LatLng businessLocation = const LatLng(-12.063449, -77.014574); // TODO poner aquí la ubicación del usuario si nos la da
+  LatLng userLocation = const LatLng(-12.063449, -77.014574); // TODO poner aquí la ubicación del usuario si nos la da
+  LatLng? businessLocation;
+  String businessLocationString = '';
+  CameraPosition cameraPosition = const CameraPosition(
+    target: LatLng(-12.063449, -77.014574),
+    zoom: 15,
+  );
 
   void _navigateToTermsAndConditions() {
     Navigator.push(
@@ -57,6 +66,58 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
     setState(() {
       error = '';
       prefix = country.prefix;
+    });
+  }
+
+  getUserLocation() async {
+    PermissionStatus permissionStatus = await Permission.location.request();
+    if(permissionStatus.isGranted) {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.best,
+      );
+      setState(() {
+        userLocation = LatLng(position.latitude, position.longitude);
+        cameraPosition = CameraPosition(
+          target: userLocation,
+          zoom: 15,
+        );
+      });
+    }
+  }
+
+  Future<LatLng> getLatLngFromAddress(String address) async {
+    final query = Uri.encodeQueryComponent(address);
+    final url = 'https://maps.googleapis.com/maps/api/geocode/json?address=$query&key=${Environment.googleMapsApiKey}';
+    try {
+      final response = await http.get(Uri.parse(url));
+      if(response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final results = data['results'] as List<dynamic>;
+        if(results.isNotEmpty) {
+          final location = results[0]['geometry']['location'];
+          final lat = location['lat'] as double;
+          final lng = location['lng'] as double;
+          return LatLng(lat, lng);
+        } else {
+          throw Exception('No se encontraron resultados para la dirección proporcionada.');
+        }
+      } else {
+        throw Exception('Hubo un error al obtener los datos de geocodificación. Código de estado: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error en la solicitud de geocodificación: $e');
+    }
+  }
+
+  void updateMarker(businessLocationString) async {
+    LatLng newLocation = await getLatLngFromAddress(businessLocationString);
+    print('NEW_LOCATION = ${newLocation.longitude} - ${newLocation.latitude}');
+    setState(() {
+      businessLocation = newLocation;
+      cameraPosition = CameraPosition(
+        target: businessLocation!,
+        zoom: 15,
+      );
     });
   }
 
@@ -266,8 +327,41 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
                 ),
                 const SizedBox(height: 15),
                 if(searchingRucAvailability == LoadingStatus.loading) const LoadingIcon(),
-
-
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: WefoodInput(
+                        labelText: 'Ubicación de su negocio',
+                        onChanged: (String value) async {
+                          setState(() {
+                            businessLocationString = value;
+                          });
+                        },
+                        errorText: (searchingRucAvailability != LoadingStatus.loading && ruc.isEmpty == false)
+                            ? (ruc.length < 6)
+                            ? 'RUC demasiado corto'
+                            : (ruc.length > 50)
+                            ? 'RUC demasiado largo'
+                            : (rucIsAvailable == true)
+                            ? '¡RUC libre!'
+                            : 'RUC no disponible'
+                            : null,
+                      ),
+                    ),
+                    ElevatedButton(
+                        onPressed: () async {
+                          print('BUSINESS_LOCATION_STRING = $businessLocationString');
+                          setState(() {
+                            error = '';
+                            if(businessLocationString != '') {
+                              updateMarker(businessLocationString);
+                            }
+                          });
+                        },
+                        child: const Text('Buscar'),
+                    )
+                  ],
+                ),
 
 
 
@@ -279,25 +373,32 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
                   child: GoogleMap(
                     gestureRecognizers: <Factory<OneSequenceGestureRecognizer>> {
                       Factory<OneSequenceGestureRecognizer>(
-                        () => EagerGestureRecognizer() // Skip screen scroll on touch
+                        () => EagerGestureRecognizer() // Skip screen scroll on GoogleMap touch
                       ),
                     },
-                    initialCameraPosition: CameraPosition(
-                      target: businessLocation,
-                      zoom: 15,
-                    ),
+                    initialCameraPosition:cameraPosition,
                     markers: {
                       Marker(
                         markerId: const MarkerId('location'),
                         icon: BitmapDescriptor.defaultMarker,
-                        position: businessLocation,
+                        position: userLocation,
+                      ),
+                      Marker(
+                        markerId: const MarkerId('pruebas'),
+                        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+                        position: LatLng(userLocation.latitude + 0.001, userLocation.longitude + 0.001),
+                      ),
+                      if(businessLocation != null) Marker(
+                        markerId: const MarkerId('typed'),
+                        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+                        position: LatLng(businessLocation!.latitude, businessLocation!.longitude + 0.001),
                       ),
                     },
+                    onMapCreated: (GoogleMapController gmc) => getUserLocation(),
+                    myLocationEnabled: true,
+                    myLocationButtonEnabled: true,
                   ),
                 ),
-
-
-
 
 
 
@@ -441,19 +542,6 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
           ),
           SizedBox(
             height: MediaQuery.of(context).size.height * 0.1,
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              print(await Permission.location.status);
-              PermissionStatus permissionStatus = await Permission.location.request();
-              if(permissionStatus.isGranted) {
-                Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
-                print('Ubicación actual - Latitud: ${position.latitude}, Longitud: ${position.longitude}');
-              } else {
-                print('Permiso de ubicación denegado');
-              }
-            },
-            child: const Text('GET LOCATION'),
           ),
         ],
       ),
