@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -5,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:wefood/components/back_arrow.dart';
 import 'package:wefood/components/loading_icon.dart';
 import 'package:wefood/components/phone_input.dart';
@@ -18,7 +20,6 @@ import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/types.dart';
 import 'package:wefood/views/terms_and_conditions.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:http/http.dart' as http;
 
 class RegisterBusiness extends StatefulWidget {
@@ -42,31 +43,27 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
   String confirmPassword = '';
   String businessName = '';
   String businessDescription = '';
-  String ruc = '';
   String location = '';
+  String ruc = '';
   int prefix = 51; // Perú
   String phone = '';
   bool conditionsAccepted = false;
+
+  final Completer<GoogleMapController> _mapController = Completer<GoogleMapController>();
   LatLng userLocation = const LatLng(-12.063449, -77.014574); // TODO poner aquí la ubicación del usuario si nos la da
   LatLng? businessLocation;
   String businessLocationString = '';
   CameraPosition cameraPosition = const CameraPosition(
     target: LatLng(-12.063449, -77.014574),
-    zoom: 15,
+    zoom: 16,
   );
+  bool errorOnFindingLocation = false;
 
   void _navigateToTermsAndConditions() {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const TermsAndConditions()),
     );
-  }
-
-  void onChangedPrefix(CountryModel country) {
-    setState(() {
-      error = '';
-      prefix = country.prefix;
-    });
   }
 
   getUserLocation() async {
@@ -79,10 +76,31 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
         userLocation = LatLng(position.latitude, position.longitude);
         cameraPosition = CameraPosition(
           target: userLocation,
-          zoom: 15,
+          zoom: 16,
         );
       });
     }
+  }
+
+  Future<void> _cameraToPosition(LatLng newPosition) async {
+    final GoogleMapController controller = await _mapController.future;
+    CameraPosition newCameraPosition = CameraPosition(
+      target: newPosition,
+      zoom: 16,
+    );
+    await controller.animateCamera(CameraUpdate.newCameraPosition(newCameraPosition));
+  }
+
+  updateMarker(businessLocationString) async {
+    LatLng newLocation = await getLatLngFromAddress(businessLocationString);
+    setState(() {
+      location = businessLocationString;
+      businessLocation = newLocation;
+      cameraPosition = CameraPosition(
+        target: businessLocation!,
+        zoom: 16,
+      );
+    });
   }
 
   Future<LatLng> getLatLngFromAddress(String address) async {
@@ -109,15 +127,10 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
     }
   }
 
-  void updateMarker(businessLocationString) async {
-    LatLng newLocation = await getLatLngFromAddress(businessLocationString);
-    print('NEW_LOCATION = ${newLocation.longitude} - ${newLocation.latitude}');
+  void onChangedPrefix(CountryModel country) {
     setState(() {
-      businessLocation = newLocation;
-      cameraPosition = CameraPosition(
-        target: businessLocation!,
-        zoom: 15,
-      );
+      error = '';
+      prefix = country.prefix;
     });
   }
 
@@ -328,47 +341,58 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
                 const SizedBox(height: 15),
                 if(searchingRucAvailability == LoadingStatus.loading) const LoadingIcon(),
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: <Widget>[
                     Expanded(
                       child: WefoodInput(
+                        upperTitle: 'Añada la ubicación de su negocio',
+                        upperDescription: 'Escriba la dirección lo más exacta posible, y compruebe en el mapa que es correcta',
                         labelText: 'Ubicación de su negocio',
-                        onChanged: (String value) async {
+                        onChanged: (String value) {
                           setState(() {
+                            errorOnFindingLocation = false;
                             businessLocationString = value;
+                            error = '';
                           });
                         },
-                        errorText: (searchingRucAvailability != LoadingStatus.loading && ruc.isEmpty == false)
-                            ? (ruc.length < 6)
-                            ? 'RUC demasiado corto'
-                            : (ruc.length > 50)
-                            ? 'RUC demasiado largo'
-                            : (rucIsAvailable == true)
-                            ? '¡RUC libre!'
-                            : 'RUC no disponible'
-                            : null,
+                        errorText: (errorOnFindingLocation == true) ? 'No se ha encontrado ubicación para esas direcciones' : null,
                       ),
                     ),
-                    ElevatedButton(
-                        onPressed: () async {
-                          print('BUSINESS_LOCATION_STRING = $businessLocationString');
-                          setState(() {
-                            error = '';
-                            if(businessLocationString != '') {
-                              updateMarker(businessLocationString);
-                            }
-                          });
-                        },
-                        child: const Text('Buscar'),
+                    IconButton(
+                      onPressed: () async {
+                        if(businessLocationString != '') {
+                          try {
+                            errorOnFindingLocation = false;
+                            await updateMarker(businessLocationString);
+                            await _cameraToPosition(businessLocation!);
+                          } catch(e) {
+                            setState(() {
+                              errorOnFindingLocation = true;
+                              businessLocation = null;
+                              location = '';
+                              error = '';
+                            });
+                          }
+                        }
+                      },
+                      icon: Container(
+                        padding: const EdgeInsets.all(15),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          color: Colors.green, // TODO poner esto con los colores del estilo
+                        ),
+                        child: const Icon(
+                          Icons.search,
+                        ),
+                      ),
                     )
                   ],
                 ),
-
-
-
-
-
+                const SizedBox(
+                  height: 20,
+                ),
                 SizedBox(
-                  height: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.width * 0.75,
                   width: MediaQuery.of(context).size.width,
                   child: GoogleMap(
                     gestureRecognizers: <Factory<OneSequenceGestureRecognizer>> {
@@ -376,36 +400,22 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
                         () => EagerGestureRecognizer() // Skip screen scroll on GoogleMap touch
                       ),
                     },
-                    initialCameraPosition:cameraPosition,
+                    initialCameraPosition: cameraPosition,
                     markers: {
-                      Marker(
-                        markerId: const MarkerId('location'),
-                        icon: BitmapDescriptor.defaultMarker,
-                        position: userLocation,
-                      ),
-                      Marker(
-                        markerId: const MarkerId('pruebas'),
-                        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
-                        position: LatLng(userLocation.latitude + 0.001, userLocation.longitude + 0.001),
-                      ),
                       if(businessLocation != null) Marker(
                         markerId: const MarkerId('typed'),
-                        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-                        position: LatLng(businessLocation!.latitude, businessLocation!.longitude + 0.001),
+                        icon: BitmapDescriptor.defaultMarker,
+                        position: LatLng(businessLocation!.latitude, businessLocation!.longitude),
                       ),
                     },
-                    onMapCreated: (GoogleMapController gmc) => getUserLocation(),
+                    onMapCreated: (GoogleMapController controller) async {
+                      await getUserLocation();
+                      _mapController.complete(controller);
+                    },
                     myLocationEnabled: true,
                     myLocationButtonEnabled: true,
                   ),
                 ),
-
-
-
-
-
-
-
                 const Text('¿A qué teléfono pueden llamar sus clientes?'),
                 PhoneInput(
                   onChangedPrefix: onChangedPrefix,
