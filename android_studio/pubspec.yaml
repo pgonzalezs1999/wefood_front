@@ -17,10 +17,13 @@ dependencies:
   get: ^4.6.6
   google_maps_flutter: ^2.5.0
   http: ^1.2.1
+  # location:
   maps_launcher: ^2.2.1
+  permission_handler: ^11.3.0
   share_plus: ^7.0.2
   sign_in_button: ^3.2.0
   syncfusion_flutter_pdfviewer: ^24.2.8
+  geolocator: ^11.0.0
 
 dev_dependencies:
   flutter_test:
