@@ -10,6 +10,7 @@ import 'package:wefood/views/business_profile.dart';
 import 'package:wefood/views/loading_screen.dart';
 import 'package:wefood/views/user_explore.dart';
 import 'package:wefood/views/user_profile.dart';
+import 'package:wefood/views/waiting_verification.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -86,8 +87,6 @@ class _HomeState extends State<Home> {
             child: const Text('Error'),
           );
         } else if (response.hasData) {
-          print('IS ADMIN: ${response.data!.isAdmin}');
-          print('ID_BUSINESS: ${response.data!.idBusiness}');
           final List<Widget> screens = [
             if(response.data!.idBusiness == null && response.data!.isAdmin != true) const UserExplore(),
             if(response.data!.idBusiness == null && response.data!.isAdmin != true) const UserProfile(),
@@ -96,7 +95,7 @@ class _HomeState extends State<Home> {
             if(response.data!.isAdmin == true) const AdminManagement(),
             if(response.data!.isAdmin == true) const AdminManagement(),
           ];
-          return WefoodScreen(
+          return (response.data!.idBusiness != null && response.data!.businessVerified == 1) ? WefoodScreen(
             canPop: false,
             body: screens[_selectedScreenIndex],
             bottomNavigationBar: BottomNavigationBar(
@@ -130,7 +129,7 @@ class _HomeState extends State<Home> {
               selectedItemColor: Colors.amber[800],
               onTap: _onScreenTapped,
             ),
-          );
+          ) : const WaitingVerification();
         } else {
           return const LoadingScreen();
         }

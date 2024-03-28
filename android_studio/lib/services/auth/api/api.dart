@@ -385,7 +385,7 @@ class Api {
     }
   }
 
-  static Future<BusinessExpandedModel> createBusiness({
+  static Future createBusiness({
     required String email,
     required String password,
     required int phonePrefix,
@@ -394,8 +394,7 @@ class Api {
     required String businessDescription,
     required String taxId,
     required String directions,
-    required Image logoFile,
-    required int idCountry,
+    required String country,
     required double longitude,
     required double latitude,
   }) async {
@@ -408,19 +407,18 @@ class Api {
             'password': password.toString(),
             'phone_prefix': phonePrefix.toString(),
             'phone': phone.toString(),
-            'businessName': businessName.toString(),
-            'businessDescription': businessDescription.toString(),
+            'name': businessName.toString(),
+            'description': businessDescription.toString(),
             'tax_id': taxId.toString(),
             'directions': directions.toString(),
-            'logo_file': logoFile.toString(),
-            'id_country': idCountry.toString(),
+            'country': country.toString(),
             'longitude': longitude.toString(),
             'latitude': latitude.toString(),
           }
       );
       print('RESPONSE DE API.CREATE_BUSINESS: $response');
-      return BusinessExpandedModel.fromJson(response);
     } catch(error) {
+      print('ERROR EN API.CREATE_BUSINESS: $error');
       throw Exception(error);
     }
   }
@@ -442,6 +440,24 @@ class Api {
         name: 'signout',
         type: HttpType.post,
       );
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static Future<bool> checkValidity({
+    required String username,
+  }) async {
+    try {
+      dynamic response = await Middleware.endpoint(
+        name: 'checkValidity',
+        type: HttpType.post,
+        body: {
+          'username': username.toString(),
+        },
+      );
+      bool validity = (response['validity'] == 1 || response['validity'] == '1' || response['validity'] == true);
+      return validity;
     } catch(error) {
       throw Exception(error);
     }

@@ -9,18 +9,16 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:wefood/components/back_arrow.dart';
 import 'package:wefood/components/loading_icon.dart';
-import 'package:wefood/components/phone_input.dart';
 import 'package:wefood/components/wefood_input.dart';
 import 'package:wefood/components/wefood_screen.dart';
 import 'package:wefood/environment.dart';
-import 'package:wefood/models/auth_model.dart';
-import 'package:wefood/models/business_expanded_model.dart';
 import 'package:wefood/models/country_model.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/types.dart';
 import 'package:wefood/views/terms_and_conditions.dart';
 import 'package:http/http.dart' as http;
+import 'package:wefood/views/waiting_verification.dart';
 
 class RegisterBusiness extends StatefulWidget {
   const RegisterBusiness({super.key});
@@ -43,14 +41,32 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
   String confirmPassword = '';
   String businessName = '';
   String businessDescription = '';
-  String location = '';
+  String directions = '';
   String ruc = '';
   int prefix = 51; // Perú
   String phone = '';
   bool conditionsAccepted = false;
+  String businessCountry = '';
+
+  String selectedPrefix = '';
+
+  getCountryItems() {
+    List<CountryModel> countries = [
+      CountryModel.fromParameters(2, 'Perú', 51, 'Peru'),
+      CountryModel.fromParameters(4, 'España', 34, 'Spain'),
+      CountryModel.fromParameters(5, 'Colombia', 57, 'Colombia'),
+    ];
+    List<DropdownMenuItem<String>> items = countries.map((country) {
+      return DropdownMenuItem<String>(
+        value: country.prefix.toString(),
+        child: Text('(+${country.prefix}) ${country.name}'),
+      );
+    }).toList();
+    return items;
+  }
 
   final Completer<GoogleMapController> _mapController = Completer<GoogleMapController>();
-  LatLng userLocation = const LatLng(-12.063449, -77.014574); // TODO poner aquí la ubicación del usuario si nos la da
+  LatLng userLocation = const LatLng(-12.063449, -77.014574);
   LatLng? businessLocation;
   String businessLocationString = '';
   CameraPosition cameraPosition = const CameraPosition(
@@ -94,7 +110,7 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
   updateMarker(businessLocationString) async {
     LatLng newLocation = await getLatLngFromAddress(businessLocationString);
     setState(() {
-      location = businessLocationString;
+      directions = businessLocationString;
       businessLocation = newLocation;
       cameraPosition = CameraPosition(
         target: businessLocation!,
@@ -115,6 +131,16 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
           final location = results[0]['geometry']['location'];
           final lat = location['lat'] as double;
           final lng = location['lng'] as double;
+          directions = results[0]['formatted_address'];
+
+          final addressComponents = results[0]['address_components'] as List<dynamic>;
+          for(var component in addressComponents) {
+            final types = component['types'] as List<dynamic>;
+            if(types.contains('country')) {
+              businessCountry = component['long_name'] as String;
+              break;
+            }
+          }
           return LatLng(lat, lng);
         } else {
           throw Exception('No se encontraron resultados para la dirección proporcionada.');
@@ -127,11 +153,11 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
     }
   }
 
-  void onChangedPrefix(CountryModel country) {
-    setState(() {
-      error = '';
-      prefix = country.prefix;
-    });
+  void _navigateToWaitVerify() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const WaitingVerification()),
+    );
   }
 
   bool _setError(String reason) {
@@ -167,6 +193,8 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
       result = _setError('El RUC es demasiado largo');
     } else if(rucIsAvailable == false) {
       result = _setError('RUC no disponible');
+    } else if(errorOnFindingLocation == true) {
+      result = _setError('La dirección no es válida');
     } else if(phone == '') {
       result = _setError('El campo teléfono es obligatorio');
     } else if(int.parse(phone) < 9999999) {
@@ -350,7 +378,6 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
                         labelText: 'Ubicación de su negocio',
                         onChanged: (String value) {
                           setState(() {
-                            errorOnFindingLocation = false;
                             businessLocationString = value;
                             error = '';
                           });
@@ -360,17 +387,18 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
                     ),
                     IconButton(
                       onPressed: () async {
+                        FocusManager.instance.primaryFocus?.unfocus();
                         if(businessLocationString != '') {
                           try {
-                            errorOnFindingLocation = false;
                             await updateMarker(businessLocationString);
                             await _cameraToPosition(businessLocation!);
+                            errorOnFindingLocation = false;
+                            error = '';
                           } catch(e) {
                             setState(() {
                               errorOnFindingLocation = true;
                               businessLocation = null;
-                              location = '';
-                              error = '';
+                              directions = '';
                             });
                           }
                         }
@@ -417,29 +445,51 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
                   ),
                 ),
                 const Text('¿A qué teléfono pueden llamar sus clientes?'),
-                PhoneInput(
-                  onChangedPrefix: onChangedPrefix,
-                  onChangedNumber: (String value) async {
-                    setState(() {
-                      error = '';
-                      phone = value;
-                      if(9999999 < int.parse(phone) && int.parse(phone) < 1000000000000) {
-                        searchingPhoneAvailability = LoadingStatus.loading;
-                      }
-                    });
-                    if(9999999 < int.parse(phone) && int.parse(phone) < 1000000000000) {
-                      bool available = false;
-                      try {
-                        available = await Api.checkPhoneAvailability(phone: phone);
-                      } catch(e) {
-                        available = false;
-                      }
-                      setState(() {
-                        phoneIsAvailable = available;
-                        searchingPhoneAvailability = LoadingStatus.successful;
-                      });
-                    }
-                  },
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    DropdownButton<String>(
+                      value: selectedPrefix.isNotEmpty ? selectedPrefix : '51',
+                      items: getCountryItems(),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedPrefix = value!;
+                        });
+                        setState(() {
+                          error = '';
+                          prefix = int.parse(value!);
+                        });
+                      },
+                    ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: WefoodInput(
+                        onChanged: (String value) async {
+                          setState(() {
+                            error = '';
+                            phone = value;
+                            if(9999999 < int.parse(phone) && int.parse(phone) < 1000000000000) {
+                              searchingPhoneAvailability = LoadingStatus.loading;
+                            }
+                          });
+                          if(9999999 < int.parse(phone) && int.parse(phone) < 1000000000000) {
+                            bool available = false;
+                            try {
+                              available = await Api.checkPhoneAvailability(phone: phone);
+                            } catch(e) {
+                              available = false;
+                            }
+                            setState(() {
+                              phoneIsAvailable = available;
+                              searchingPhoneAvailability = LoadingStatus.successful;
+                            });
+                          }
+                        },
+                        labelText: 'Número de teléfono',
+                        type: InputType.integer,
+                      ),
+                    ),
+                  ],
                 ),
                 if(searchingPhoneAvailability == LoadingStatus.loading) const LoadingIcon(),
                 if(searchingPhoneAvailability != LoadingStatus.loading && phone != '') Text(
@@ -451,104 +501,85 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
                         ? 'Teléfono no disponible'
                         : '¡Teléfono libre!'
                 ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Checkbox(
+                      value: conditionsAccepted,
+                      onChanged: (value) {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                        setState(() {
+                          error = '';
+                          conditionsAccepted = !conditionsAccepted;
+                        });
+                      },
+                    ),
+                    const Text('He leído y acepto los'),
+                    TextButton(
+                        onPressed: () {
+                          _navigateToTermsAndConditions();
+                        },
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 5,
+                          ),
+                        ),
+                        child: const Text('términos y condiciones')
+                    ),
+                  ],
+                ),
+                if(authenticating == LoadingStatus.loading) const Center(
+                  child: LoadingIcon()
+                ),
+                if(authenticating != LoadingStatus.loading) Center(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      if(_readyToRegister() == true) {
+                        setState(() {
+                          authenticating = LoadingStatus.loading;
+                        });
+                        try {
+                          await Api.createBusiness(
+                            email: email,
+                            password: password,
+                            phonePrefix: prefix,
+                            phone: int.parse(phone),
+                            businessName: businessName,
+                            businessDescription: businessDescription,
+                            taxId: ruc,
+                            directions: directions,
+                            country: businessCountry,
+                            longitude: businessLocation!.longitude,
+                            latitude: businessLocation!.latitude,
+                          );
+                          await UserSecureStorage().write(key: 'username', value: email);
+                          await UserSecureStorage().write(key: 'password', value: password);
+                          _navigateToWaitVerify();
+                        }
+                        catch(e) {
+                          setState(() {
+                            UserSecureStorage().delete(key: 'username');
+                            UserSecureStorage().delete(key: 'password');
+                            error = 'Ha ocurrido un error. Por favor, inténtalo de nuevo más tarde.';
+                            authenticating = LoadingStatus.error;
+                          });
+                        }
+                      }
+                    },
+                    child: const Text('REGISTRARME'),
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                if(error != '') Center(
+                  child: Text(
+                    error,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
               ],
             ),
-          ),
-          const Text('Añade una foto para dar más confianza a tus clientes:'),
-          Container(
-            padding: EdgeInsets.symmetric(
-              vertical: MediaQuery.of(context).size.height * 0.025,
-            ),
-            child: ClipRRect( // TODO cambiar esto por algo para elegir y guardar una foto
-              borderRadius: BorderRadius.circular(999),
-              child: SizedBox.fromSize(
-                size: Size.fromRadius(MediaQuery.of(context).size.width * 0.15),
-                child: Container(
-                  color: Colors.black.withOpacity(0.15),
-                  child: Icon(
-                    Icons.add,
-                    size: MediaQuery.of(context).size.width * 0.2,
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Row(
-            children: <Widget>[
-              Checkbox(
-                value: conditionsAccepted,
-                onChanged: (value) {
-                  setState(() {
-                    error = '';
-                    conditionsAccepted = !conditionsAccepted;
-                  });
-                },
-              ),
-              const Text('He leído y acepto los'),
-              TextButton(
-                onPressed: () {
-                  _navigateToTermsAndConditions();
-                },
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 5,
-                  ),
-                ),
-                child: const Text('términos y condiciones')
-              ),
-            ],
-          ),
-          if(authenticating == LoadingStatus.loading) const LoadingIcon(),
-          if(authenticating != LoadingStatus.loading) ElevatedButton(
-            onPressed: () async {
-              if(_readyToRegister() == true) {
-                setState(() {
-                  authenticating = LoadingStatus.loading;
-                });
-                try {
-                  BusinessExpandedModel business = await Api.createBusiness(
-                    email: email,
-                    password: password,
-                    businessName: 'Nombre del business hardcodeado',
-                    businessDescription: 'Descripción del business hardcodeada',
-                    phonePrefix: 123,
-                    phone: 123456789,
-                    directions: 'Calle hardcodeada nº 404 bajo B',
-                    idCountry: 12345,
-                    taxId: 'Tax id hardcodeado',
-                    logoFile: Image.asset('assets/images/logo.png'),
-                    latitude: 123.456,
-                    longitude: 123.456,
-                  );
-                  UserSecureStorage().write(key: 'username', value: email);
-                  UserSecureStorage().write(key: 'password', value: password);
-                  AuthModel? auth = await Api.login(
-                      context: context,
-                      username: email,
-                      password: password
-                  );
-                  authenticating = LoadingStatus.successful;
-                }
-                catch(e) {
-                  setState(() {
-                    UserSecureStorage().delete(key: 'username');
-                    UserSecureStorage().delete(key: 'password');
-                    error = 'Ha ocurrido un error. Por favor, inténtalo de nuevo más tarde.';
-                    authenticating = LoadingStatus.error;
-                    print('ERROR: $e');
-                  });
-                }
-              }
-            },
-            child: const Text('REGISTRARME'),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          if(error != '') Text(
-            error,
-            textAlign: TextAlign.center,
           ),
           SizedBox(
             height: MediaQuery.of(context).size.height * 0.1,

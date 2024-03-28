@@ -13,6 +13,7 @@ class UserModel {
   double? lastLatitude;
   DateTime? lastLoginDate;
   int? idBusiness;
+  int? businessVerified;
 
   UserModel.fromJson(Map<String, dynamic> json):
     id = json['id'] as int?,
@@ -28,5 +29,6 @@ class UserModel {
     lastLongitude = json['last_longitude'] as double?,
     lastLatitude = json['last_latitude'] as double?,
     lastLoginDate = json['last_login_date'] as DateTime?,
-    idBusiness = json['id_business'] as int?;
+    idBusiness = json['id_business'] as int?,
+    businessVerified = json['business_verified'] as int?;
 }

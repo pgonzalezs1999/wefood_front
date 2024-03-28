@@ -8,6 +8,8 @@ enum InputType {
 enum HttpType {
   get,
   post,
+  multipartGet,
+  multipartPost,
 }
 
 enum LoadingStatus {

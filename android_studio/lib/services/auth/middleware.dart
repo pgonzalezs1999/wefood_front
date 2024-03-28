@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:wefood/environment.dart';
 import 'package:wefood/services/secure_storage.dart';
@@ -33,6 +34,30 @@ class Middleware {
     return response;
   }
 
+  static Future multipartPost({
+    required String url,
+    required Map<String, String> auth,
+    body,
+  }) async {
+    var request = http.MultipartRequest('POST', Uri.parse(url),);
+    auth.forEach((key, value) {
+      request.headers[key] = value;
+    });
+    if(body != null) {
+      body.forEach((key, value) {
+        request.fields[key] = value;
+      });
+    }
+    var picture = http.MultipartFile.fromBytes(
+      'logo_file',
+      (await rootBundle.load('assets/images/logo.png')).buffer.asUint8List(),
+      filename: 'testImage.png',
+    );
+    request.files.add(picture);
+    var response = await request.send();
+    return response.stream.toBytes();
+  }
+
   static Future endpoint({
     required String name,
     required HttpType type,
@@ -41,29 +66,37 @@ class Middleware {
   }) async {
     String? accessToken = await UserSecureStorage().read(key: 'accessToken');
     final auth = needsAccessToken ? { 'Authorization': 'Bearer $accessToken' } : null;
-    final Uri url = Uri.parse('${Environment.apiUrl}$name');
+    final String fullUrl = '${Environment.apiUrl}$name';
+    final Uri uri = Uri.parse(fullUrl);
     dynamic response;
     try {
       switch(type) {
         case HttpType.get:
-          print('HACIENDO GET DE: $url');
+          print('HACIENDO GET DE: $uri');
           response = await get(
-            url: url,
+            url: uri,
             auth: auth,
           ).timeout(timeOutDuration);
-          break;
+          return jsonDecode(utf8.decode(response.bodyBytes));
         case HttpType.post:
-          print('HACIENDO POST DE: $url CON BODY: $body');
+          print('HACIENDO POST DE: $uri CON BODY: $body');
           response = await post(
-            url: url,
+            url: uri,
             body: body,
             auth: auth,
           ).timeout(timeOutDuration);
-          break;
+          return jsonDecode(utf8.decode(response.bodyBytes));
+        case HttpType.multipartPost:
+          print('HACIENDO MULTIPART_POST DE: $fullUrl CON BODY: $body');
+          response = await multipartPost(
+            url: fullUrl,
+            body: body,
+            auth: auth!,
+          ).timeout(timeOutDuration);
+          jsonDecode(utf8.decode(response));
         default:
           throw Exception("Unsupported HTTP method");
       }
-      return jsonDecode(utf8.decode(response.bodyBytes));
     } catch(error) {
       return error;
     }
