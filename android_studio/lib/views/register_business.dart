@@ -18,7 +18,7 @@ import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/types.dart';
 import 'package:wefood/views/terms_and_conditions.dart';
 import 'package:http/http.dart' as http;
-import 'package:wefood/views/waiting_verification.dart';
+import 'package:wefood/views/business/waiting_verification.dart';
 
 class RegisterBusiness extends StatefulWidget {
   const RegisterBusiness({super.key});

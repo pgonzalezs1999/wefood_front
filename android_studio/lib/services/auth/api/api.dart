@@ -141,6 +141,20 @@ class Api {
     }
   }
 
+  static Future<BusinessExpandedModel> getSessionBusiness() async {
+    try {
+      final response = await Middleware.endpoint(
+        name: 'getSessionBusiness',
+        type: HttpType.get,
+      );
+      print('RESPONSE DE GET_SESSION_BUSINESS: $response');
+      BusinessExpandedModel businessModel = BusinessExpandedModel.fromJson(response);
+      return businessModel;
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
   static updateUsername({
     required String username,
   }) async {
@@ -170,6 +184,63 @@ class Api {
           'real_name': name,
           'real_surname': surname,
         }
+      );
+      return response;
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static updateBusinessName({
+    required String name,
+  }) async {
+    try {
+      dynamic response = await Middleware.endpoint(
+          name: 'updateBusinessName',
+          type: HttpType.post,
+          body: {
+            'name': name.toString(),
+          }
+      );
+      return response;
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static updateBusinessDescription({
+    required String description,
+  }) async {
+    try {
+      dynamic response = await Middleware.endpoint(
+          name: 'updateBusinessDescription',
+          type: HttpType.post,
+          body: {
+            'description': description.toString(),
+          }
+      );
+      return response;
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static updateBusinessDirections({
+    required String directions,
+    required String country,
+    required double longitude,
+    required double latitude,
+  }) async {
+    try {
+      dynamic response = await Middleware.endpoint(
+          name: 'updateBusinessDirections',
+          type: HttpType.post,
+          body: {
+            'directions': directions.toString(),
+            'country': country.toString(),
+            'longitude': longitude.toString(),
+            'latitude': latitude.toString(),
+          }
       );
       return response;
     } catch(error) {

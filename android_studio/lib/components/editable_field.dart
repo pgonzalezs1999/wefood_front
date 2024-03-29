@@ -47,7 +47,6 @@ class _EditableFieldState extends State<EditableField> {
 
   @override
   Widget build(BuildContext context) {
-
     void setCanConfirm() {
       String result = '';
       if(newFirst == widget.firstInitialValue && newSecond == widget.secondInitialValue) {
@@ -77,7 +76,9 @@ class _EditableFieldState extends State<EditableField> {
 
     return Row(
       children: [
-        Text(widget.feedbackText),
+        Expanded(
+          child: Text(widget.feedbackText),
+        ),
         const SizedBox(
           width: 10,
         ),
