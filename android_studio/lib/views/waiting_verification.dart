@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:wefood/components/wefood_screen.dart';
+import 'package:wefood/models/auth_model.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/services/secure_storage.dart';
-import 'package:wefood/views/home.dart';
 import 'package:wefood/views/login.dart';
 
 class WaitingVerification extends StatefulWidget {
@@ -20,13 +20,6 @@ class _WaitingVerificationState extends State<WaitingVerification> {
   static const double delaySeconds = 60;
   double secondsToReload = 60;
 
-  void _navigateToHome() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const Home()),
-    );
-  }
-
   void _navigateToLogin() {
     Navigator.pushReplacement(
       context,
@@ -38,7 +31,9 @@ class _WaitingVerificationState extends State<WaitingVerification> {
     _timer = Timer.periodic(const Duration(milliseconds: 500), (timer) async {
       setState(() {
         if(secondsToReload > 0.5) {
-          secondsToReload = secondsToReload - 0.5;
+          if(isChecking  == false) {
+            secondsToReload = secondsToReload - 0.5;
+          }
         } else {
           secondsToReload = delaySeconds;
         }
@@ -47,17 +42,26 @@ class _WaitingVerificationState extends State<WaitingVerification> {
         setState(() {
           isChecking = true;
         });
-        String? username = await UserSecureStorage().read(key: 'username');
-        bool validity = await Api.checkValidity(
-          username: username ?? '',
-        );
-        if(validity == true) {
-          _navigateToHome();
-          _timer.cancel();
-        }
-        setState(() {
+        try {
+          String? username = await UserSecureStorage().read(key: 'username');
+          String? password = await UserSecureStorage().read(key: 'password');
+          bool validity = await Api.checkValidity(
+            username: username ?? '',
+          );
+          if(validity == true) {
+            AuthModel? auth = await Api.login(
+              context: context,
+              username: username!,
+              password: password!,
+            );
+            _timer.cancel();
+          }
+          setState(() {
+            isChecking = false;
+          });
+        } catch(e) {
           isChecking = false;
-        });
+        }
       }
     });
   }
@@ -104,12 +108,11 @@ class _WaitingVerificationState extends State<WaitingVerification> {
                 ),
                 TextButton(
                   onPressed: () async {
-                    // TODO llamada para poner a "2" el validated de ese business.
-                      // TODO Un admin la eliminará a mano más tarde (para evitar hackeos, ya que
-                      // TODO ese endpoint no requiere auth
-                    // TODO also, hacer en back que un negocio validado no se pueda anular con este endpoint, sino
-                      // TODO con signOut normal (que sí requiere auth)
-                    // TODO eliminar username y pass de UserSecureStorage()
+                    await Api.cancelValidation(
+                      username: (await UserSecureStorage().read(key: 'username'))!
+                    );
+                    await UserSecureStorage().delete(key: 'username');
+                    await UserSecureStorage().delete(key: 'password');
                     _navigateToLogin();
                   },
                   child: const Text('CONFIRMAR'),
@@ -122,6 +125,7 @@ class _WaitingVerificationState extends State<WaitingVerification> {
     }
 
     return WefoodScreen(
+      canPop: false,
       body: SizedBox(
         height: MediaQuery.of(context).size.height * 0.9,
         width: double.infinity,
@@ -155,11 +159,12 @@ class _WaitingVerificationState extends State<WaitingVerification> {
                   width: MediaQuery.of(context).size.width * 0.75,
                   child: Row(
                     children: <Widget>[
-                      const Expanded(
-                        child: Text('Volveremos a comprobar si ha sido validado en...'),
+                      Expanded(
+                        child: Text('Volveremos a comprobar si ha sido validado en ${secondsToReload.round()} segundos'),
                       ),
                       CircularProgressIndicator(
                         value: 1 - (secondsToReload / delaySeconds),
+                        backgroundColor: Colors.grey.withAlpha(70),
                       ),
                     ],
                   ),

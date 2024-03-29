@@ -67,6 +67,19 @@ class _HomeState extends State<Home> {
     setState(() {});
   }
 
+  bool shouldWaitForValidation({
+    required dynamic idBusiness,
+    required dynamic businessVerified,
+  }) {
+    bool result = false;
+    if(idBusiness != null) {
+      if(businessVerified == 0) {
+        result = true;
+      }
+    }
+    return result;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -86,7 +99,7 @@ class _HomeState extends State<Home> {
             vertical: MediaQuery.of(context).size.height * 0.05),
             child: const Text('Error'),
           );
-        } else if (response.hasData) {
+        } else if(response.hasData) {
           final List<Widget> screens = [
             if(response.data!.idBusiness == null && response.data!.isAdmin != true) const UserExplore(),
             if(response.data!.idBusiness == null && response.data!.isAdmin != true) const UserProfile(),
@@ -95,7 +108,12 @@ class _HomeState extends State<Home> {
             if(response.data!.isAdmin == true) const AdminManagement(),
             if(response.data!.isAdmin == true) const AdminManagement(),
           ];
-          return (response.data!.idBusiness != null && response.data!.businessVerified == 1) ? WefoodScreen(
+          print('response.data!.idBusiness: ${response.data!.idBusiness}');
+          print('response.data!.businessVerified: ${response.data!.businessVerified}');
+          return (shouldWaitForValidation(
+              idBusiness: response.data!.idBusiness,
+              businessVerified: response.data!.businessVerified
+          ) == false) ? WefoodScreen(
             canPop: false,
             body: screens[_selectedScreenIndex],
             bottomNavigationBar: BottomNavigationBar(

@@ -462,4 +462,23 @@ class Api {
       throw Exception(error);
     }
   }
+
+  static Future cancelValidation({
+    required String username,
+  }) async {
+    try {
+      dynamic response = await Middleware.endpoint(
+        name: 'cancelValidation',
+        type: HttpType.post,
+        body: {
+          'username': username.toString(),
+        },
+      );
+      if(response['message'] == null) {
+        throw Exception(response['error']);
+      }
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
 }
