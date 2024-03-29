@@ -40,7 +40,7 @@ class _ProductButtonState extends State<ProductButton> {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => Product(
-                id: widget.productExpanded.product.id,
+                id: widget.productExpanded.product!.id,
             )),
           );
         },
@@ -72,11 +72,11 @@ class _ProductButtonState extends State<ProductButton> {
                         children: <Widget>[
                           Row(
                             children: <Widget>[
-                              if(widget.productExpanded.product.vegetarian == true) const ProductTag(title: 'Vegetariano'),
-                              if(widget.productExpanded.product.vegan == true) const ProductTag(title: 'Vegano'),
-                              if(widget.productExpanded.product.bakery == true) const ProductTag(title: 'Bollería'),
-                              if(widget.productExpanded.product.fresh == true) const ProductTag(title: 'Frescos'),
-                              if(widget.productExpanded.product.vegetarian == false && widget.productExpanded.product.vegan == false && widget.productExpanded.product.bakery == false && widget.productExpanded.product.fresh == false) const Text(''),
+                              if(widget.productExpanded.product!.vegetarian == true) const ProductTag(title: 'Vegetariano'),
+                              if(widget.productExpanded.product!.vegan == true) const ProductTag(title: 'Vegano'),
+                              if(widget.productExpanded.product!.bakery == true) const ProductTag(title: 'Bollería'),
+                              if(widget.productExpanded.product!.fresh == true) const ProductTag(title: 'Frescos'),
+                              if(widget.productExpanded.product!.vegetarian == false && widget.productExpanded.product!.vegan == false && widget.productExpanded.product!.bakery == false && widget.productExpanded.product!.fresh == false) const Text(''),
                             ],
                           ),
                           if(widget.productExpanded.isFavourite == true) Container(
@@ -106,8 +106,8 @@ class _ProductButtonState extends State<ProductButton> {
                             children: [
                               Text('${widget.productExpanded.business?.rate ?? 0} '),
                               const Icon(Icons.star, size: 15),
-                              Text(' | ${widget.productExpanded.product.price} Sol/. | '
-                                '${widget.productExpanded.product.startingHour?.hour}:${widget.productExpanded.product.startingHour?.minute}h-${widget.productExpanded.product.endingHour?.hour}:${widget.productExpanded.product.endingHour?.minute}h'
+                              Text(' | ${widget.productExpanded.product!.price} Sol/. | '
+                                '${widget.productExpanded.product!.startingHour?.hour}:${widget.productExpanded.product!.startingHour?.minute}h-${widget.productExpanded.product!.endingHour?.hour}:${widget.productExpanded.product!.endingHour?.minute}h'
                               ),
                             ],
                           ),

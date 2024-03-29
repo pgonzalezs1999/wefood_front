@@ -108,8 +108,6 @@ class _HomeState extends State<Home> {
             if(response.data!.isAdmin == true) const AdminManagement(),
             if(response.data!.isAdmin == true) const AdminManagement(),
           ];
-          print('response.data!.idBusiness: ${response.data!.idBusiness}');
-          print('response.data!.businessVerified: ${response.data!.businessVerified}');
           return (shouldWaitForValidation(
               idBusiness: response.data!.idBusiness,
               businessVerified: response.data!.businessVerified

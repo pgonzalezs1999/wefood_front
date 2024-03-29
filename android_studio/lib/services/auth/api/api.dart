@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wefood/models/auth_model.dart';
 import 'package:wefood/models/business_expanded_model.dart';
+import 'package:wefood/models/business_products_resume_model.dart';
 import 'package:wefood/models/country_model.dart';
 import 'package:wefood/models/exceptions.dart';
 import 'package:wefood/models/favourite_model.dart';
@@ -133,7 +134,6 @@ class Api {
         name: 'getProfile',
         type: HttpType.get,
       );
-      print('RESPONSE DE GET_PROFILE: $response');
       UserModel userModel = UserModel.fromJson(response['message']);
       return userModel;
     } catch(error) {
@@ -147,7 +147,6 @@ class Api {
         name: 'getSessionBusiness',
         type: HttpType.get,
       );
-      print('RESPONSE DE GET_SESSION_BUSINESS: $response');
       BusinessExpandedModel businessModel = BusinessExpandedModel.fromJson(response);
       return businessModel;
     } catch(error) {
@@ -449,7 +448,6 @@ class Api {
             'password': password.toString(),
           }
       );
-      print('RESPONSE DE API.SIGN_IN: ${response['user']}');
       return UserModel.fromJson(response['user']);
     } catch(error) {
       throw Exception(error);
@@ -487,9 +485,7 @@ class Api {
             'latitude': latitude.toString(),
           }
       );
-      print('RESPONSE DE API.CREATE_BUSINESS: $response');
     } catch(error) {
-      print('ERROR EN API.CREATE_BUSINESS: $error');
       throw Exception(error);
     }
   }
@@ -548,6 +544,19 @@ class Api {
       if(response['message'] == null) {
         throw Exception(response['error']);
       }
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static Future<BusinessProductsResumeModel> businessProductsResume() async {
+    try {
+      final response = await Middleware.endpoint(
+        name: 'businessProductsResume',
+        type: HttpType.get,
+      );
+      BusinessProductsResumeModel result = BusinessProductsResumeModel.fromJson(response);
+      return result;
     } catch(error) {
       throw Exception(error);
     }

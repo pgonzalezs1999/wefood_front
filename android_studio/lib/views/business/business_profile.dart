@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wefood/commands/share_app.dart';
 import 'package:wefood/components/business_info.dart';
-import 'package:wefood/components/profile_name.dart';
 import 'package:wefood/components/settings_element.dart';
 import 'package:wefood/components/wefood_navigation_screen.dart';
 import 'package:wefood/components/wefood_popup.dart';

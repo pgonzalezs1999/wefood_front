@@ -175,9 +175,9 @@ class _ProductState extends State<Product> {
                     children: <Widget>[
                       if(info.business!.description != null) Text(info.business!.description!),
                       SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-                      Text('Precio: ${info.product.price} Sol/.'),
+                      Text('Precio: ${info.product!.price} Sol/.'),
                       SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-                      Text('Hora de recogida: De ${_parseTime(info.product.startingHour)} a ${_parseTime(info.product.endingHour)} h'),
+                      Text('Hora de recogida: De ${_parseTime(info.product!.startingHour)} a ${_parseTime(info.product!.endingHour)} h'),
                       SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                       Row(
                         children: <Widget>[
@@ -204,7 +204,7 @@ class _ProductState extends State<Product> {
                           )
                         ],
                       ),
-                      if(info.product.vegetarian == true || info.product.vegan == true || info.product.bakery == true || info.product.fresh == true) Column(
+                      if(info.product!.vegetarian == true || info.product!.vegan == true || info.product!.bakery == true || info.product!.fresh == true) Column(
                         children: <Widget>[
                           const Text('Categoría:'),
                           SizedBox(height: MediaQuery.of(context).size.height * 0.01),
@@ -212,10 +212,10 @@ class _ProductState extends State<Product> {
                       ),
                       Row(
                         children: <Widget>[
-                          if(info.product.vegetarian == true) const ProductTag(title: 'Vegetariano'),
-                          if(info.product.vegan == true) const ProductTag(title: 'Vegano'),
-                          if(info.product.bakery == true) const ProductTag(title: 'Bollería'),
-                          if(info.product.fresh == true) const ProductTag(title: 'Frescos'),
+                          if(info.product!.vegetarian == true) const ProductTag(title: 'Vegetariano'),
+                          if(info.product!.vegan == true) const ProductTag(title: 'Vegano'),
+                          if(info.product!.bakery == true) const ProductTag(title: 'Bollería'),
+                          if(info.product!.fresh == true) const ProductTag(title: 'Frescos'),
                         ],
                       ),
                       const Divider(),

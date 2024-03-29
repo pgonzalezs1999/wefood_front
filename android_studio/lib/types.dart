@@ -18,3 +18,9 @@ enum LoadingStatus {
   successful,
   error,
 }
+
+enum ProductType {
+  breakfast,
+  lunch,
+  dinner,
+}
