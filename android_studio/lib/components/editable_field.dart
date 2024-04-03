@@ -172,9 +172,9 @@ class _EditableFieldState extends State<EditableField> {
                     ],
                   );
                 });
-              }
+              },
             );
-          }
+          },
         ),
       ],
     );

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:wefood/models/auth_model.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/views/home.dart';
+import 'package:wefood/views/loading_screen.dart';
 import 'package:wefood/views/login.dart';
 
 void main() {
@@ -14,6 +16,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
     return MaterialApp(
       title: 'WeFood',
       theme: ThemeData(
@@ -91,10 +96,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: CircularProgressIndicator(),
-      ),
-    );
+    return const LoadingScreen();
   }
 }

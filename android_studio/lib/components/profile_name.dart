@@ -26,43 +26,48 @@ class ProfileNameState extends State<ProfileName> {
             child: const Text('Error'),
           );
         } else if(response.hasData) {
-          resultWidget = Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              EditableField(
-                feedbackText: (response.data?.realName != null) ? '¡Hola de nuevo, ${response.data!.realName!}!' : 'Añade tu nombre',
-                firstTopic: 'nombre',
-                firstInitialValue: (response.data?.realName != null) ? response.data!.realName! : '',
-                firstMinimumLength: 2,
-                firstMaximumLength: 30,
-                secondTopic: 'apellidos',
-                secondInitialValue: (response.data?.realName != null) ? response.data!.realSurname : '',
-                secondMinimumLength: 2,
-                secondMaximumLength: 30,
-                onSave: (newValue, newSecondValue) async {
-                  dynamic response = await Api.updateRealName(
-                    name: newValue,
-                    surname: newSecondValue!,
-                  );
-                  setState(() {});
-                  return response;
-                },
-              ),
-              if(response.data?.realName != null) EditableField(
-                feedbackText: 'Usuario: ${response.data!.username}',
-                firstTopic: 'usuario',
-                firstInitialValue: response.data!.username!,
-                firstMinimumLength: 5,
-                firstMaximumLength: 50,
-                onSave: (newValue, newSecondValue) async {
-                  dynamic response = await Api.updateUsername(
-                    username: newValue,
-                  );
-                  setState(() {});
-                  return response;
-                },
-              ),
-            ],
+          resultWidget = Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                EditableField(
+                  feedbackText: (response.data?.realName != null) ? '¡Hola de nuevo, ${response.data!.realName!}!' : 'Añade tu nombre',
+                  firstTopic: 'nombre',
+                  firstInitialValue: (response.data?.realName != null) ? response.data!.realName! : '',
+                  firstMinimumLength: 2,
+                  firstMaximumLength: 30,
+                  secondTopic: 'apellidos',
+                  secondInitialValue: (response.data?.realName != null) ? response.data!.realSurname : '',
+                  secondMinimumLength: 2,
+                  secondMaximumLength: 30,
+                  onSave: (newValue, newSecondValue) async {
+                    dynamic response = await Api.updateRealName(
+                      name: newValue,
+                      surname: newSecondValue!,
+                    );
+                    setState(() {});
+                    return response;
+                  },
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                EditableField(
+                  feedbackText: 'Usuario: ${response.data!.username}',
+                  firstTopic: 'usuario',
+                  firstInitialValue: response.data!.username!,
+                  firstMinimumLength: 5,
+                  firstMaximumLength: 50,
+                  onSave: (newValue, newSecondValue) async {
+                    dynamic response = await Api.updateUsername(
+                      username: newValue,
+                    );
+                    setState(() {});
+                    return response;
+                  },
+                ),
+              ],
+            ),
           );
         }
         return resultWidget;
