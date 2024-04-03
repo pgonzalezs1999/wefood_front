@@ -134,7 +134,6 @@ class Api {
         name: 'getProfile',
         type: HttpType.get,
       );
-      print('RESPONSE DE API.GET_PROFILE: $response');
       UserModel userModel = UserModel.fromJson(response['message']);
       return userModel;
     } catch(error) {
@@ -309,9 +308,7 @@ class Api {
           name: 'getProduct/$id',
           type: HttpType.get,
       );
-      print('RESPONSE DE API.GET_PRODUCT: $response');
       ProductExpandedModel product = ProductExpandedModel.fromJson(response);
-      print('RESPONSE PROCESADO CORRECTAMENTE EN API.GET_PRODUCT');
       return product;
     } catch(error) {
       throw Exception(error);
@@ -558,6 +555,7 @@ class Api {
         name: 'businessProductsResume',
         type: HttpType.get,
       );
+      print('RESPONSE DE API.BUSINESS_PRODUCTS_RESUME: $response');
       BusinessProductsResumeModel result = BusinessProductsResumeModel.fromJson(response);
       return result;
     } catch(error) {
