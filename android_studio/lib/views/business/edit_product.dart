@@ -48,7 +48,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
   bool sundays = false;
   DateTime? endDate;
   bool endless = false;
-  List<Image?> images = [ // TODO ponerlos todos a null
+  List<Image?> images = [ // TODO ponerlos a null
     Image.asset('assets/images/salmon.jpg', fit: BoxFit.cover,), null, null, null, null, null, null, null, null, null,
   ];
   String error = '';
@@ -351,26 +351,32 @@ class _EditProductScreenState extends State<EditProductScreen> {
               TextButton(
                 onPressed: () async {
                   DateTime? pickedDate = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2101)
-                  );
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2101)
+                  ) ?? endDate;
                   setState(() {
                     error = '';
+                    endless = false;
                     endDate = pickedDate;
                   });
                 },
-                child: Text((endDate != null) ? displayDateTime(endDate!) : 'Elegir fecha'),
+                child: Text((endDate != null && endless == false) ? (displayDateTime(endDate!)) : 'Elegir fecha'),
               ),
-              _CheckBoxRow(
-                title: 'Indefinido',
-                value: endless,
-                onChanged: () {
-                  setState(() {
-                    endless = !endless; // TODO Si se marca indefinido, bloquear la fecha
-                  });
-                },
+              Container(
+                margin: const EdgeInsets.only(
+                  left: 25,
+                ),
+                child: _CheckBoxRow(
+                  title: 'Indefinido',
+                  value: endless,
+                  onChanged: () {
+                    setState(() {
+                      endless = !endless;
+                    });
+                  },
+                ),
               ),
             ],
           ),
@@ -448,7 +454,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
             children: <Widget>[
               ElevatedButton(
                 onPressed: () async {
-                  // TODO ¿seguro?
                   Navigator.pop(context);
                 },
                 child: const Text('CANCELAR'),
@@ -503,7 +508,40 @@ class _EditProductScreenState extends State<EditProductScreen> {
           Align(
             child: ElevatedButton(
               onPressed: () async {
-                // TODO ¿seguro? e ir a pantalla anterior
+                showDialog(
+                    context: context,
+                    useRootNavigator: false,
+                    builder: (_) => AlertDialog(
+                      title: const Text('¿Eliminar producto?'),
+                      content: const Text('No podrás deshacer esta acción'),
+                      actions: <TextButton>[
+                        TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text('CANCELAR'),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            try {
+                              await Api.deleteProduct(
+                                type: (widget.productType == ProductType.breakfast) ? 'B'
+                                    : (widget.productType == ProductType.lunch) ? 'L'
+                                    : (widget.productType == ProductType.dinner) ? 'D' : '',
+                              );
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                            } catch(e) {
+                              setState(() {
+                                error = 'Ha ocurrido un error eliminar el producto. Por favor, inténtelo de nuevo más tarde';
+                              });
+                            }
+                          },
+                          child: const Text('CONFIRMAR'),
+                        ),
+                      ],
+                    )
+                );
               },
               child: const Text('ELIMINAR PRODUCTO'),
             ),

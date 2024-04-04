@@ -135,6 +135,7 @@ class Api {
         name: 'getProfile',
         type: HttpType.get,
       );
+
       UserModel userModel = UserModel.fromJson(response['message']);
       return userModel;
     } catch(error) {
@@ -309,6 +310,7 @@ class Api {
           name: 'getProduct/$id',
           type: HttpType.get,
       );
+      print('RESPONSE DEL API.GET_PRODUCT: $response');
       ProductExpandedModel product = ProductExpandedModel.fromJson(response);
       return product;
     } catch(error) {
@@ -606,9 +608,28 @@ class Api {
           'working_on_sunday': workingOnSunday.toString(),
         },
       );
-      print('RESPONSE DEL API.UPDATE_PRODUCT: $response');
       ProductModel result = ProductModel.fromJson(response['product']);
       return result;
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static Future<void> deleteProduct({
+    required String type,
+  }) async {
+    try {
+      final response = await Middleware.endpoint(
+        name: 'deleteProduct',
+        type: HttpType.post,
+        body: {
+          'type': type.toString(),
+        }
+      );
+      print('RESPONSE DEL API.DELETE_PRODUCT: $response');
+      if(response['message'] == null) {
+        throw Exception();
+      }
     } catch(error) {
       print('ERROR DEL API.UPDATE_PRODUCT: $error');
       throw Exception(error);
