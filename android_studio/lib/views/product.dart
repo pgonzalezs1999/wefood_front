@@ -72,7 +72,7 @@ class _ProductState extends State<Product> {
                   width: MediaQuery.of(context).size.width,
                   decoration: const BoxDecoration(
                     image: DecorationImage(
-                      image: AssetImage('assets/images/logo.jpg'),
+                      image: AssetImage('assets/images/salmon.jpg'),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -136,7 +136,7 @@ class _ProductState extends State<Product> {
                                 borderRadius: BorderRadius.circular(999),
                                 child: SizedBox.fromSize(
                                   size: Size.fromRadius(MediaQuery.of(context).size.width * 0.05),
-                                  child: Image.asset('assets/images/logo.jpg'),
+                                  child: Image.asset('assets/images/salmon.jpg'),
                                 ),
                               ),
                             ),

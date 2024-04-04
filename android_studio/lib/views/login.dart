@@ -8,7 +8,6 @@ import 'package:sign_in_button/sign_in_button.dart';
 import 'package:wefood/views/register_business.dart';
 import 'package:wefood/views/register_user.dart';
 import 'package:wefood/views/terms_and_conditions.dart';
-import 'dart:io';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -32,16 +31,6 @@ class _LoginState extends State<Login> {
         duration: const Duration(milliseconds: 1000),
       ),
     );
-  }
-
-  Future printIps() async {
-    for (var interface in await NetworkInterface.list()) {
-      print('== Interface: ${interface.name} ==');
-      for (var addr in interface.addresses) {
-        print(
-            '${addr.address} ${addr.host} ${addr.isLoopback} ${addr.rawAddress} ${addr.type.name}');
-      }
-    }
   }
 
   void _navigateToRegisterUser() {

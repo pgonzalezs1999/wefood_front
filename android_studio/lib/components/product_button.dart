@@ -53,7 +53,7 @@ class _ProductButtonState extends State<ProductButton> {
             child: Stack(
               children: <Widget>[
                 Image.asset(
-                  'assets/images/logo.jpg',
+                  'assets/images/salmon.jpg',
                   fit: BoxFit.fitWidth,
                   width: double.infinity,
                 ),

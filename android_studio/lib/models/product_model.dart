@@ -23,7 +23,7 @@ class ProductModel {
     id = json['id'] as int,
     price = (json['price']).toDouble(),
     amount = json['amount'] as int?,
-    endingDate = DateTime.parse(json['ending_date']) as DateTime?,
+    endingDate = (json['ending_date'] != null) ? DateTime.parse(json['ending_date']) as DateTime? : null,
     startingHour = _parseTime(json['starting_hour']),
     endingHour = _parseTime(json['ending_hour']),
     vegetarian = Utils.controlBool(json['vegetarian']) as bool?,

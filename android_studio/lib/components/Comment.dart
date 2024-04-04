@@ -35,7 +35,7 @@ class _CommentState extends State<Comment> {
             child: SizedBox.fromSize(
               size: Size.fromRadius(MediaQuery.of(context).size.width * 0.05),
               child: Image.asset(
-                'assets/images/logo.jpg',
+                'assets/images/salmon.jpg',
                 fit: BoxFit.cover,
               ),
             ),

@@ -59,7 +59,7 @@ class _BusinessProfileState extends State<BusinessProfile> {
                   child: SizedBox.fromSize(
                     size: Size.fromRadius(MediaQuery.of(context).size.width * 0.1),
                     child: Image.asset(
-                      'assets/images/logo.jpg', // TODO esta foto no es !!
+                      'assets/images/salmon.jpg', // TODO esta foto no es !!
                       fit: BoxFit.cover,
                     ),
                   ),

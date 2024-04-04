@@ -1,9 +1,8 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:wefood/models/product_model.dart';
 import 'package:wefood/types.dart';
-import 'package:wefood/views/edit_product.dart';
+import 'package:wefood/views/business/edit_product.dart';
 
 class EditProductButton extends StatefulWidget {
 
@@ -36,8 +35,9 @@ class _EditProductButtonState extends State<EditProductButton> {
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => EditProduct(
-                id: widget.product.id,
+            MaterialPageRoute(builder: (context) => EditProductScreen(
+              productId: widget.product.id,
+              productType: widget.productType,
             )),
           );
         },
@@ -51,7 +51,7 @@ class _EditProductButtonState extends State<EditProductButton> {
               alignment: Alignment.center,
               children: <Widget>[
                 Image.asset(
-                  'assets/images/logo.jpg',
+                  'assets/images/salmon.jpg',
                   fit: BoxFit.fitWidth,
                   width: double.infinity,
                 ),

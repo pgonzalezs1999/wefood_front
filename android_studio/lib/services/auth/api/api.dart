@@ -27,7 +27,7 @@ class Api {
     required dynamic error,
     String title = '',
     String description = '',
-    String imageUrl = 'assets/images/logo.jpg',
+    String imageUrl = 'assets/images/salmon.jpg',
   }) {
     title = error;
     FocusScope.of(context).unfocus();
@@ -308,9 +308,11 @@ class Api {
           name: 'getProduct/$id',
           type: HttpType.get,
       );
+      print('RESPONSE DEL API.GET_PRODUCT: $response');
       ProductExpandedModel product = ProductExpandedModel.fromJson(response);
       return product;
     } catch(error) {
+      print('ERROR DEL API.GET_PRODUCT: $error');
       throw Exception(error);
     }
   }
@@ -555,7 +557,6 @@ class Api {
         name: 'businessProductsResume',
         type: HttpType.get,
       );
-      print('RESPONSE DE API.BUSINESS_PRODUCTS_RESUME: $response');
       BusinessProductsResumeModel result = BusinessProductsResumeModel.fromJson(response);
       return result;
     } catch(error) {
