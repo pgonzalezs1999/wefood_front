@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wefood/commands/custom_parsers.dart';
 import 'package:wefood/components/back_arrow.dart';
 import 'package:wefood/components/choosable_numeric_input.dart';
 import 'package:wefood/components/loading_icon.dart';
@@ -27,6 +28,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
   String _productTypeString = '';
 
+  bool isRetrievingData = true;
+  bool isSubmitting = false;
+
   double? price;
   TimeOfDay? startTime;
   TimeOfDay? endTime;
@@ -44,22 +48,69 @@ class _EditProductScreenState extends State<EditProductScreen> {
   bool sundays = false;
   DateTime? endDate;
   bool endless = false;
-  List<Image?> images = [
-    Image.asset('assets/images/salmon.jpg', fit: BoxFit.cover,),
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
+  List<Image?> images = [ // TODO ponerlos todos a null
+    Image.asset('assets/images/salmon.jpg', fit: BoxFit.cover,), null, null, null, null, null, null, null, null, null,
   ];
+  String error = '';
 
   String displayDateTime(DateTime dateTime) {
     List<String> monthNames = [ 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre' ];
     return '${dateTime.day} de ${monthNames[dateTime.month]} del ${dateTime.year}';
+  }
+
+  bool _setError(String reason) {
+    setState(() {
+      error = reason;
+    });
+    return false;
+  }
+
+  bool _readyToRegister() {
+    bool result = true;
+    if(price == null) {
+      result = _setError('El campo precio es obligatorio');
+    } else if(price! <= 0) {
+      result = _setError('El precio debe ser un número entero positivo');
+    } else if(endless == false && endDate == null) {
+      result = _setError('El campo fecha límite es obligatorio. Si no tiene fecha de fin, marque "Indefinido"');
+    } else {
+      setState(() {
+        error = '';
+      });
+    }
+    return result;
+  }
+
+  void retrieveData() async {
+    ProductExpandedModel response = await Api.getProduct(
+      id: widget.productId,
+    );
+    price = response.product!.price;
+    startTime = TimeOfDay(
+      hour: response.product!.startingHour!.hour,
+      minute: response.product!.startingHour!.minute,
+    );
+    endTime = TimeOfDay(
+      hour: response.product!.endingHour!.hour,
+      minute: response.product!.endingHour!.minute,
+    );
+    setState(() {
+      amount = response.product!.amount!;
+      fresh = response.product!.fresh!;
+      bakery = response.product!.bakery!;
+      vegetarian = response.product!.vegetarian!;
+      vegan = response.product!.vegan!;
+      mondays = response.product!.workingOnMonday!;
+      tuesdays = response.product!.workingOnTuesday!;
+      wednesdays = response.product!.workingOnWednesday!;
+      thursdays = response.product!.workingOnThursday!;
+      fridays = response.product!.workingOnFriday!;
+      saturdays = response.product!.workingOnSaturday!;
+      sundays = response.product!.workingOnSunday!;
+      endDate = response.product!.endingDate;
+      endless = (endDate == null);
+      isRetrievingData = false;
+    });
   }
 
   @override
@@ -71,6 +122,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     } else {
       _productTypeString = 'cenas';
     }
+    retrieveData();
     super.initState();
   }
 
@@ -90,356 +142,382 @@ class _EditProductScreenState extends State<EditProductScreen> {
               Text('Editar $_productTypeString'),
             ],
           ),
-          FutureBuilder<ProductExpandedModel>(
-              future: Api.getProduct(
-                id: widget.productId,
+          if(price == null) const LoadingIcon(),
+          if(price != null) Column(
+            children: <Widget>[
+              ChoosableNumericInput(
+                title: 'Precio',
+                initialValue: price!,
+                interval: 0.1,
+                allowsDecimals: true,
+                onChanged: (String value) {
+                  setState(() {
+                    error = '';
+                    price = double.tryParse(value);
+                  });
+                },
               ),
-              builder: (BuildContext context, AsyncSnapshot<ProductExpandedModel> response) {
-                if(response.hasError) {
-                  resultWidget = Container(
-                    margin: EdgeInsets.symmetric(
-                      vertical: MediaQuery.of(context).size.height * 0.05,
+              Text((price == null || price == 0) ? 'Número incorrecto' : '', style: const TextStyle(color: Colors.red),), // TODO deshardcodear estilo
+            ],
+          ),
+          const Text('Horario de recogida:'),
+          Row(
+            children: <Widget>[
+              const Text('Desde las'),
+              TextButton(
+                onPressed: () async {
+                  final selectedTime = await showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay.now(),
+                  );
+                  setState(() {
+                    startTime = selectedTime;
+                  });
+                },
+                child: Text('${startTime?.format(context)} h'),
+              ),
+              const Text('hasta las'),
+              TextButton(
+                onPressed: () async {
+                  final selectedTime = await showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay.now(),
+                  );
+                  setState(() {
+                    endTime = selectedTime;
+                  });
+                },
+                child: Text('${endTime?.format(context)} h'),
+              ),
+            ],
+          ),
+          if(amount == null) const LoadingIcon(),
+          if(amount != null) Column(
+            children: <Widget>[
+              ChoosableNumericInput(
+                title: 'Número de packs por día',
+                initialValue: amount!.toDouble(),
+                interval: 1,
+                onChanged: (String value) {
+                  setState(() {
+                    error = '';
+                    amount = int.parse(value);
+                  });
+                },
+              ),
+              Text((amount == null || amount == 0 || int.tryParse('$amount') == null) ? 'Número incorrecto' : '', style: const TextStyle(color: Colors.red),), // TODO deshardcodear estilo
+            ],
+          ),
+          const Text('Categorías'),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <_CheckBoxRow>[
+                  _CheckBoxRow(
+                      title: 'Productos frescos',
+                      value: fresh,
+                      onChanged: () {
+                        setState(() {
+                          fresh = !fresh;
+                        });
+                      }
+                  ),
+                  _CheckBoxRow(
+                      title: 'Bollería',
+                      value: bakery,
+                      onChanged: () {
+                        setState(() {
+                          bakery = !bakery;
+                        });
+                      }
+                  ),
+                ],
+              ),
+              const SizedBox(
+                width: 20,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <_CheckBoxRow>[
+                  _CheckBoxRow(
+                      title: 'Vegetariano',
+                      value: vegetarian,
+                      onChanged: () {
+                        setState(() {
+                          vegetarian = !vegetarian;
+                        });
+                      }
+                  ),
+                  _CheckBoxRow(
+                      title: 'Vegano',
+                      value: vegan,
+                      onChanged: () {
+                        setState(() {
+                          vegan = !vegan;
+                        });
+                      }
+                  ),
+                ],
+              )
+            ],
+          ),
+          const Text('Días en que se ofrecen packs'),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <_CheckBoxRow>[
+                  _CheckBoxRow(
+                      title: 'Lunes',
+                      value: mondays,
+                      onChanged: () {
+                        setState(() {
+                          mondays = !mondays;
+                        });
+                      }
+                  ),
+                  _CheckBoxRow(
+                      title: 'Martes',
+                      value: tuesdays,
+                      onChanged: () {
+                        setState(() {
+                          tuesdays = !tuesdays;
+                        });
+                      }
+                  ),
+                  _CheckBoxRow(
+                      title: 'Miércoles',
+                      value: wednesdays,
+                      onChanged: () {
+                        setState(() {
+                          wednesdays = !wednesdays;
+                        });
+                      }
+                  ),
+                  _CheckBoxRow(
+                      title: 'Jueves',
+                      value: thursdays,
+                      onChanged: () {
+                        setState(() {
+                          thursdays = !thursdays;
+                        });
+                      }
+                  ),
+                ],
+              ),
+              const SizedBox(
+                width: 20,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <_CheckBoxRow>[
+                  _CheckBoxRow(
+                      title: 'Viernes',
+                      value: fridays,
+                      onChanged: () {
+                        setState(() {
+                          fridays = !fridays;
+                        });
+                      }
+                  ),
+                  _CheckBoxRow(
+                      title: 'Sábados',
+                      value: saturdays,
+                      onChanged: () {
+                        setState(() {
+                          saturdays = !saturdays;
+                        });
+                      }
+                  ),
+                  _CheckBoxRow(
+                      title: 'Domingos',
+                      value: sundays,
+                      onChanged: () {
+                        setState(() {
+                          sundays = !sundays;
+                        });
+                      }
+                  ),
+                ],
+              )
+            ],
+          ),
+          const Text('Ofrecer packs hasta'),
+          Row(
+            children: <Widget>[
+              TextButton(
+                onPressed: () async {
+                  DateTime? pickedDate = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2101)
+                  );
+                  setState(() {
+                    error = '';
+                    endDate = pickedDate;
+                  });
+                },
+                child: Text((endDate != null) ? displayDateTime(endDate!) : 'Elegir fecha'),
+              ),
+              _CheckBoxRow(
+                title: 'Indefinido',
+                value: endless,
+                onChanged: () {
+                  setState(() {
+                    endless = !endless; // TODO Si se marca indefinido, bloquear la fecha
+                  });
+                },
+              ),
+            ],
+          ),
+          const Text('Añadir imágenes'),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Container(
+                margin: EdgeInsets.only(
+                  right: MediaQuery.of(context).size.width * 0.05,
+                ),
+                child: Column(
+                  children: <Widget>[
+                    _ImageSlot(
+                      image: images[0],
+                      isMain: true,
                     ),
-                    child: const Text('Error'),
-                  );
-                } else if(response.hasData) {
-                  ProductModel product = response.data!.product!;
-                  price = product.price;
-                  startTime = TimeOfDay(
-                      hour: product.startingHour!.hour,
-                      minute: product.startingHour!.minute,
-                  );
-                  endTime = TimeOfDay(
-                    hour: product.endingHour!.hour,
-                    minute: product.endingHour!.minute,
-                  );
-                  amount = product.amount!;
-                  fresh = product.fresh!;
-                  bakery = product.bakery!;
-                  vegetarian = product.vegetarian!;
-                  vegan = product.vegan!;
-                  mondays = product.workingOnMonday!;
-                  tuesdays = product.workingOnTuesday!;
-                  wednesdays = product.workingOnWednesday!;
-                  thursdays = product.workingOnThursday!;
-                  fridays = product.workingOnFriday!;
-                  saturdays = product.workingOnSaturday!;
-                  sundays = product.workingOnSunday!;
-                  endDate = product.endingDate;
-                  endless = (endDate == null);
-
-                  resultWidget = Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      ChoosableNumericInput(
-                        title: 'Precio',
-                        initialValue: price ?? 1,
-                        interval: 0.1,
-                        allowsDecimals: true,
-                        onChanged: (String value) {
-                          setState(() {
-                            price = double.parse(value);
-                          });
-                        },
-                      ),
-                      const Text('Horario de recogida:'),
-                      Row(
-                        children: <Widget>[
-                          const Text('Desde las'),
-                          TextButton(
-                            onPressed: () async {
-                              final selectedTime = await showTimePicker(
-                                context: context,
-                                initialTime: TimeOfDay.now(),
-                              );
-                              setState(() {
-                                startTime = selectedTime;
-                              });
-                            },
-                            child: Text('${startTime?.format(context)} h'),
-                          ),
-                          const Text('hasta las'),
-                          TextButton(
-                            onPressed: () async {
-                              final selectedTime = await showTimePicker(
-                                context: context,
-                                initialTime: TimeOfDay.now(),
-                              );
-                              setState(() {
-                                endTime = selectedTime;
-                              });
-                            },
-                            child: Text('${endTime?.format(context)} h'),
-                          ),
-                        ],
-                      ),
-                      ChoosableNumericInput(
-                        title: 'Número de packs por día',
-                        initialValue: (amount ?? 1).toDouble(),
-                        interval: 1,
-                        onChanged: (String value) {
-                          setState(() {
-                            price = double.parse(value);
-                          });
-                        },
-                      ),
-                      const Text('Categorías'),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <_CheckBoxRow>[
-                              _CheckBoxRow(
-                                title: 'Productos frescos',
-                                value: fresh,
-                                onChanged: () {
-                                  setState(() {
-                                    fresh = !fresh;
-                                  });
-                                }
-                              ),
-                              _CheckBoxRow(
-                                title: 'Bollería',
-                                value: bakery,
-                                onChanged: () {
-                                  setState(() {
-                                    bakery = !bakery;
-                                  });
-                                }
-                              ),
-                            ],
-                          ),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <_CheckBoxRow>[
-                              _CheckBoxRow(
-                                title: 'Vegetariano',
-                                value: vegetarian,
-                                onChanged: () {
-                                  setState(() {
-                                    vegetarian = !vegetarian;
-                                  });
-                                }
-                              ),
-                              _CheckBoxRow(
-                                title: 'Vegano',
-                                value: vegan,
-                                onChanged: () {
-                                  setState(() {
-                                    vegan = !vegan;
-                                  });
-                                }
-                              ),
-                            ],
-                          )
-                        ],
-                      ),
-                      const Text('Días en que se ofrecen packs'),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <_CheckBoxRow>[
-                              _CheckBoxRow(
-                                title: 'Lunes',
-                                value: mondays,
-                                onChanged: () {
-                                  setState(() {
-                                    mondays = !mondays;
-                                  });
-                                }
-                              ),
-                              _CheckBoxRow(
-                                title: 'Martes',
-                                value: tuesdays,
-                                onChanged: () {
-                                  setState(() {
-                                    tuesdays = !tuesdays;
-                                  });
-                                }
-                              ),
-                              _CheckBoxRow(
-                                title: 'Miércoles',
-                                value: wednesdays,
-                                onChanged: () {
-                                  setState(() {
-                                    wednesdays = !wednesdays;
-                                  });
-                                }
-                              ),
-                              _CheckBoxRow(
-                                title: 'Jueves',
-                                value: thursdays,
-                                onChanged: () {
-                                  setState(() {
-                                    thursdays = !thursdays;
-                                  });
-                                }
-                              ),
-                            ],
-                          ),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <_CheckBoxRow>[
-                              _CheckBoxRow(
-                                title: 'Viernes',
-                                value: fridays,
-                                onChanged: () {
-                                  setState(() {
-                                    fridays = !fridays;
-                                  });
-                                }
-                              ),
-                              _CheckBoxRow(
-                                title: 'Sábados',
-                                value: saturdays,
-                                onChanged: () {
-                                  setState(() {
-                                    saturdays = !saturdays;
-                                  });
-                                }
-                              ),
-                              _CheckBoxRow(
-                                title: 'Domingos',
-                                value: sundays,
-                                onChanged: () {
-                                  setState(() {
-                                    sundays = !sundays;
-                                  });
-                                }
-                              ),
-                            ],
-                          )
-                        ],
-                      ),
-                      const Text('Ofrecer packs hasta'),
-                      Row(
-                        children: <Widget>[
-                          TextButton(
-                            onPressed: () async {
-                              DateTime? pickedDate = await showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime(2000),
-                                lastDate: DateTime(2101)
-                              );
-                              setState(() {
-                                endDate = pickedDate;
-                              });
-                            },
-                            child: Text((endDate != null) ? displayDateTime(endDate!) : 'Elegir fecha'),
-                          ),
-                          _CheckBoxRow(
-                            title: 'Indefinido',
-                            value: endless,
-                            onChanged: () {
-                              setState(() {
-                                endless = !endless; // TODO Si se marca indefinido, bloquear la fecha
-                              });
-                            },
-                          ),
-                        ],
-                      ),
-                      const Text('Añadir imágenes'),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Container(
-                            margin: EdgeInsets.only(
-                              right: MediaQuery.of(context).size.width * 0.05,
-                            ),
-                            child: Column(
-                              children: <Widget>[
-                                _ImageSlot(
-                                  image: images[0],
-                                  isMain: true,
-                                ),
-                                const Text('Imagen principal'),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: Column(
-                              children: <Widget>[
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                  children: <_ImageSlot>[
-                                    _ImageSlot(
-                                      image: images[0],
-                                    ),
-                                    _ImageSlot(
-                                      image: images[1],
-                                    ),
-                                    _ImageSlot(
-                                      image: images[2],
-                                    ),
-                                    _ImageSlot(
-                                      image: images[3],
-                                    ),
-                                    _ImageSlot(
-                                      image: images[4],
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: MediaQuery.of(context).size.width * 0.025,
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                  children: <_ImageSlot>[
-                                    _ImageSlot(
-                                      image: images[5],
-                                    ),
-                                    _ImageSlot(
-                                      image: images[6],
-                                    ),
-                                    _ImageSlot(
-                                      image: images[7],
-                                    ),
-                                    _ImageSlot(
-                                      image: images[8],
-                                    ),
-                                    _ImageSlot(
-                                      image: images[9],
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      Text('Se guardará: [\n'
-                        '     Precio = ${price ?? 'N/A'};\n'
-                        '     Desde las ${startTime?.format(context) ?? 'N/A'}h hasta las ${endTime?.format(context) ?? 'N/A'}h\n'
-                        '     Packs/día: $amount\n'
-                        '     Fresco: $fresh\n'
-                        '     Bollería: $bakery\n'
-                        '     Vegetariano: $vegetarian\n'
-                        '     Vegano: $vegan\n'
-                        '     Lunes: $mondays\n'
-                        '     Martes: $tuesdays\n'
-                        '     Miércoles: $wednesdays\n'
-                        '     Jueves: $thursdays\n'
-                        '     Viernes: $fridays\n'
-                        '     Sábados: $saturdays\n'
-                        '     Domingos: $sundays\n'
-                        '     Hasta el día ${(endDate != null) ? displayDateTime(endDate!) : 'N/A'} (indefinido: $endless)\n'
-                        ']'
-                      ),
-                    ],
-                  );
-                }
-                return resultWidget;
-              }
+                    const Text('Imagen principal'),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  children: <Widget>[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <_ImageSlot>[
+                        _ImageSlot(
+                          image: images[0],
+                        ),
+                        _ImageSlot(
+                          image: images[1],
+                        ),
+                        _ImageSlot(
+                          image: images[2],
+                        ),
+                        _ImageSlot(
+                          image: images[3],
+                        ),
+                        _ImageSlot(
+                          image: images[4],
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.width * 0.025,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <_ImageSlot>[
+                        _ImageSlot(
+                          image: images[5],
+                        ),
+                        _ImageSlot(
+                          image: images[6],
+                        ),
+                        _ImageSlot(
+                          image: images[7],
+                        ),
+                        _ImageSlot(
+                          image: images[8],
+                        ),
+                        _ImageSlot(
+                          image: images[9],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              ElevatedButton(
+                onPressed: () async {
+                  // TODO ¿seguro?
+                  Navigator.pop(context);
+                },
+                child: const Text('CANCELAR'),
+              ),
+              if(isSubmitting == true) const LoadingIcon(),
+              if(isSubmitting == false) ElevatedButton(
+                onPressed: () async {
+                  print('He pulsado GUARDAR');
+                  if(_readyToRegister() == true) {
+                    print('Esta ready to register');
+                    setState(() {
+                      isSubmitting = true;
+                    });
+                    try {
+                      ProductModel product = await Api.updateProduct(
+                        id: widget.productId,
+                        price: price!,
+                        amount: amount!,
+                        endingDate: CustomParsers.dateTimeOfDayToSqlDateTimeString(endDate),
+                        startHour: CustomParsers.timeOfDayToSqlTimeString(startTime!),
+                        endHour: CustomParsers.timeOfDayToSqlTimeString(endTime!),
+                        vegetarian: CustomParsers.boolToSqlString(vegetarian),
+                        vegan: CustomParsers.boolToSqlString(vegan),
+                        bakery: CustomParsers.boolToSqlString(bakery),
+                        fresh: CustomParsers.boolToSqlString(fresh),
+                        workingOnMonday: CustomParsers.boolToSqlString(mondays),
+                        workingOnTuesday: CustomParsers.boolToSqlString(tuesdays),
+                        workingOnWednesday: CustomParsers.boolToSqlString(wednesdays),
+                        workingOnThursday: CustomParsers.boolToSqlString(thursdays),
+                        workingOnFriday: CustomParsers.boolToSqlString(fridays),
+                        workingOnSaturday: CustomParsers.boolToSqlString(saturdays),
+                        workingOnSunday: CustomParsers.boolToSqlString(sundays),
+                      );
+                      print('Ha enviado la petición');
+                      Navigator.pop(context);
+                      setState(() {
+                        isSubmitting = false;
+                      });
+                    } catch(e) {
+                      print('ERROR: $e');
+                      setState(() {
+                        isSubmitting = false;
+                        error = 'Ha ocurrido un error'; // TODO hacer algo más currado
+                      });
+                    }
+                  }
+                },
+                child: const Text('GUARDAR'),
+              ),
+            ],
+          ),
+          Align(
+            child: ElevatedButton(
+              onPressed: () async {
+                // TODO ¿seguro? e ir a pantalla anterior
+              },
+              child: const Text('ELIMINAR PRODUCTO'),
+            ),
+          ),
+          if(error != '') Align(
+            child: Text(
+              error,
+              textAlign: TextAlign.center,
+              style: const TextStyle( // TODO deshardcodear estilo
+                color: Colors.red,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 0.25,
+              ),
+            ),
           ),
         ],
       ),

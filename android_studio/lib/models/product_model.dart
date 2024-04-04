@@ -21,8 +21,8 @@ class ProductModel {
 
   ProductModel.fromJson(Map<String, dynamic> json):
     id = json['id'] as int,
-    price = (json['price']).toDouble(),
-    amount = json['amount'] as int?,
+    price = double.parse('${json['price']}') as double?,
+    amount = int.parse('${json['amount']}') as int?,
     endingDate = (json['ending_date'] != null) ? DateTime.parse(json['ending_date']) as DateTime? : null,
     startingHour = _parseTime(json['starting_hour']),
     endingHour = _parseTime(json['ending_hour']),
@@ -40,8 +40,13 @@ class ProductModel {
 
   static DateTime? _parseTime(String? time) { // Convertir HH:mm:ss a DateTime
     if(time != null) {
+      DateTime result = DateTime.now();
       List<String> parts = time.split(':');
-      return DateTime(0, 1, 1, int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
+      result = result.copyWith(
+        hour: int.parse(parts[0]),
+        minute: int.parse(parts[1]),
+      );
+      return result;
     } else {
       return null;
     }

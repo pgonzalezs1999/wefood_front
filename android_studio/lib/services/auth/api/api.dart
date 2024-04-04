@@ -6,6 +6,7 @@ import 'package:wefood/models/country_model.dart';
 import 'package:wefood/models/exceptions.dart';
 import 'package:wefood/models/favourite_model.dart';
 import 'package:wefood/models/product_expanded_model.dart';
+import 'package:wefood/models/product_model.dart';
 import 'package:wefood/models/user_model.dart';
 import 'package:wefood/services/auth/middleware.dart';
 import 'package:wefood/services/secure_storage.dart';
@@ -308,11 +309,9 @@ class Api {
           name: 'getProduct/$id',
           type: HttpType.get,
       );
-      print('RESPONSE DEL API.GET_PRODUCT: $response');
       ProductExpandedModel product = ProductExpandedModel.fromJson(response);
       return product;
     } catch(error) {
-      print('ERROR DEL API.GET_PRODUCT: $error');
       throw Exception(error);
     }
   }
@@ -560,6 +559,58 @@ class Api {
       BusinessProductsResumeModel result = BusinessProductsResumeModel.fromJson(response);
       return result;
     } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static Future<ProductModel> updateProduct({
+    required int id,
+    required double price,
+    required int amount,
+    required String? endingDate,
+    required String startHour,
+    required String endHour,
+    required String vegetarian,
+    required String vegan,
+    required String bakery,
+    required String fresh,
+    required String workingOnMonday,
+    required String workingOnTuesday,
+    required String workingOnWednesday,
+    required String workingOnThursday,
+    required String workingOnFriday,
+    required String workingOnSaturday,
+    required String workingOnSunday,
+  }) async {
+    try {
+      final response = await Middleware.endpoint(
+        name: 'updateProduct',
+        type: HttpType.post,
+        body: {
+          'id': id.toString(),
+          'price': price.toString(),
+          'amount': amount.toString(),
+          'ending_date': endingDate.toString(),
+          'starting_hour': startHour.toString(),
+          'ending_hour': endHour.toString(),
+          'vegetarian': vegetarian.toString(),
+          'vegan': vegan.toString(),
+          'bakery': bakery.toString(),
+          'fresh': fresh.toString(),
+          'working_on_monday': workingOnMonday.toString(),
+          'working_on_tuesday': workingOnTuesday.toString(),
+          'working_on_wednesday': workingOnWednesday.toString(),
+          'working_on_thursday': workingOnThursday.toString(),
+          'working_on_friday': workingOnFriday.toString(),
+          'working_on_saturday': workingOnSaturday.toString(),
+          'working_on_sunday': workingOnSunday.toString(),
+        },
+      );
+      print('RESPONSE DEL API.UPDATE_PRODUCT: $response');
+      ProductModel result = ProductModel.fromJson(response['product']);
+      return result;
+    } catch(error) {
+      print('ERROR DEL API.UPDATE_PRODUCT: $error');
       throw Exception(error);
     }
   }

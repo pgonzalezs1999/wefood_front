@@ -82,6 +82,13 @@ class _ChoosableNumericInputState extends State<ChoosableNumericInput> {
                         FilteringTextInputFormatter.digitsOnly,
                       ],
                   onChanged: (String value) {
+                    setState(() {
+                      if(value != '' && value != '0') {
+                        _controller!.text = value;
+                      } else {
+                        _controller!.text = (widget.interval != null) ? '${widget.interval}' : '1';
+                      }
+                    });
                     widget.onChanged(_controller!.text);
                   }
                 ),
