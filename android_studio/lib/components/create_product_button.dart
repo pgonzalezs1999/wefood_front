@@ -31,8 +31,8 @@ class _CreateProductButtonState extends State<CreateProductButton> {
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => CreateProduct(
-                productType: widget.productType,
+            MaterialPageRoute(builder: (context) => CreateProductScreen(
+              productType: widget.productType,
             )),
           );
         },

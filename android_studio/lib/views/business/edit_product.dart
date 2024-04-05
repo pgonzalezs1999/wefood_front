@@ -8,6 +8,7 @@ import 'package:wefood/models/product_expanded_model.dart';
 import 'package:wefood/models/product_model.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/types.dart';
+import 'package:wefood/utils.dart';
 
 class EditProductScreen extends StatefulWidget {
 
@@ -53,11 +54,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
   ];
   String error = '';
 
-  String displayDateTime(DateTime dateTime) {
-    List<String> monthNames = [ 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre' ];
-    return '${dateTime.day} de ${monthNames[dateTime.month]} del ${dateTime.year}';
-  }
-
   bool _setError(String reason) {
     setState(() {
       error = reason;
@@ -71,6 +67,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
       result = _setError('El campo precio es obligatorio');
     } else if(price! <= 0) {
       result = _setError('El precio debe ser un número entero positivo');
+    } else if(Utils.timesOfDayFirstIsSooner(startTime!, endTime!) == false) {
+      result = _setError('Horario de recogida incorrecto: ¡la fecha de apertura debe ser antes que la fecha de cierre!');
     } else if(endless == false && endDate == null) {
       result = _setError('El campo fecha límite es obligatorio. Si no tiene fecha de fin, marque "Indefinido"');
     } else {
@@ -115,13 +113,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
   @override
   void initState() {
-    if(widget.productType == ProductType.breakfast) {
-      _productTypeString = 'desayunos';
-    } else if(widget.productType == ProductType.lunch) {
-      _productTypeString = 'almuerzos';
-    } else {
-      _productTypeString = 'cenas';
-    }
+    _productTypeString = Utils.productTypeToString(widget.productType);
     retrieveData();
     super.initState();
   }
@@ -362,7 +354,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     endDate = pickedDate;
                   });
                 },
-                child: Text((endDate != null && endless == false) ? (displayDateTime(endDate!)) : 'Elegir fecha'),
+                child: Text((endDate != null && endless == false) ? (Utils.displayDateTime(endDate!)) : 'Elegir fecha'),
               ),
               Container(
                 margin: const EdgeInsets.only(
@@ -459,11 +451,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 child: const Text('CANCELAR'),
               ),
               if(isSubmitting == true) const LoadingIcon(),
-              if(isSubmitting == false) ElevatedButton(
+              if(isSubmitting == false && isRetrievingData == false) ElevatedButton(
                 onPressed: () async {
-                  print('He pulsado GUARDAR');
                   if(_readyToRegister() == true) {
-                    print('Esta ready to register');
                     setState(() {
                       isSubmitting = true;
                     });
@@ -487,13 +477,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         workingOnSaturday: CustomParsers.boolToSqlString(saturdays),
                         workingOnSunday: CustomParsers.boolToSqlString(sundays),
                       );
-                      print('Ha enviado la petición');
                       Navigator.pop(context);
                       setState(() {
                         isSubmitting = false;
                       });
                     } catch(e) {
-                      print('ERROR: $e');
                       setState(() {
                         isSubmitting = false;
                         error = 'Ha ocurrido un error'; // TODO hacer algo más currado

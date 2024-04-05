@@ -626,12 +626,60 @@ class Api {
           'type': type.toString(),
         }
       );
-      print('RESPONSE DEL API.DELETE_PRODUCT: $response');
       if(response['message'] == null) {
         throw Exception();
       }
     } catch(error) {
-      print('ERROR DEL API.UPDATE_PRODUCT: $error');
+      throw Exception(error);
+    }
+  }
+
+  static Future<ProductModel> createProduct({
+    required double price,
+    required int amount,
+    required String? endingDate,
+    required String startHour,
+    required String endHour,
+    required String vegetarian,
+    required String vegan,
+    required String bakery,
+    required String fresh,
+    required String workingOnMonday,
+    required String workingOnTuesday,
+    required String workingOnWednesday,
+    required String workingOnThursday,
+    required String workingOnFriday,
+    required String workingOnSaturday,
+    required String workingOnSunday,
+    required String type,
+  }) async {
+    try {
+      final response = await Middleware.endpoint(
+        name: 'createProduct',
+        type: HttpType.post,
+        body: {
+          'price': price.toString(),
+          'amount': amount.toString(),
+          'ending_date': endingDate.toString(),
+          'starting_hour': startHour.toString(),
+          'ending_hour': endHour.toString(),
+          'vegetarian': vegetarian.toString(),
+          'vegan': vegan.toString(),
+          'bakery': bakery.toString(),
+          'fresh': fresh.toString(),
+          'working_on_monday': workingOnMonday.toString(),
+          'working_on_tuesday': workingOnTuesday.toString(),
+          'working_on_wednesday': workingOnWednesday.toString(),
+          'working_on_thursday': workingOnThursday.toString(),
+          'working_on_friday': workingOnFriday.toString(),
+          'working_on_saturday': workingOnSaturday.toString(),
+          'working_on_sunday': workingOnSunday.toString(),
+          'type': type.toString(),
+        },
+      );
+      ProductModel result = ProductModel.fromJson(response['product']);
+      return result;
+    } catch(error) {
       throw Exception(error);
     }
   }
