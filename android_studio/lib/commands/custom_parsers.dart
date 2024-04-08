@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wefood/commands/utils.dart';
 
 class CustomParsers {
 
@@ -23,7 +24,7 @@ class CustomParsers {
       ':00';
   }
 
-  static String dateTimeOfDayToSqlDateTimeString(DateTime? time) {
+  static String dateTimeToSqlDateTimeString(DateTime? time) {
     String result = '';
     if(time != null) {
       result = '${time.year}-'
@@ -38,5 +39,16 @@ class CustomParsers {
 
   static String boolToSqlString(bool boolean) {
     return boolean ? '1' : '0';
+  }
+
+  static String? dateTimeToString(DateTime? time) {
+    String result = '';
+    if(time != null) {
+      result = '${time.day}/${Utils.monthNumberToString(
+        number: time.month,
+        shortened: true,
+      )}/${time.year}, ${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}h';
+    }
+    return result;
   }
 }

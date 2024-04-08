@@ -7,7 +7,7 @@ import 'package:wefood/components/wefood_screen.dart';
 import 'package:wefood/models/product_model.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/types.dart';
-import 'package:wefood/utils.dart';
+import 'package:wefood/commands/utils.dart';
 
 class CreateProductScreen extends StatefulWidget {
 
@@ -73,7 +73,9 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
 
   @override
   void initState() {
-    _productTypeString = Utils.productTypeToString(widget.productType);
+    _productTypeString = Utils.productTypeToString(
+        type: widget.productType,
+    ) ?? '';
     super.initState();
   }
 
@@ -416,9 +418,9 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
                     });
                     try {
                       ProductModel product = await Api.createProduct(
-                        price: price!,
-                        amount: amount!,
-                        endingDate: CustomParsers.dateTimeOfDayToSqlDateTimeString(endDate),
+                        price: price,
+                        amount: amount,
+                        endingDate: CustomParsers.dateTimeToSqlDateTimeString(endDate),
                         startHour: CustomParsers.timeOfDayToSqlTimeString(startTime!),
                         endHour: CustomParsers.timeOfDayToSqlTimeString(endTime!),
                         vegetarian: CustomParsers.boolToSqlString(vegetarian),

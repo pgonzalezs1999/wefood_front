@@ -5,6 +5,7 @@ import 'package:wefood/models/user_model.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/views/admin/admin_management.dart';
+import 'package:wefood/views/admin/admin_profile.dart';
 import 'package:wefood/views/business/business_management.dart';
 import 'package:wefood/views/business/business_profile.dart';
 import 'package:wefood/views/loading_screen.dart';
@@ -106,7 +107,7 @@ class _HomeState extends State<Home> {
             if(response.data!.idBusiness != null && response.data!.isAdmin != true) const BusinessManagement(),
             if(response.data!.idBusiness != null && response.data!.isAdmin != true) const BusinessProfile(),
             if(response.data!.isAdmin == true) const AdminManagement(),
-            if(response.data!.isAdmin == true) const AdminManagement(),
+            if(response.data!.isAdmin == true) const AdminProfile(),
           ];
           return (shouldWaitForValidation(
               idBusiness: response.data!.idBusiness,
@@ -137,8 +138,8 @@ class _HomeState extends State<Home> {
                   label: 'Gestión',
                 ),
                 if(response.data!.isAdmin == true) const BottomNavigationBarItem(
-                  icon: Icon(Icons.business),
-                  label: 'Gestión',
+                  icon: Icon(Icons.person),
+                  label: 'Perfil',
                 ),
               ],
               currentIndex: _selectedScreenIndex,

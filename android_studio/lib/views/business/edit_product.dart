@@ -8,7 +8,7 @@ import 'package:wefood/models/product_expanded_model.dart';
 import 'package:wefood/models/product_model.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/types.dart';
-import 'package:wefood/utils.dart';
+import 'package:wefood/commands/utils.dart';
 
 class EditProductScreen extends StatefulWidget {
 
@@ -113,7 +113,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
   @override
   void initState() {
-    _productTypeString = Utils.productTypeToString(widget.productType);
+    _productTypeString = Utils.productTypeToString(
+      type: widget.productType,
+    ) ?? '';
     retrieveData();
     super.initState();
   }
@@ -462,7 +464,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         id: widget.productId,
                         price: price!,
                         amount: amount!,
-                        endingDate: CustomParsers.dateTimeOfDayToSqlDateTimeString(endDate),
+                        endingDate: CustomParsers.dateTimeToSqlDateTimeString(endDate),
                         startHour: CustomParsers.timeOfDayToSqlTimeString(startTime!),
                         endHour: CustomParsers.timeOfDayToSqlTimeString(endTime!),
                         vegetarian: CustomParsers.boolToSqlString(vegetarian),

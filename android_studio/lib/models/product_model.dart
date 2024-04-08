@@ -1,4 +1,4 @@
-import 'package:wefood/utils.dart';
+import 'package:wefood/commands/utils.dart';
 
 class ProductModel {
   int id;
@@ -18,11 +18,12 @@ class ProductModel {
   bool? workingOnFriday;
   bool? workingOnSaturday;
   bool? workingOnSunday;
+  String? type;
 
   ProductModel.fromJson(Map<String, dynamic> json):
     id = json['id'] as int,
-    price = double.parse('${json['price']}') as double?,
-    amount = int.parse('${json['amount']}') as int?,
+    price = double.tryParse('${json['price']}'),
+    amount = int.tryParse('${json['amount']}'),
     endingDate = (json['ending_date'] != null) ? DateTime.parse(json['ending_date']) as DateTime? : null,
     startingHour = _parseTime(json['starting_hour']),
     endingHour = _parseTime(json['ending_hour']),
@@ -36,9 +37,10 @@ class ProductModel {
     workingOnThursday = Utils.controlBool(json['working_on_thursday']) as bool?,
     workingOnFriday = Utils.controlBool(json['working_on_friday']) as bool?,
     workingOnSaturday = Utils.controlBool(json['working_on_saturday']) as bool?,
-    workingOnSunday = Utils.controlBool(json['working_on_sunday']) as bool?;
+    workingOnSunday = Utils.controlBool(json['working_on_sunday']) as bool?,
+    type = json['type'] as String?;
 
-  static DateTime? _parseTime(String? time) { // Convertir HH:mm:ss a DateTime
+  static DateTime? _parseTime(String? time) { // Convert HH:mm:ss to DateTime
     if(time != null) {
       DateTime result = DateTime.now();
       List<String> parts = time.split(':');

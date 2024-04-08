@@ -683,4 +683,58 @@ class Api {
       throw Exception(error);
     }
   }
+
+  static Future<List<BusinessExpandedModel>> getValidatableBusinesses() async {
+    try {
+      final response = await Middleware.endpoint(
+        name: 'getValidatableBusinesses',
+        type: HttpType.get,
+      );
+      List<BusinessExpandedModel> result = (response['results'] as List<dynamic>).map((business) => BusinessExpandedModel.fromJson(business)).toList();
+      return result;
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static Future<void> validateBusiness({
+    required int id,
+  }) async {
+    try {
+      final response = await Middleware.endpoint(
+        name: 'validateBusiness',
+        type: HttpType.post,
+        body: {
+          'id': id.toString(),
+        }
+      );
+      if(response['message'] != null) {
+      } else {
+        throw Exception('ERROR WHILE VALIDATING BUSINESS');
+      }
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static Future<void> refuseBusiness({
+    required int id,
+  }) async {
+    try {
+      final response = await Middleware.endpoint(
+          name: 'refuseBusiness',
+          type: HttpType.post,
+          body: {
+            'id': id.toString(),
+          }
+      );
+      if(response['message'] != null) {
+        print('RESPONSE DEL API.REFUSE_BUSINESS: $response');
+      } else {
+        throw Exception('ERROR WHILE REFUSING BUSINESS');
+      }
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
 }

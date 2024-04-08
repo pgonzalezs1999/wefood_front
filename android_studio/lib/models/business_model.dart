@@ -14,6 +14,7 @@ class BusinessModel {
   String? directions;
   int? isValidated;
   double? rate;
+  DateTime? createdAt;
   List<CommentExpandedModel>? comments;
 
   BusinessModel.fromJson(Map<String, dynamic> json):
@@ -30,6 +31,7 @@ class BusinessModel {
     directions = json['directions'] as String?,
     isValidated = json['is_validated'] as int?,
     rate = (json['rate'])?.toDouble(),
+    createdAt = (json['created_at'] != null) ? DateTime.parse(json['created_at']) as DateTime? : null,
     comments = json['comments'] != null
       ? List<CommentExpandedModel>.from((json['comments'] as List<dynamic>).map((comment) => CommentExpandedModel.fromJson(comment as Map<String, dynamic>)))
       : null;

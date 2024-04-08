@@ -42,7 +42,6 @@ class _UserExploreState extends State<UserExplore> {
     return Container(
       margin: const EdgeInsets.only(
         top: 20,
-        bottom: 10,
       ),
       child: Text(title),
     );
