@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:wefood/components/loading_icon.dart';
-import 'package:wefood/components/product_button.dart';
+import 'package:wefood/components/item_button.dart';
 import 'package:wefood/models/product_expanded_model.dart';
 import 'package:wefood/services/auth/api/api.dart';
 
-class ProductFavouriteList extends StatefulWidget {
+class ItemFavouriteList extends StatefulWidget {
 
   final Axis axis;
 
-  const ProductFavouriteList({
+  const ItemFavouriteList({
     super.key,
     this.axis = Axis.horizontal,
   });
 
   @override
-  State<ProductFavouriteList> createState() => _ProductFavouriteListState();
+  State<ItemFavouriteList> createState() => _ItemFavouriteListState();
 }
 
-class _ProductFavouriteListState extends State<ProductFavouriteList> {
+class _ItemFavouriteListState extends State<ItemFavouriteList> {
   Widget resultWidget = const LoadingIcon();
   @override
   Widget build(BuildContext context) {
@@ -31,21 +31,21 @@ class _ProductFavouriteListState extends State<ProductFavouriteList> {
             ),
             child: const Text('Error'),
           );
-        } else if(response.hasData) { // TODO devolver otra cosa si no hay favoritos
+        } else if(response.hasData) {
           if(response.data!.isNotEmpty) {
             resultWidget = SingleChildScrollView(
               scrollDirection: widget.axis,
               child: (widget.axis == Axis.horizontal)
                 ? Row(
                   children: response.data!.map((ProductExpandedModel product) =>
-                    ProductButton(
+                    ItemButton(
                       horizontalScroll: true,
                       productExpanded: product,
                     )).toList(),
                   )
                 : Column(
                   children: response.data!.map((ProductExpandedModel product) =>
-                    ProductButton(
+                    ItemButton(
                       horizontalScroll: false,
                       productExpanded: product,
                     )).toList(),

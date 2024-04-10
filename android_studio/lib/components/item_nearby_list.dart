@@ -1,30 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:wefood/components/loading_icon.dart';
-import 'package:wefood/components/product_button.dart';
+import 'package:wefood/components/item_button.dart';
 import 'package:wefood/models/product_expanded_model.dart';
 import 'package:wefood/services/auth/api/api.dart';
 
-class ProductNearbyList extends StatefulWidget {
+class ItemNearbyList extends StatefulWidget {
 
   final double longitude;
   final double latitude;
 
-  const ProductNearbyList({
+  const ItemNearbyList({
     super.key,
     required this.longitude,
     required this.latitude,
   });
 
   @override
-  State<ProductNearbyList> createState() => _ProductNearbyListState();
+  State<ItemNearbyList> createState() => _ItemNearbyListState();
 }
 
-class _ProductNearbyListState extends State<ProductNearbyList> {
+class _ItemNearbyListState extends State<ItemNearbyList> {
   Widget resultWidget = const LoadingIcon();
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<ProductExpandedModel>>(
-      future: Api.getNearbyBusinesses(
+      future: Api.getNearbyItems(
         longitude: widget.longitude,
         latitude: widget.latitude,
       ),
@@ -36,18 +36,18 @@ class _ProductNearbyListState extends State<ProductNearbyList> {
             ),
             child: const Text('Error'),
           );
-        } else if(response.hasData) { // TODO devolver otra cosa si no hay cercanos o no nos da su ubi
+        } else if(response.hasData) {
           if(response.data!.isNotEmpty) {
             resultWidget = SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: response.data!.map((ProductExpandedModel product) => ProductButton(
+                children: response.data!.map((ProductExpandedModel product) => ItemButton(
                   horizontalScroll: true,
                   productExpanded: product,
                 )).toList(),
               ),
             );
-          } else {
+          } else { // TODO currárselo un poco más
             resultWidget = Align(
               alignment: Alignment.center,
               child: Card(

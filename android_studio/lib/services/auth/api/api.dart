@@ -262,40 +262,40 @@ class Api {
     }
   }
 
-  static Future<List<ProductExpandedModel>> getNearbyBusinesses({
+  static Future<List<ProductExpandedModel>> getNearbyItems({
     required double longitude,
     required double latitude,
   }) async {
     try {
       dynamic response = await Middleware.endpoint(
-        name: 'getNearbyBusinesses',
+        name: 'getNearbyItems',
         type: HttpType.post,
         body: {
           'longitude': longitude.toString(),
           'latitude': latitude.toString(),
         }
       );
-      List<ProductExpandedModel> products = (response['products'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();
+      List<ProductExpandedModel> products = (response['items'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();
       return products;
     } catch(error) {
       throw Exception(error);
     }
   }
 
-  static Future<List<ProductExpandedModel>> getRecommendedProducts({
+  static Future<List<ProductExpandedModel>> getRecommendedItems({
     required double longitude,
     required double latitude,
   }) async {
     try {
       dynamic response = await Middleware.endpoint(
-          name: 'getRecommendedProducts',
+          name: 'getRecommendedItems',
           type: HttpType.post,
           body: {
             'longitude': longitude.toString(),
             'latitude': latitude.toString(),
           }
       );
-      List<ProductExpandedModel> products = (response['products'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();
+      List<ProductExpandedModel> products = (response['items'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();
       return products;
     } catch(error) {
       throw Exception(error);
@@ -310,10 +310,26 @@ class Api {
           name: 'getProduct/$id',
           type: HttpType.get,
       );
-      print('RESPONSE DEL API.GET_PRODUCT: $response');
       ProductExpandedModel product = ProductExpandedModel.fromJson(response);
       return product;
     } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static Future<ProductExpandedModel> getItem({
+    required int id,
+  }) async {
+    try {
+      dynamic response = await Middleware.endpoint(
+        name: 'getItem/$id',
+        type: HttpType.get,
+      );
+      print('RESPONSE DEL API.GET_ITEM: $response');
+      ProductExpandedModel product = ProductExpandedModel.fromJson(response);
+      return product;
+    } catch(error) {
+      print('ERROR DEL API.GET_ITEM: $error');
       throw Exception(error);
     }
   }
@@ -728,9 +744,28 @@ class Api {
             'id': id.toString(),
           }
       );
-      if(response['message'] != null) {
-        print('RESPONSE DEL API.REFUSE_BUSINESS: $response');
-      } else {
+      if(response['message'] == null) {
+        throw Exception('ERROR WHILE REFUSING BUSINESS');
+      }
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static Future<void> orderItem({
+    required int idItem,
+    required int amount,
+  }) async {
+    try {
+      final response = await Middleware.endpoint(
+          name: 'orderItem',
+          type: HttpType.post,
+          body: {
+            'id_item': idItem.toString(),
+            'amount': amount.toString(),
+          }
+      );
+      if(response['message'] == null) {
         throw Exception('ERROR WHILE REFUSING BUSINESS');
       }
     } catch(error) {

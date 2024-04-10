@@ -12,25 +12,24 @@ import 'package:wefood/models/product_expanded_model.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/views/loading_screen.dart';
 
-class Product extends StatefulWidget {
+class Item extends StatefulWidget {
 
   final int id;
 
-  const Product({
+  const Item({
     super.key,
     required this.id,
   });
 
   @override
-  State<Product> createState() => _ProductState();
+  State<Item> createState() => _ItemState();
 }
-
-
-class _ProductState extends State<Product> {
+class _ItemState extends State<Item> {
 
   Widget resultWidget = const LoadingScreen();
   Widget favouriteIcon = const Icon(Icons.favorite_outline);
   late ProductExpandedModel info;
+  int selectedAmount = 1;
 
   _chooseFavouriteIcon(bool newState) {
     setState(() {
@@ -44,10 +43,23 @@ class _ProductState extends State<Product> {
     });
   }
 
+  List<DropdownMenuItem<int>> _amountOptions(int max) {
+    List<DropdownMenuItem<int>> amounts = [];
+    for(int i = 1; i <= max; i++) {
+      amounts.add(
+        DropdownMenuItem<int>(
+          value: i,
+          child: Text(i.toString()),
+        )
+      );
+    }
+    return amounts;
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<ProductExpandedModel>(
-      future: Api.getProduct(
+      future: Api.getItem(
         id: widget.id,
       ),
       builder: (BuildContext context, AsyncSnapshot<ProductExpandedModel> response) {
@@ -206,37 +218,110 @@ class _ProductState extends State<Product> {
                       ),
                       if(info.product!.vegetarian == true || info.product!.vegan == true || info.product!.bakery == true || info.product!.fresh == true) Column(
                         children: <Widget>[
-                          const Text('Categoría:'),
+                          const Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text('Categoría:'),
+                          ),
                           SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-                        ],
-                      ),
-                      Row(
-                        children: <Widget>[
-                          if(info.product!.vegetarian == true) const ProductTag(title: 'Vegetariano'),
-                          if(info.product!.vegan == true) const ProductTag(title: 'Vegano'),
-                          if(info.product!.bakery == true) const ProductTag(title: 'Bollería'),
-                          if(info.product!.fresh == true) const ProductTag(title: 'Frescos'),
+                          Row(
+                            children: <Widget>[
+                              if(info.product!.vegetarian == true) const ProductTag(title: 'Vegetariano'),
+                              if(info.product!.vegan == true) const ProductTag(title: 'Vegano'),
+                              if(info.product!.bakery == true) const ProductTag(title: 'Bollería'),
+                              if(info.product!.fresh == true) const ProductTag(title: 'Frescos'),
+                            ],
+                          ),
                         ],
                       ),
                       const Divider(),
                       Container(
+                        width: double.infinity,
                         margin: EdgeInsets.symmetric(
                           vertical: MediaQuery.of(context).size.height * 0.02,
                         ),
-                        child: Center(
-                          child: ElevatedButton(
-                            child: const Text('COMPRAR'),
-                            onPressed: () {
-
-                            },
-                          ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            if(info.available != null) if(info.available! > 0) Text('${info.available} de ${info.product?.amount} disponibles'),
+                            if(info.available != null) if(info.available! <= 0) const Text('¡Agotado!'),
+                            if(info.available != null) if(info.available! > 0) ElevatedButton(
+                              child: const Text('COMPRAR'),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return StatefulBuilder(
+                                      builder: (context, setState) {
+                                        return AlertDialog(
+                                          title: const Text('Comprar producto'),
+                                          content: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: <Widget>[
+                                              Row(
+                                                children: <Widget>[
+                                                  const Text('Cantidad:'),
+                                                  const SizedBox(
+                                                    width: 10,
+                                                  ),
+                                                  DropdownButton<int>(
+                                                    value: selectedAmount,
+                                                    items: _amountOptions(info.available!),
+                                                    onChanged: (value) {
+                                                      setState(() {
+                                                        selectedAmount = value!;
+                                                      });
+                                                    },
+                                                  ),
+                                                  const Text(' packs'),
+                                                ],
+                                              ),
+                                              if(info.product?.price != null) Align(
+                                                alignment: Alignment.centerLeft,
+                                                child: Text('Precio: ${(info.product!.price! * selectedAmount).toStringAsFixed(2)} Sol/.'),
+                                              ),
+                                            ],
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              child: const Text('CANCELAR'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () async {
+                                                await Api.orderItem(
+                                                  idItem: info.item!.id!,
+                                                  amount: selectedAmount,
+                                                ).then((_) {
+                                                  setState(() {
+                                                    Navigator.pop(context);
+                                                    Navigator.pop(context);
+                                                  });
+                                                });
+                                              },
+                                              child: const Text('COMPRAR'),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ],
                         ),
                       ),
-                      const Divider(),
-                      const Text('¿Qué opinan los compradores?'),
                       if(info.business?.comments != null && info.business!.comments!.isNotEmpty) Column(
-                        children: info.business!.comments!.map((CommentExpandedModel c) => Comment(comment: c)).toList(),
-                      ),
+                        children: <Widget>[
+                          const Divider(),
+                          const Text('¿Qué opinan los compradores?'),
+                          Column(
+                            children: info.business!.comments!.map((CommentExpandedModel c) => Comment(comment: c)).toList(),
+                          ),
+                        ],
+                      )
                     ],
                   ),
                 ),

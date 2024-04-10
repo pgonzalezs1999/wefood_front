@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:wefood/components/product_favourite_list.dart';
-import 'package:wefood/components/product_nearby_list.dart';
-import 'package:wefood/components/product_recommended_list.dart';
+import 'package:wefood/components/item_favourite_list.dart';
+import 'package:wefood/components/item_nearby_list.dart';
+import 'package:wefood/components/item_recommended_list.dart';
 import 'package:wefood/components/search_input.dart';
 import 'package:wefood/components/wefood_navigation_screen.dart';
 
@@ -14,27 +14,24 @@ class UserExplore extends StatefulWidget {
 
 class _UserExploreState extends State<UserExplore> {
 
-  Widget recommendedList = const ProductRecommendedList(
-    longitude: -77,
-    latitude: -12.5,
-  ); // TODO deshardcodear longitud y latitud
-  Widget nearbyList = const ProductNearbyList(
-  longitude: -77,
-  latitude: -12.5,
-  ); // TODO deshardcodear longitud y latitud
-  Widget favouriteList = const ProductFavouriteList();
+  double userLongitude = -77; // TODO deshardcodear
+  double userLatitude = -12.5; // TODO deshardcodear
+
+  Widget recommendedList = const SizedBox();
+  Widget nearbyList =  const SizedBox();
+  Widget favouriteList = const SizedBox();
 
   _reloadLists() async {
     setState(() {
-      recommendedList = const ProductRecommendedList(
-        longitude: -77,
-        latitude: -12.5,
-      ); // TODO deshardcodear longitud y latitud
-      nearbyList = const ProductNearbyList(
-        longitude: -77,
-        latitude: -12.5,
-      ); // TODO deshardcodear longitud y latitud
-      favouriteList = const ProductFavouriteList();
+      recommendedList = ItemRecommendedList(
+        longitude: userLongitude,
+        latitude: userLatitude,
+      );
+      nearbyList = ItemNearbyList(
+        longitude: userLongitude,
+        latitude: userLatitude,
+      );
+      favouriteList = const ItemFavouriteList();
     });
   }
 
@@ -54,9 +51,9 @@ class _UserExploreState extends State<UserExplore> {
     return WefoodNavigationScreen(
       children: <Widget>[
         SearchInput(
-            onChanged: (value) {
+          onChanged: (value) {
 
-            }
+          }
         ),
         _exploreTitle('Recomendados'),
         recommendedList,

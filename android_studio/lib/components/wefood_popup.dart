@@ -4,14 +4,16 @@ class WefoodPopup extends StatefulWidget {
 
   final String title;
   final String? description;
+  Widget? content;
   final Function()? onYes;
   final String? yesButtonTitle;
   final String? noButtonTitle;
 
-  const WefoodPopup({
+  WefoodPopup({
     super.key,
     required this.title,
     this.description,
+    this.content,
     this.onYes,
     this.yesButtonTitle,
     this.noButtonTitle,
@@ -27,7 +29,13 @@ class _WefoodPopupState extends State<WefoodPopup> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(widget.title),
-      content: (widget.description != null) ? Text(widget.description!) : null,
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          if(widget.description != null) Text(widget.description!),
+          if(widget.content != null) widget.content!,
+        ],
+      ),
       actions: [
         TextButton(
           onPressed: () {

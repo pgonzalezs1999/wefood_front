@@ -3,24 +3,24 @@ import 'package:flutter/material.dart';
 import 'package:wefood/components/product_tag.dart';
 import 'package:wefood/models/product_expanded_model.dart';
 import 'package:wefood/commands/utils.dart';
-import 'package:wefood/views/product.dart';
+import 'package:wefood/views/item.dart';
 
-class ProductButton extends StatefulWidget {
+class ItemButton extends StatefulWidget {
 
   final ProductExpandedModel productExpanded;
   final bool? horizontalScroll;
 
-  const ProductButton({
+  const ItemButton({
     super.key,
     this.horizontalScroll,
     required this.productExpanded,
   });
 
   @override
-  State<ProductButton> createState() => _ProductButtonState();
+  State<ItemButton> createState() => _ItemButtonState();
 }
 
-class _ProductButtonState extends State<ProductButton> {
+class _ItemButtonState extends State<ItemButton> {
 
   @override
   void initState() {
@@ -41,12 +41,17 @@ class _ProductButtonState extends State<ProductButton> {
         : null,
       child: GestureDetector(
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => Product(
-                id: widget.productExpanded.product!.id,
-            )),
-          );
+          print('ABRIENDO PAGINA ITEM CON "ID" = ${widget.productExpanded.item!.id}');
+          if(widget.productExpanded.item!.id != null) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => Item(
+                id: widget.productExpanded.item!.id!,
+              )),
+            );
+          } else {
+            print('ERA NULL');
+          }
         },
         child: Card(
           shape: RoundedRectangleBorder(
@@ -110,13 +115,19 @@ class _ProductButtonState extends State<ProductButton> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('${Utils.productTypeCharToString(
-                            type: widget.productExpanded.product?.type,
-                            isCapitalized: true,
-                          )} de'),
-                          Text( // TODO deshardcodear este estilo
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Text>[
+                              Text('${Utils.productTypeCharToString(
+                                type: widget.productExpanded.product?.type,
+                                isCapitalized: true,
+                              )} de'),
+                              if(widget.productExpanded.item?.date != null) Text((widget.productExpanded.item?.date?.day == DateTime.now().day) ? '(hoy)' : '(mañana)'),
+                            ],
+                          ),
+                          Text(
                             widget.productExpanded.business?.name ?? '',
-                            style: const TextStyle(fontWeight: FontWeight.w600),
+                            style: const TextStyle(fontWeight: FontWeight.w600), // TODO deshardcodear este estilo
                           ),
                           Row(
                             children: [

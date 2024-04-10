@@ -1,38 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:wefood/components/loading_icon.dart';
-import 'package:wefood/components/product_button.dart';
+import 'package:wefood/components/item_button.dart';
 import 'package:wefood/models/product_expanded_model.dart';
 import 'package:wefood/services/auth/api/api.dart';
-import 'package:wefood/services/secure_storage.dart';
 
-class ProductRecommendedList extends StatefulWidget {
+class ItemRecommendedList extends StatefulWidget {
 
   final double longitude;
   final double latitude;
 
-  const ProductRecommendedList({
+  const ItemRecommendedList({
     super.key,
     required this.longitude,
     required this.latitude,
   });
 
   @override
-  State<ProductRecommendedList> createState() => _ProductRecommendedListState();
+  State<ItemRecommendedList> createState() => _ItemRecommendedListState();
 }
 
-class _ProductRecommendedListState extends State<ProductRecommendedList> {
+class _ItemRecommendedListState extends State<ItemRecommendedList> {
   Widget resultWidget = const LoadingIcon();
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<ProductExpandedModel>>(
-      future: Api.getRecommendedProducts(
+      future: Api.getRecommendedItems(
         longitude: widget.longitude,
         latitude: widget.latitude,
       ),
       builder: (BuildContext context, AsyncSnapshot<List<ProductExpandedModel>> response) {
         if(response.hasError) {
-          print('RECOMMENDED_LIST ERROR: ${response.error}');
           resultWidget = Container(
             margin: EdgeInsets.symmetric(
               vertical: MediaQuery.of(context).size.height * 0.05,
@@ -41,7 +39,7 @@ class _ProductRecommendedListState extends State<ProductRecommendedList> {
           );
         } else if(response.hasData) { // TODO devolver otra cosa si no hay cercanos o no nos da su ubi
           resultWidget = Column(
-            children: response.data!.map((ProductExpandedModel product) => ProductButton(
+            children: response.data!.map((ProductExpandedModel product) => ItemButton(
               productExpanded: product,
             )).toList(),
           );
