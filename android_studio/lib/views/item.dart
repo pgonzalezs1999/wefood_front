@@ -314,6 +314,7 @@ class _ItemState extends State<Item> {
                         ),
                       ),
                       if(info.business?.comments != null && info.business!.comments!.isNotEmpty) Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           const Divider(),
                           const Text('¿Qué opinan los compradores?'),

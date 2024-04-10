@@ -115,36 +115,39 @@ class _HomeState extends State<Home> {
           ) == false) ? WefoodScreen(
             canPop: false,
             body: screens[_selectedScreenIndex],
-            bottomNavigationBar: BottomNavigationBar(
-              items: <BottomNavigationBarItem>[
-                if(response.data!.idBusiness == null && response.data!.isAdmin != true) const BottomNavigationBarItem(
-                  icon: Icon(Icons.search),
-                  label: 'Explora',
-                ),
-                if(response.data!.idBusiness == null && response.data!.isAdmin != true) const BottomNavigationBarItem(
-                  icon: Icon(Icons.person),
-                  label: 'Perfil',
-                ),
-                if(response.data!.idBusiness != null && response.data!.isAdmin != true) const BottomNavigationBarItem(
-                  icon: Icon(Icons.business),
-                  label: 'Gestión',
-                ),
-                if(response.data!.idBusiness != null && response.data!.isAdmin != true) const BottomNavigationBarItem(
-                  icon: Icon(Icons.person),
-                  label: 'Perfil',
-                ),
-                if(response.data!.isAdmin == true) const BottomNavigationBarItem(
-                  icon: Icon(Icons.business),
-                  label: 'Gestión',
-                ),
-                if(response.data!.isAdmin == true) const BottomNavigationBarItem(
-                  icon: Icon(Icons.person),
-                  label: 'Perfil',
-                ),
-              ],
-              currentIndex: _selectedScreenIndex,
-              selectedItemColor: Colors.amber[800],
-              onTap: _onScreenTapped,
+            bottomNavigationBar: SizedBox(
+              height: (MediaQuery.of(context).size.height - MediaQuery.of(context).viewPadding.top) * 0.075,
+              child: BottomNavigationBar(
+                items: <BottomNavigationBarItem>[
+                  if(response.data!.idBusiness == null && response.data!.isAdmin != true) const BottomNavigationBarItem(
+                    icon: Icon(Icons.search),
+                    label: 'Explora',
+                  ),
+                  if(response.data!.idBusiness == null && response.data!.isAdmin != true) const BottomNavigationBarItem(
+                    icon: Icon(Icons.person),
+                    label: 'Perfil',
+                  ),
+                  if(response.data!.idBusiness != null && response.data!.isAdmin != true) const BottomNavigationBarItem(
+                    icon: Icon(Icons.business),
+                    label: 'Gestión',
+                  ),
+                  if(response.data!.idBusiness != null && response.data!.isAdmin != true) const BottomNavigationBarItem(
+                    icon: Icon(Icons.person),
+                    label: 'Perfil',
+                  ),
+                  if(response.data!.isAdmin == true) const BottomNavigationBarItem(
+                    icon: Icon(Icons.business),
+                    label: 'Gestión',
+                  ),
+                  if(response.data!.isAdmin == true) const BottomNavigationBarItem(
+                    icon: Icon(Icons.person),
+                    label: 'Perfil',
+                  ),
+                ],
+                currentIndex: _selectedScreenIndex,
+                selectedItemColor: Colors.amber[800],
+                onTap: _onScreenTapped,
+              ),
             ),
           ) : const WaitingVerification();
         } else {

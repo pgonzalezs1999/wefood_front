@@ -249,10 +249,10 @@ class Api {
     }
   }
 
-  static Future<List<ProductExpandedModel>> getFavouriteProducts() async {
+  static Future<List<ProductExpandedModel>> getFavouriteItems() async {
     try {
       dynamic response = await Middleware.endpoint(
-        name: 'getFavouriteProducts',
+        name: 'getFavouriteItems',
         type: HttpType.get,
       );
       List<ProductExpandedModel> products = (response['products'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();

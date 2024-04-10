@@ -5,7 +5,7 @@ import 'package:wefood/environment.dart';
 class WefoodScreen extends StatefulWidget {
   final AppBar? appBar;
   final Widget body;
-  final BottomNavigationBar? bottomNavigationBar;
+  final Widget? bottomNavigationBar;
   final bool? canPop;
   final Function(bool)? onPopInvoked;
   final bool ignoreHorizontalPadding;

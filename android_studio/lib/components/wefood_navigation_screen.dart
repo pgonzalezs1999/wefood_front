@@ -18,7 +18,7 @@ class _WefoodNavigationScreenState extends State<WefoodNavigationScreen> {
   Widget build(BuildContext context) {
     return SizedBox(
       width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height * 0.9, // TODO arreglar esto: es una cutrada
+      height: (MediaQuery.of(context).size.height - MediaQuery.of(context).viewPadding.top) * 0.9, // Because navigationBar have height = 0.075
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         scrollDirection: Axis.vertical,

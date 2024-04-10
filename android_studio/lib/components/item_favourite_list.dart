@@ -22,7 +22,7 @@ class _ItemFavouriteListState extends State<ItemFavouriteList> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<ProductExpandedModel>>(
-      future: Api.getFavouriteProducts(),
+      future: Api.getFavouriteItems(),
       builder: (BuildContext context, AsyncSnapshot<List<ProductExpandedModel>> response) {
         if(response.hasError) {
           resultWidget = Container(
