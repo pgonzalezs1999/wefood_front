@@ -4,16 +4,24 @@ import 'package:wefood/components/product_tag.dart';
 import 'package:wefood/models/product_expanded_model.dart';
 import 'package:wefood/commands/utils.dart';
 import 'package:wefood/views/item.dart';
+import 'package:wefood/views/order_customer.dart';
+
+enum NextScreen {
+  item,
+  orderCustomer,
+}
 
 class ItemButton extends StatefulWidget {
 
   final ProductExpandedModel productExpanded;
   final bool? horizontalScroll;
+  final NextScreen? nextScreen;
 
   const ItemButton({
     super.key,
     this.horizontalScroll,
     required this.productExpanded,
+    this.nextScreen = NextScreen.item,
   });
 
   @override
@@ -41,16 +49,20 @@ class _ItemButtonState extends State<ItemButton> {
         : null,
       child: GestureDetector(
         onTap: () {
-          print('ABRIENDO PAGINA ITEM CON "ID" = ${widget.productExpanded.item!.id}');
-          if(widget.productExpanded.item!.id != null) {
+          if(widget.nextScreen == NextScreen.item) {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => Item(
                 id: widget.productExpanded.item!.id!,
               )),
             );
-          } else {
-            print('ERA NULL');
+          } else if(widget.nextScreen == NextScreen.orderCustomer) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => OrderCustomer(
+                id: widget.productExpanded.order!.id!,
+              )),
+            );
           }
         },
         child: Card(
@@ -131,11 +143,25 @@ class _ItemButtonState extends State<ItemButton> {
                           ),
                           Row(
                             children: [
-                              Text('${widget.productExpanded.business?.rate ?? 0} '),
-                              const Icon(Icons.star, size: 15),
-                              Text(' | ${widget.productExpanded.product!.price} Sol/. | '
-                                  '${widget.productExpanded.product!.startingHour?.hour}:${widget.productExpanded.product!.startingHour?.minute}h-${widget.productExpanded.product!.endingHour?.hour}:${widget.productExpanded.product!.endingHour?.minute}h'
+                              if(widget.productExpanded.business?.rate != null) if(widget.productExpanded.business!.rate! > 0) Row(
+                                children: <Widget>[
+                                  const Icon(
+                                    Icons.star,
+                                    size: 15,
+                                  ),
+                                  Text(' ${widget.productExpanded.business?.rate ?? 0} | '),
+                                ],
                               ),
+                              const Icon(
+                                Icons.price_change,
+                                size: 15,
+                              ),
+                              Text(' ${widget.productExpanded.product!.price} Sol/. | '),
+                              const Icon(
+                                Icons.watch_later,
+                                size: 15,
+                              ),
+                              Text(' ${widget.productExpanded.product!.startingHour?.hour}:${widget.productExpanded.product!.startingHour?.minute}h - ${widget.productExpanded.product!.endingHour?.hour}:${widget.productExpanded.product!.endingHour?.minute}h'),
                             ],
                           ),
                         ],

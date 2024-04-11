@@ -24,7 +24,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
               BackArrow(
                 margin: EdgeInsets.zero,
               ),
-              Text('Mis productos favoritos'),
+              Text('Productos de mis sitios favoritos'),
             ],
           ),
           ItemFavouriteList(

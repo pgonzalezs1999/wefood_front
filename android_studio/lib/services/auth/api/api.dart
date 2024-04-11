@@ -772,4 +772,21 @@ class Api {
       throw Exception(error);
     }
   }
+
+  static Future<List<ProductExpandedModel>> getPendingOrdersCustomer() async {
+    try {
+      final response = await Middleware.endpoint(
+          name: 'getPendingOrdersCustomer',
+          type: HttpType.get,
+      );
+      print('RESPONSE DEL API.GET_PENDING_ORDERS_CUSTOMER: $response');
+      if(response['results'] == null) {
+        throw Exception('ERROR WHILE GETTING PENDING ITEMS');
+      }
+      List<ProductExpandedModel> result = (response['results'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();
+      return result;
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
 }

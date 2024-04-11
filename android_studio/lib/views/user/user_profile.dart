@@ -9,6 +9,7 @@ import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/views/user/favourites_screen.dart';
 import 'package:wefood/views/terms_and_conditions.dart';
+import 'package:wefood/views/user/pending_orders_screen.dart';
 
 class UserProfile extends StatefulWidget {
   const UserProfile({super.key});
@@ -30,6 +31,13 @@ class _UserProfileState extends State<UserProfile> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const FavouritesScreen()),
+    );
+  }
+
+  void _navigateToPendingOrders() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const PendingOrdersScreen()),
     );
   }
 
@@ -80,18 +88,18 @@ class _UserProfileState extends State<UserProfile> {
           children: <Widget>[
             SettingsElement(
               iconData: Icons.timelapse,
-              title: 'Pedidos pendientes - FALTA',
-              isFirst: true,
-              onTap: () async {
-                // TODO falta esto (quitar async y el mostrar accessToken)
-                String? at = await UserSecureStorage().read(key: 'accessToken');
-                print('ACCESS_TOKEN: $at');
+              title: 'Pedidos pendientes',
+              onTap: () {
+                _navigateToPendingOrders();
               },
             ),
             SettingsElement(
               iconData: Icons.history,
               title: 'Historial de pedidos - FALTA',
-              onTap: () {
+              onTap: () async { // TODO falta esto
+                // TODO quitar async y el mostrar accessToken
+                String? at = await UserSecureStorage().read(key: 'accessToken');
+                print('ACCESS_TOKEN: $at');
                 // TODO falta esto
               },
             ),

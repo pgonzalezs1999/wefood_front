@@ -190,11 +190,15 @@ class _ItemState extends State<Item> {
                       Text('Precio: ${info.product!.price} Sol/.'),
                       SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                       Text('Hora de recogida: De ${_parseTime(info.product!.startingHour)} a ${_parseTime(info.product!.endingHour)} h'),
-                      SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-                      Row(
+                      if(info.business?.rate != null) if(info.business!.rate! > 0) Column(
                         children: <Widget>[
-                          Text('Valoración: ${info.business?.rate}  '),
-                        ] + _printStarts(info.business!.rate!),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                          Row(
+                            children: <Widget>[
+                              Text('Valoración: ${info.business?.rate}  '),
+                            ] + _printStarts(info.business!.rate!),
+                          ),
+                        ],
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
