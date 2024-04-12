@@ -50,7 +50,7 @@ class _OrderPendingListState extends State<OrderPendingList> {
                     horizontal: MediaQuery.of(context).size.width * 0.05,
                     vertical: MediaQuery.of(context).size.width * 0.025,
                   ),
-                  child: const Text('¡Añade productos a favoritos para encontrarlos más fácilmente!'),
+                  child: const Text('¡Estás al día! Aquí aparecerán los productos que compres mientras aún puedas recogerlos'),
                 ),
               ),
             );

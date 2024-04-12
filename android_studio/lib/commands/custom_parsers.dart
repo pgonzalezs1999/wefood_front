@@ -51,4 +51,20 @@ class CustomParsers {
     }
     return result;
   }
+
+  static String numberToHexadecimal(int number) {
+    String result = number.toRadixString(16).toUpperCase();
+    while(result.length < 6) {
+      result = '0$result';
+    }
+    return result;
+  }
+
+  static int hexadecimalToNumber(String hexadecimal) {
+    if(hexadecimal.startsWith("0x") || hexadecimal.startsWith("0X")) {
+      hexadecimal = hexadecimal.substring(2);
+    }
+    int result = int.parse(hexadecimal, radix: 16);
+    return result;
+  }
 }

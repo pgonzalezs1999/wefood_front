@@ -5,6 +5,7 @@ import 'package:wefood/models/business_products_resume_model.dart';
 import 'package:wefood/models/country_model.dart';
 import 'package:wefood/models/exceptions.dart';
 import 'package:wefood/models/favourite_model.dart';
+import 'package:wefood/models/order_model.dart';
 import 'package:wefood/models/product_expanded_model.dart';
 import 'package:wefood/models/product_model.dart';
 import 'package:wefood/models/user_model.dart';
@@ -779,11 +780,32 @@ class Api {
           name: 'getPendingOrdersCustomer',
           type: HttpType.get,
       );
-      print('RESPONSE DEL API.GET_PENDING_ORDERS_CUSTOMER: $response');
       if(response['results'] == null) {
         throw Exception('ERROR WHILE GETTING PENDING ITEMS');
       }
       List<ProductExpandedModel> result = (response['results'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();
+      return result;
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static Future<OrderModel> completeOrderCustomer({
+    required int idOrder,
+  }) async {
+    try {
+      final response = await Middleware.endpoint(
+        name: 'completeOrderCustomer',
+        type: HttpType.post,
+        body: {
+          'id_order': idOrder.toString(),
+        }
+      );
+      print('RESPONSE DEL API.COMPLETE_ORDER_CUSTOMER: $response');
+      if(response['message'] == null) {
+        throw Exception('ERROR WHILE GETTING PENDING ITEMS');
+      }
+      OrderModel result = OrderModel.fromJson(response['order']);
       return result;
     } catch(error) {
       throw Exception(error);

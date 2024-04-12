@@ -14,8 +14,8 @@ class OrderModel {
   OrderModel.fromJson(Map<String, dynamic> json):
     id = json['id'] as int?,
     idUser = json['id_user'] as int?,
-    orderDate = json['order_date'] as DateTime?,
-    receptionDate = json['reception_date'] as DateTime?,
+    orderDate = (json['order_date'] != null) ? DateTime.parse(json['order_date']) as DateTime? : null,
+    receptionDate = (json['reception_date'] != null) ? DateTime.parse(json['reception_date']) as DateTime? : null,
     receptionMethod = json['reception_method'] as int?,
     amount = json['amount'] as int?,
     available = json['available'] as int?,
