@@ -6,6 +6,7 @@ import 'package:wefood/components/wefood_navigation_screen.dart';
 import 'package:wefood/models/business_products_resume_model.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/types.dart';
+import 'package:wefood/views/business/pending_orders_business.dart';
 
 class BusinessManagement extends StatefulWidget {
   const BusinessManagement({super.key});
@@ -15,6 +16,13 @@ class BusinessManagement extends StatefulWidget {
 }
 
 class _BusinessManagementState extends State<BusinessManagement> {
+
+  void _navigateToPendingOrdersBusiness() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const PendingOrdersBusiness()),
+    );
+  }
 
   Widget resultWidget = const LoadingIcon();
 
@@ -90,7 +98,7 @@ class _BusinessManagementState extends State<BusinessManagement> {
         Align(
           child: ElevatedButton(
             onPressed: () {
-              // TODO falta crear esta pantalla
+              _navigateToPendingOrdersBusiness();
             },
             child: const Text('RECOGIDAS'),
           ),

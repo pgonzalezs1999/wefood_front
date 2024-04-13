@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wefood/commands/utils.dart';
+import 'package:wefood/types.dart';
 
 class CustomParsers {
 
@@ -53,18 +54,30 @@ class CustomParsers {
   }
 
   static String numberToHexadecimal(int number) {
-    String result = number.toRadixString(16).toUpperCase();
-    while(result.length < 6) {
+    String result = number.toRadixString(36).toUpperCase();
+    while(result.length < 5) {
       result = '0$result';
     }
     return result;
   }
 
-  static int hexadecimalToNumber(String hexadecimal) {
-    if(hexadecimal.startsWith("0x") || hexadecimal.startsWith("0X")) {
-      hexadecimal = hexadecimal.substring(2);
+  static int hexadecimalToNumber(String hexadecimalNumber) {
+    int result = int.parse(
+      hexadecimalNumber,
+      radix: 36,
+    );
+    return result;
+  }
+
+  static OrderReceptionMethod? stringToOrderReceptionMethod(String? string) {
+    OrderReceptionMethod? result;
+    if(string != null) {
+      if(string.toLowerCase() == 'pm') {
+        result = OrderReceptionMethod.pm;
+      } else if(string.toLowerCase() == 'normal') {
+        result = OrderReceptionMethod.normal;
+      }
     }
-    int result = int.parse(hexadecimal, radix: 16);
     return result;
   }
 }

@@ -3,7 +3,7 @@ class OrderModel {
   int? idUser;
   DateTime? orderDate;
   DateTime? receptionDate;
-  int? receptionMethod;
+  String? receptionMethod;
   int? amount;
   int? available;
   int? idBusiness;
@@ -16,7 +16,7 @@ class OrderModel {
     idUser = json['id_user'] as int?,
     orderDate = (json['order_date'] != null) ? DateTime.parse(json['order_date']) as DateTime? : null,
     receptionDate = (json['reception_date'] != null) ? DateTime.parse(json['reception_date']) as DateTime? : null,
-    receptionMethod = json['reception_method'] as int?,
+    receptionMethod = json['reception_method'] as String?,
     amount = json['amount'] as int?,
     available = json['available'] as int?,
     idBusiness = json['id_business'] as int?,

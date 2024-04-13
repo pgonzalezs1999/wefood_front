@@ -326,11 +326,9 @@ class Api {
         name: 'getItem/$id',
         type: HttpType.get,
       );
-      print('RESPONSE DEL API.GET_ITEM: $response');
       ProductExpandedModel product = ProductExpandedModel.fromJson(response);
       return product;
     } catch(error) {
-      print('ERROR DEL API.GET_ITEM: $error');
       throw Exception(error);
     }
   }
@@ -790,7 +788,23 @@ class Api {
     }
   }
 
-  static Future<OrderModel> completeOrderCustomer({
+  static Future<List<OrderModel>> getPendingOrdersBusiness() async {
+    try {
+      final response = await Middleware.endpoint(
+        name: 'getPendingOrdersBusiness',
+        type: HttpType.get,
+      );
+      if(response['orders'] == null) {
+        throw Exception('ERROR WHILE GETTING PENDING ITEMS');
+      }
+      List<OrderModel> result = (response['orders'] as List<dynamic>).map((order) => OrderModel.fromJson(order)).toList();
+      return result;
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static Future<void> completeOrderCustomer({
     required int idOrder,
   }) async {
     try {
@@ -801,12 +815,28 @@ class Api {
           'id_order': idOrder.toString(),
         }
       );
-      print('RESPONSE DEL API.COMPLETE_ORDER_CUSTOMER: $response');
       if(response['message'] == null) {
         throw Exception('ERROR WHILE GETTING PENDING ITEMS');
       }
-      OrderModel result = OrderModel.fromJson(response['order']);
-      return result;
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static Future<void> completeOrderBusiness({
+    required int idOrder,
+  }) async {
+    try {
+      final response = await Middleware.endpoint(
+          name: 'completeOrderBusiness',
+          type: HttpType.post,
+          body: {
+            'id_order': idOrder.toString(),
+          }
+      );
+      if(response['message'] == null) {
+        throw Exception('ERROR WHILE GETTING PENDING ITEMS');
+      }
     } catch(error) {
       throw Exception(error);
     }

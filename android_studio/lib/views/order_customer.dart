@@ -32,16 +32,16 @@ class _OrderCustomerState extends State<OrderCustomer> {
     return WefoodScreen(
       body: Column(
         children: <Widget>[
-          Row(
+          const Row(
             children: <Widget>[
-              const BackArrow(
+              BackArrow(
                 margin: EdgeInsets.zero,
               ),
-              Text('Pedido ${CustomParsers.numberToHexadecimal(widget.id)}'),
+              Text('Confirmar pedido'),
             ],
           ),
           FutureBuilder<ProductExpandedModel>(
-            future: Api.getItem( // TODO ESTE ENDPOINT NO ES!!!!
+            future: Api.getItem(
               id: widget.id,
             ),
             builder: (BuildContext context, AsyncSnapshot<ProductExpandedModel> response) {
@@ -64,7 +64,10 @@ class _OrderCustomerState extends State<OrderCustomer> {
                     ),
                     Align(
                       alignment: Alignment.centerLeft,
-                      child: Text('NOMBRE DEL ESTABLECIMIENTO'),
+                      child: Text('${info.business!.name}'),
+                    ),
+                    const SizedBox(
+                      height: 20,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -87,13 +90,18 @@ class _OrderCustomerState extends State<OrderCustomer> {
                           width: 10,
                         ),
                         Expanded(
-                          child: Text('UBICACIÓN DEL ESTABLECIMIENTO'),
+                          child: Text('${info.business!.directions}'),
                         ),
                       ],
                     ),
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text('Enseña este QR al encargado:'),
+                    Container(
+                      margin: const EdgeInsets.symmetric(
+                        vertical: 20,
+                      ),
+                      child: const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text('Enseña este QR al encargado:'),
+                      ),
                     ),
                     SizedBox(
                       height: MediaQuery.of(context).size.width * 0.75,
@@ -104,9 +112,17 @@ class _OrderCustomerState extends State<OrderCustomer> {
                         size: 200.0,
                       ),
                     ),
-                    const Text(
-                      '¿No conseguís leer el QR? Confirma tú la entrega desde el siguiente botón y enséñale el código al encargado para que reconozca tu pedido:',
-                      textAlign: TextAlign.center,
+                    Container(
+                      margin: const EdgeInsets.symmetric(
+                        vertical: 20,
+                      ),
+                      child: const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          '¿No conseguís leer el QR? Confirma tú la entrega desde el siguiente botón y enséñale el código al encargado para que reconozca tu pedido:',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
                     ),
                     ElevatedButton(
                       onPressed: () async {
@@ -132,10 +148,11 @@ class _OrderCustomerState extends State<OrderCustomer> {
                                     ),
                                     TextButton(
                                       onPressed: () async {
-                                        await Api.completeOrderCustomer( // TODO ESTA NO ES!!!!
+                                        await Api.completeOrderCustomer(
                                           idOrder: widget.id,
                                         ).then((_) {
                                           setState(() {
+                                            Navigator.pop(context);
                                             Navigator.pop(context);
                                             Navigator.pop(context);
                                           });
@@ -152,7 +169,16 @@ class _OrderCustomerState extends State<OrderCustomer> {
                       },
                       child: const Text('CONFIRMAR RECOGIDA'),
                     ),
-                    Text('Código: ${CustomParsers.numberToHexadecimal(widget.id)}')
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Text( // TODO deshardcodear este estilo
+                      'Código: ${CustomParsers.numberToHexadecimal(widget.id)}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 20,
+                      ),
+                    )
                   ],
                 );
               }

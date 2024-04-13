@@ -24,3 +24,8 @@ enum ProductType {
   lunch,
   dinner,
 }
+
+enum OrderReceptionMethod {
+  pm, // picked up manually
+  normal,
+}

@@ -9,7 +9,7 @@ import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/views/user/favourites_screen.dart';
 import 'package:wefood/views/terms_and_conditions.dart';
-import 'package:wefood/views/user/pending_orders_screen.dart';
+import 'package:wefood/views/user/pending_orders_customer.dart';
 
 class UserProfile extends StatefulWidget {
   const UserProfile({super.key});
@@ -37,7 +37,7 @@ class _UserProfileState extends State<UserProfile> {
   void _navigateToPendingOrders() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const PendingOrdersScreen()),
+      MaterialPageRoute(builder: (context) => const PendingOrdersCustomer()),
     );
   }
 
