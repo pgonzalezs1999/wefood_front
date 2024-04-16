@@ -25,6 +25,10 @@ dependencies:
   sign_in_button: ^3.2.0
   syncfusion_flutter_pdfviewer: ^24.2.8
   qr_flutter: ^4.1.0
+  flutter_bloc: ^8.1.5
+  bloc: ^8.1.4
+  equatable: ^2.0.5
+  get_it: ^7.7.0
 
 dev_dependencies:
   flutter_test:

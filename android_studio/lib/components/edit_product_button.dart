@@ -35,7 +35,7 @@ class _EditProductButtonState extends State<EditProductButton> {
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => EditProductScreen(
+            MaterialPageRoute(builder: (context) => EditProduct(
               productId: widget.product.id,
               productType: widget.productType,
             )),

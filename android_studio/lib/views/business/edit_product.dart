@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/commands/custom_parsers.dart';
 import 'package:wefood/components/back_arrow.dart';
 import 'package:wefood/components/choosable_numeric_input.dart';
@@ -10,22 +12,22 @@ import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/types.dart';
 import 'package:wefood/commands/utils.dart';
 
-class EditProductScreen extends StatefulWidget {
+class EditProduct extends StatefulWidget {
 
   final int productId;
   final ProductType productType;
 
-  const EditProductScreen({
+  const EditProduct({
     super.key,
     required this.productId,
     required this.productType,
   });
 
   @override
-  State<EditProductScreen> createState() => _EditProductScreenState();
+  State<EditProduct> createState() => _EditProductState();
 }
 
-class _EditProductScreenState extends State<EditProductScreen> {
+class _EditProductState extends State<EditProduct> {
 
   String _productTypeString = '';
 
@@ -479,11 +481,20 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         workingOnSaturday: CustomParsers.boolToSqlString(saturdays),
                         workingOnSunday: CustomParsers.boolToSqlString(sundays),
                       );
-                      Navigator.pop(context);
+                      print('PRODUCT DEVUELTO POR EL API: $product');
+                      /*if(widget.productType == ProductType.breakfast) {
+                        context.read<BusinessSelfProductsCubit>().setBreakfast(product);
+                      } else if(widget.productType == ProductType.lunch) {
+                        context.read<BusinessSelfProductsCubit>().setLunch(product);
+                      } else if(widget.productType == ProductType.dinner) {
+                        context.read<BusinessDinnerCubit>().set(product);
+                      }*/
                       setState(() {
                         isSubmitting = false;
                       });
+                      // Navigator.pop(context);
                     } catch(e) {
+                      print('ERROR: $e');
                       setState(() {
                         isSubmitting = false;
                         error = 'Ha ocurrido un error'; // TODO hacer algo más currado
@@ -516,8 +527,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                             try {
                               await Api.deleteProduct(
                                 type: (widget.productType == ProductType.breakfast) ? 'B'
-                                    : (widget.productType == ProductType.lunch) ? 'L'
-                                    : (widget.productType == ProductType.dinner) ? 'D' : '',
+                                  : (widget.productType == ProductType.lunch) ? 'L'
+                                  : (widget.productType == ProductType.dinner) ? 'D' : '',
                               );
                               Navigator.pop(context);
                               Navigator.pop(context);

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/commands/custom_parsers.dart';
 import 'package:wefood/components/back_arrow.dart';
 import 'package:wefood/components/choosable_numeric_input.dart';
@@ -421,8 +423,8 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
                         price: price,
                         amount: amount,
                         endingDate: CustomParsers.dateTimeToSqlDateTimeString(endDate),
-                        startHour: CustomParsers.timeOfDayToSqlTimeString(startTime!),
-                        endHour: CustomParsers.timeOfDayToSqlTimeString(endTime!),
+                        startHour: CustomParsers.timeOfDayToSqlTimeString(startTime),
+                        endHour: CustomParsers.timeOfDayToSqlTimeString(endTime),
                         vegetarian: CustomParsers.boolToSqlString(vegetarian),
                         vegan: CustomParsers.boolToSqlString(vegan),
                         bakery: CustomParsers.boolToSqlString(bakery),
@@ -436,11 +438,19 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
                         workingOnSunday: CustomParsers.boolToSqlString(sundays),
                         type: Utils.productTypeToChar(widget.productType),
                       );
-                      Navigator.pop(context);
+                      if(widget.productType == ProductType.breakfast) {
+                        context.read<BusinessBreakfastCubit>().set(product);
+                      } else if(widget.productType == ProductType.lunch) {
+                        context.read<BusinessLunchCubit>().set(product);
+                      } else if(widget.productType == ProductType.dinner) {
+                        context.read<BusinessDinnerCubit>().set(product);
+                      }
                       setState(() {
                         isSubmitting = false;
                       });
+                      Navigator.pop(context);
                     } catch(e) {
+                      print('ERROR: $e');
                       setState(() {
                         isSubmitting = false;
                         error = 'Ha ocurrido un error'; // TODO hacer algo más currado

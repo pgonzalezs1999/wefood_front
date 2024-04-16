@@ -53,4 +53,26 @@ class ProductModel {
       return null;
     }
   }
+
+  static void printInfo(ProductModel product) {
+    print('---------- IMPRIMIENDO PRODUCT CON ID: ${product.id} ----------');
+    print('-> price: ${product.price}');
+    print('-> amount: ${product.amount}');
+    print('-> endingDate: ${product.endingDate}');
+    print('-> startingHour: ${product.startingHour}');
+    print('-> endingHour: ${product.endingHour}');
+    print('-> fresh: ${product.fresh}');
+    print('-> bakery: ${product.bakery}');
+    print('-> vegetarian: ${product.vegetarian}');
+    print('-> vegan: ${product.vegan}');
+    print('-> workingOnMonday: ${product.workingOnMonday}');
+    print('-> workingOnTuesday: ${product.workingOnTuesday}');
+    print('-> workingOnWednesday: ${product.workingOnWednesday}');
+    print('-> workingOnThursday: ${product.workingOnThursday}');
+    print('-> workingOnFriday: ${product.workingOnFriday}');
+    print('-> workingOnSaturday: ${product.workingOnSaturday}');
+    print('-> workingOnSunday: ${product.workingOnSunday}');
+    print('-> type: ${product.type}');
+    print('------------------------------');
+  }
 }

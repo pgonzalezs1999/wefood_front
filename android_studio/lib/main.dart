@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/models/auth_model.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/services/secure_storage.dart';
@@ -8,7 +10,23 @@ import 'package:wefood/views/loading_screen.dart';
 import 'package:wefood/views/login.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const BlocsProvider());
+}
+
+class BlocsProvider extends StatelessWidget {
+  const BlocsProvider({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => BusinessBreakfastCubit(), lazy: false),
+        BlocProvider(create: (context) => BusinessLunchCubit(), lazy: false),
+        BlocProvider(create: (context) => BusinessDinnerCubit(), lazy: false),
+      ],
+      child: const MyApp(),
+    );
+  }
 }
 
 class MyApp extends StatelessWidget {
