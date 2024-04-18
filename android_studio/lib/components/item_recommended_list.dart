@@ -35,8 +35,9 @@ class _ItemRecommendedListState extends State<ItemRecommendedList> {
             margin: EdgeInsets.symmetric(
               vertical: MediaQuery.of(context).size.height * 0.05,
             ),
-            child: const Text('Error'),
+            child: Text('Error ${response.error}'),
           );
+          print('------------> ${response.error}');
         } else if(response.hasData) { // TODO devolver otra cosa si no hay cercanos o no nos da su ubi
           resultWidget = Column(
             children: response.data!.map((ProductExpandedModel product) => ItemButton(

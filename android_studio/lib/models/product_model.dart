@@ -73,6 +73,5 @@ class ProductModel {
     print('-> workingOnSaturday: ${product.workingOnSaturday}');
     print('-> workingOnSunday: ${product.workingOnSunday}');
     print('-> type: ${product.type}');
-    print('------------------------------');
   }
 }

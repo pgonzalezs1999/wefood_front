@@ -52,7 +52,7 @@ class _UserExploreState extends State<UserExplore> {
       children: <Widget>[
         SearchInput(
           onChanged: (value) {
-
+            // TODO falta esto
           }
         ),
         _exploreTitle('Recomendados'),

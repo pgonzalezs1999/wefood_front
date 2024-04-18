@@ -28,7 +28,6 @@ class _BusinessInfoState extends State<BusinessInfo> {
 
   void retrieveData() async {
     await Api.getSessionBusiness().then((BusinessExpandedModel data) {
-      BusinessExpandedModel.printInfo(data);
       context.read<UserInfoCubit>().setBusinessName(data.business.name);
       context.read<UserInfoCubit>().setBusinessDescription(data.business.description);
       context.read<UserInfoCubit>().setBusinessDirections(data.business.directions);

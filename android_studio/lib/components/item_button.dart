@@ -1,8 +1,10 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:wefood/components/product_tag.dart';
+import 'package:wefood/models/image_model.dart';
 import 'package:wefood/models/product_expanded_model.dart';
 import 'package:wefood/commands/utils.dart';
+import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/views/item.dart';
 import 'package:wefood/views/order_customer.dart';
 
@@ -30,10 +32,23 @@ class ItemButton extends StatefulWidget {
 
 class _ItemButtonState extends State<ItemButton> {
 
+  void retrieveData() async {
+    ImageModel imageModel = await Api.getImage(
+      idUser: widget.productExpanded.user!.id!,
+      meaning: '${widget.productExpanded.product!.type!.toLowerCase()}1',
+    );
+    setState(() {
+      imageUrl = imageModel.image;
+    });
+  }
+
   @override
   void initState() {
+    retrieveData();
     super.initState();
   }
+
+  String? imageUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -71,8 +86,10 @@ class _ItemButtonState extends State<ItemButton> {
           ),
           child: Container(
             decoration: BoxDecoration(
-              image: const DecorationImage(
-                image: AssetImage('assets/images/salmon.jpg'),
+              image: DecorationImage(
+                image: (imageUrl != null)
+                  ? NetworkImage(imageUrl!)
+                  : const AssetImage('assets/images/salmon.jpg'),
                 fit: BoxFit.cover,
               ),
               borderRadius: BorderRadius.circular(10),

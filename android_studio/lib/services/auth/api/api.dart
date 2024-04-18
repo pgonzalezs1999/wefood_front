@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:wefood/environment.dart';
 import 'package:wefood/models/auth_model.dart';
 import 'package:wefood/models/business_expanded_model.dart';
 import 'package:wefood/models/business_products_resume_model.dart';
 import 'package:wefood/models/country_model.dart';
 import 'package:wefood/models/exceptions.dart';
 import 'package:wefood/models/favourite_model.dart';
+import 'package:wefood/models/image_model.dart';
 import 'package:wefood/models/order_model.dart';
 import 'package:wefood/models/product_expanded_model.dart';
 import 'package:wefood/models/product_model.dart';
@@ -837,6 +840,30 @@ class Api {
       if(response['message'] == null) {
         throw Exception('ERROR WHILE GETTING PENDING ITEMS');
       }
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static Future<ImageModel> getImage({
+    required int idUser,
+    required String meaning,
+  }) async {
+    try {
+      final response = await Middleware.endpoint(
+          name: 'getImage',
+          type: HttpType.post,
+          body: {
+            'id_user': idUser.toString(),
+            'meaning': meaning.toString(),
+          }
+      );
+      if(response['image'] == null) {
+        throw Exception('ERROR WHILE GETTING IMAGE');
+      }
+      ImageModel imageModel = ImageModel.fromJson(response['image']);
+      imageModel.image = '${Environment.storageUrl}${imageModel.image}';
+      return imageModel;
     } catch(error) {
       throw Exception(error);
     }
