@@ -15,6 +15,23 @@ class UserModel {
   int? idBusiness;
   int? businessVerified;
 
+  UserModel.empty():
+    id = null,
+    realName = null,
+    realSurname = null,
+    username = null,
+    email = null,
+    emailVerified = null,
+    isAdmin = null,
+    phone = null,
+    phonePrefix = null,
+    sex = null,
+    lastLongitude = null,
+    lastLatitude = null,
+    lastLoginDate = null,
+    idBusiness = null,
+    businessVerified = null;
+
   UserModel.fromJson(Map<String, dynamic> json):
     id = json['id'] as int?,
     realName = json['real_name'] as String?,
@@ -31,4 +48,22 @@ class UserModel {
     lastLoginDate = json['last_login_date'] as DateTime?,
     idBusiness = json['id_business'] as int?,
     businessVerified = json['business_verified'] as int?;
+
+  static void printInfo(UserModel user) {
+    print('IMPRIMIENDO USER CON ID: ${user.id}');
+    print('-> realName: ${user.realName}');
+    print('-> realSurname: ${user.realSurname}');
+    print('-> username: ${user.username}');
+    print('-> email: ${user.email}');
+    print('-> emailVerified: ${user.emailVerified}');
+    print('-> isAdmin: ${user.isAdmin}');
+    print('-> phone: ${user.phone}');
+    print('-> phonePrefix: ${user.phonePrefix}');
+    print('-> sex: ${user.sex}');
+    print('-> lastLongitude: ${user.lastLongitude}');
+    print('-> lastLatitude: ${user.lastLatitude}');
+    print('-> lastLoginDate: ${user.lastLoginDate}');
+    print('-> idBusiness: ${user.idBusiness}');
+    print('-> businessVerified: ${user.businessVerified}');
+  }
 }

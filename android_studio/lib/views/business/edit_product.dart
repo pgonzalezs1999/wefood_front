@@ -481,18 +481,10 @@ class _EditProductState extends State<EditProduct> {
                         workingOnSaturday: CustomParsers.boolToSqlString(saturdays),
                         workingOnSunday: CustomParsers.boolToSqlString(sundays),
                       );
-                      print('PRODUCT DEVUELTO POR EL API: $product');
-                      /*if(widget.productType == ProductType.breakfast) {
-                        context.read<BusinessSelfProductsCubit>().setBreakfast(product);
-                      } else if(widget.productType == ProductType.lunch) {
-                        context.read<BusinessSelfProductsCubit>().setLunch(product);
-                      } else if(widget.productType == ProductType.dinner) {
-                        context.read<BusinessDinnerCubit>().set(product);
-                      }*/
                       setState(() {
                         isSubmitting = false;
                       });
-                      // Navigator.pop(context);
+                      Navigator.pop(context);
                     } catch(e) {
                       print('ERROR: $e');
                       setState(() {

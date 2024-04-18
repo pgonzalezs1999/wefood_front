@@ -55,7 +55,7 @@ class ProductModel {
   }
 
   static void printInfo(ProductModel product) {
-    print('---------- IMPRIMIENDO PRODUCT CON ID: ${product.id} ----------');
+    print('IMPRIMIENDO PRODUCT CON ID: ${product.id}');
     print('-> price: ${product.price}');
     print('-> amount: ${product.amount}');
     print('-> endingDate: ${product.endingDate}');

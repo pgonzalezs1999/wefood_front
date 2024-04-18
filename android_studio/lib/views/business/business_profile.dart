@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/commands/share_app.dart';
 import 'package:wefood/components/business_info.dart';
 import 'package:wefood/components/settings_element.dart';
 import 'package:wefood/components/wefood_navigation_screen.dart';
 import 'package:wefood/components/wefood_popup.dart';
 import 'package:wefood/main.dart';
-import 'package:wefood/models/product_model.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/views/terms_and_conditions.dart';
@@ -149,11 +146,6 @@ class _BusinessProfileState extends State<BusinessProfile> {
                       );
                     }
                 );
-              },
-            ),
-            BlocBuilder<BusinessDinnerCubit, ProductModel?>(
-              builder: (context, value) {
-                return Text(value?.startingHour.toString() ?? 'Sin horario de apertura');
               },
             ),
           ],

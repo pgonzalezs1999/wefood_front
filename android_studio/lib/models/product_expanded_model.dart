@@ -13,6 +13,15 @@ class ProductExpandedModel {
   int? favourites;
   int? available;
 
+  ProductExpandedModel.empty():
+    product = null,
+    item = null,
+    order = null,
+    business = null,
+    isFavourite = null,
+    favourites = null,
+    available = null;
+
   ProductExpandedModel.fromJson(Map<String, dynamic> json) :
     product = json['product'] != null ? ProductModel.fromJson(json['product'] as Map<String, dynamic>) : null,
     item = json['item'] != null ? ItemModel.fromJson(json['item'] as Map<String, dynamic>) : null,

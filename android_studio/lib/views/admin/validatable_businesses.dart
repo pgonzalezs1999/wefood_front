@@ -76,19 +76,19 @@ class _ValidatableBusinessesState extends State<ValidatableBusinesses> {
                         ),
                         _ValidatableRow(
                           title: 'Nombre',
-                          value: item.business.name,
+                          value: item.business!.name,
                         ),
                         _ValidatableRow(
                           title: 'Descripción',
-                          value: item.business.description,
+                          value: item.business!.description,
                         ),
                         _ValidatableRow(
                           title: 'RUC',
-                          value: item.business.taxId,
+                          value: item.business!.taxId,
                         ),
                         _ValidatableRow(
                           title: 'Dirección',
-                          value: '${item.business.directions} - (long: ${item.business.longitude}, lat: ${item.business.latitude})',
+                          value: '${item.business!.directions} - (long: ${item.business!.longitude}, lat: ${item.business!.latitude})',
                         ),
                         const Divider(
                           height: 30,
@@ -116,7 +116,7 @@ class _ValidatableBusinessesState extends State<ValidatableBusinesses> {
                         ),
                         _ValidatableRow(
                           title: 'Solicitado a fecha',
-                          value: CustomParsers.dateTimeToString(item.business.createdAt),
+                          value: CustomParsers.dateTimeToString(item.business!.createdAt),
                         ),
                         const Divider(
                           height: 30,
@@ -133,7 +133,7 @@ class _ValidatableBusinessesState extends State<ValidatableBusinesses> {
                                       title: '¿Rechazar establecimiento?',
                                       onYes: () async {
                                         await Api.refuseBusiness(
-                                          id: item.business.id!,
+                                          id: item.business!.id!,
                                         ).then((value) async {
                                           _retrieveData();
                                         }).then((value) {
@@ -155,7 +155,7 @@ class _ValidatableBusinessesState extends State<ValidatableBusinesses> {
                                       title: '¿Aceptar establecimiento?',
                                       onYes: () async {
                                         await Api.validateBusiness(
-                                          id: item.business.id!,
+                                          id: item.business!.id!,
                                         ).then((value) async {
                                           _retrieveData();
                                         }).then((value) {

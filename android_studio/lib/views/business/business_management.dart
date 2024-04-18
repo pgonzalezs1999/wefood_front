@@ -7,7 +7,6 @@ import 'package:wefood/components/edit_product_button.dart';
 import 'package:wefood/components/loading_icon.dart';
 import 'package:wefood/components/wefood_navigation_screen.dart';
 import 'package:wefood/models/business_products_resume_model.dart';
-import 'package:wefood/models/product_model.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/types.dart';
 import 'package:wefood/views/business/pending_orders_business.dart';
