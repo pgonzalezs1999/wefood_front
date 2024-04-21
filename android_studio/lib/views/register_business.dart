@@ -7,18 +7,14 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:wefood/components/back_arrow.dart';
-import 'package:wefood/components/loading_icon.dart';
-import 'package:wefood/components/wefood_input.dart';
-import 'package:wefood/components/wefood_screen.dart';
+import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
-import 'package:wefood/models/country_model.dart';
+import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/types.dart';
-import 'package:wefood/views/terms_and_conditions.dart';
+import 'package:wefood/views/views.dart';
 import 'package:http/http.dart' as http;
-import 'package:wefood/views/business/waiting_verification.dart';
 
 class RegisterBusiness extends StatefulWidget {
   const RegisterBusiness({super.key});

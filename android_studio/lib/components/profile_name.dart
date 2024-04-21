@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:wefood/components/editable_field.dart';
-import 'package:wefood/components/loading_icon.dart';
-import 'package:wefood/models/user_model.dart';
+import 'package:wefood/components/components.dart';
+import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api/api.dart';
 
 class ProfileName extends StatefulWidget {

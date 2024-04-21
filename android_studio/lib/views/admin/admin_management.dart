@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:wefood/components/wefood_navigation_screen.dart';
-import 'package:wefood/views/admin/validatable_businesses.dart';
+import 'package:wefood/components/components.dart';
+import 'package:wefood/views/views.dart';
 
 class AdminManagement extends StatefulWidget {
   const AdminManagement({super.key});

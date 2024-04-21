@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:wefood/commands/share_app.dart';
-import 'package:wefood/components/business_info.dart';
-import 'package:wefood/components/settings_element.dart';
-import 'package:wefood/components/wefood_navigation_screen.dart';
-import 'package:wefood/components/wefood_popup.dart';
+import 'package:wefood/components/components.dart';
 import 'package:wefood/main.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/services/secure_storage.dart';
-import 'package:wefood/views/terms_and_conditions.dart';
+import 'package:wefood/views/views.dart';
 
 class BusinessProfile extends StatefulWidget {
   const BusinessProfile({super.key});

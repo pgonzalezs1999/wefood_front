@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:wefood/components/wefood_screen.dart';
-import 'package:wefood/models/auth_model.dart';
+import 'package:wefood/components/components.dart';
+import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/services/secure_storage.dart';
-import 'package:wefood/views/login.dart';
+import 'package:wefood/views/views.dart';
 
 class WaitingVerification extends StatefulWidget {
   const WaitingVerification({super.key});

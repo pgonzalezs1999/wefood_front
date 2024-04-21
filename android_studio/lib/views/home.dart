@@ -2,18 +2,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wefood/blocs/blocs.dart';
-import 'package:wefood/components/wefood_screen.dart';
-import 'package:wefood/models/user_model.dart';
+import 'package:wefood/components/components.dart';
+import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/services/secure_storage.dart';
-import 'package:wefood/views/admin/admin_management.dart';
-import 'package:wefood/views/admin/admin_profile.dart';
-import 'package:wefood/views/business/business_management.dart';
-import 'package:wefood/views/business/business_profile.dart';
-import 'package:wefood/views/loading_screen.dart';
-import 'package:wefood/views/user/user_explore.dart';
-import 'package:wefood/views/user/user_profile.dart';
-import 'package:wefood/views/business/waiting_verification.dart';
+import 'package:wefood/views/views.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});

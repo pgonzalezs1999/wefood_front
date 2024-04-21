@@ -1,8 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:wefood/models/product_model.dart';
+import 'package:wefood/models/models.dart';
 import 'package:wefood/types.dart';
-import 'package:wefood/views/business/edit_product.dart';
+import 'package:wefood/views/views.dart';
 
 class EditProductButton extends StatefulWidget {
 

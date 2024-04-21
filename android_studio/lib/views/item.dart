@@ -1,24 +1,20 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:maps_launcher/maps_launcher.dart';
-import 'package:wefood/components/comment.dart';
-import 'package:wefood/components/back_arrow.dart';
-import 'package:wefood/components/loading_icon.dart';
-import 'package:wefood/components/product_tag.dart';
-import 'package:wefood/components/wefood_screen.dart';
+import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
-import 'package:wefood/models/comment_expanded_model.dart';
-import 'package:wefood/models/favourite_model.dart';
-import 'package:wefood/models/product_expanded_model.dart';
+import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api/api.dart';
-import 'package:wefood/views/loading_screen.dart';
+import 'package:wefood/views/views.dart';
 
 class Item extends StatefulWidget {
 
-  final int id;
+  final ProductExpandedModel productExpanded;
 
   const Item({
     super.key,
-    required this.id,
+    required this.productExpanded,
   });
 
   @override
@@ -30,6 +26,8 @@ class _ItemState extends State<Item> {
   Widget favouriteIcon = const Icon(Icons.favorite_outline);
   late ProductExpandedModel info;
   int selectedAmount = 1;
+  List<String> backgroundImageRoutes = [];
+  String? profileImageRoute;
 
   _chooseFavouriteIcon(bool newState) {
     setState(() {
@@ -56,11 +54,54 @@ class _ItemState extends State<Item> {
     return amounts;
   }
 
+  void _getBackgroundImages({required int searchedPosition}) async {
+    ImageModel? imageModel;
+    try {
+      imageModel = await Api.getImage(
+        idUser: widget.productExpanded.user!.id!,
+        meaning: '${widget.productExpanded.product!.type!.toLowerCase()}$searchedPosition',
+      );
+    } catch(e) {
+      print('No se ha encontrado la imagen en la base de datos');
+    }
+    if(imageModel != ImageModel.empty()) {
+      setState(() {
+        backgroundImageRoutes.addIf(true, imageModel!.image!);
+      });
+      _getBackgroundImages(
+        searchedPosition: searchedPosition + 1,
+      );
+    }
+  }
+
+  void _getProfileImage() async {
+    try {
+      ImageModel? imageModel = await Api.getImage(
+        idUser: widget.productExpanded.user!.id!,
+        meaning: 'profile',
+      );
+      setState(() {
+        profileImageRoute = imageModel.image;
+      });
+    } catch(e) {
+      print('No se ha encontrado la imagen en la base de datos');
+    }
+  }
+
+  @override
+  void initState() {
+    _getBackgroundImages(
+      searchedPosition: 1
+    );
+    _getProfileImage();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<ProductExpandedModel>(
       future: Api.getItem(
-        id: widget.id,
+        id: widget.productExpanded.item!.id!,
       ),
       builder: (BuildContext context, AsyncSnapshot<ProductExpandedModel> response) {
         if(response.hasError) {
@@ -77,104 +118,119 @@ class _ItemState extends State<Item> {
             ignoreVerticalPadding: true,
             body: Column(
               children: [
-                Container(
-                  padding: EdgeInsets.only(
-                    top: MediaQuery.of(context).viewPadding.top,
-                  ),
-                  width: MediaQuery.of(context).size.width,
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage('assets/images/salmon.jpg'),
-                      fit: BoxFit.cover,
+                Stack(
+                  children: <Widget>[
+                    if(backgroundImageRoutes.isNotEmpty) CarouselSlider(
+                      items: backgroundImageRoutes.map((String route) => Image.network(
+                        route,
+                        width: MediaQuery.of(context).size.width,
+                        fit: BoxFit.cover,
+                      )).toList(),
+                      options: CarouselOptions(
+                        viewportFraction: 1,
+                        height: MediaQuery.of(context).size.height * 0.25,
+                      ),
                     ),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Row(
+                    Container(
+                      padding: EdgeInsets.only(
+                        top: MediaQuery.of(context).viewPadding.top,
+                      ),
+                      height: MediaQuery.of(context).size.height * 0.25,
+                      child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          const BackArrow(),
-                          GestureDetector(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(999),
-                                color: const Color.fromRGBO(255, 255, 255, 0.666),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              const BackArrow(),
+                              GestureDetector(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(999),
+                                    color: const Color.fromRGBO(255, 255, 255, 0.666),
+                                  ),
+                                  margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
+                                  padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
+                                  child: (info.isFavourite == true)
+                                      ? const Icon(Icons.favorite)
+                                      : const Icon(Icons.favorite_outline),
+                                ),
+                                onTap: () async {
+                                  setState(() {
+                                    favouriteIcon = const LoadingIcon();
+                                  });
+                                  try {
+                                    late FavouriteModel favourite;
+                                    if(info.isFavourite == true) {
+                                      _chooseFavouriteIcon(false);
+                                      favourite = await Api.removeFavourite(idBusiness: info.business!.id!);
+                                    } else {
+                                      _chooseFavouriteIcon(true);
+                                      favourite = await Api.addFavourite(idBusiness: info.business!.id!);
+                                    }
+                                  } catch(e) {
+                                    _chooseFavouriteIcon(info.isFavourite!);
+                                  }
+                                },
                               ),
-                              margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
-                              padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
-                              child: (info.isFavourite == true)
-                                ? const Icon(Icons.favorite)
-                                : const Icon(Icons.favorite_outline),
+                            ],
+                          ),
+                          Container(
+                            decoration: const BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [Colors.transparent, Color.fromRGBO(0, 0, 0, 0.666)],
+                              ),
                             ),
-                            onTap: () async {
-                              setState(() {
-                                favouriteIcon = const LoadingIcon();
-                              });
-                              try {
-                                late FavouriteModel favourite;
-                                if(info.isFavourite == true) {
-                                  _chooseFavouriteIcon(false);
-                                  favourite = await Api.removeFavourite(idBusiness: info.business!.id!);
-                                } else {
-                                  _chooseFavouriteIcon(true);
-                                  favourite = await Api.addFavourite(idBusiness: info.business!.id!);
-                                }
-                              } catch(e) {
-                                _chooseFavouriteIcon(info.isFavourite!);
-                              }
-                            },
+                            child: Row(
+                              children: <Widget>[
+                                Container(
+                                  padding: const EdgeInsets.all(2),
+                                  margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(999),
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(999),
+                                    child: SizedBox.fromSize(
+                                      size: Size.fromRadius(MediaQuery.of(context).size.width * 0.05),
+                                      child: (profileImageRoute != null)
+                                          ? Image.network(
+                                        profileImageRoute!,
+                                        fit: BoxFit.cover,
+                                      )
+                                          : const Icon(
+                                        Icons.business,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Column(
+                                  children: <Widget>[
+                                    const Text(
+                                      'Caja sorpresa de',
+                                      style: TextStyle( // TODO deshardcodear estilo
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    Text(
+                                      info.business?.name ?? '',
+                                      style: const TextStyle( // TODO deshardcodear estilo
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
                           ),
                         ],
                       ),
-                      Container(
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [Colors.transparent, Color.fromRGBO(0, 0, 0, 0.666)],
-                          ),
-                        ),
-                        child: Row(
-                          children: <Widget>[
-                            Container(
-                              padding: const EdgeInsets.all(2),
-                              margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(999),
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(999),
-                                child: SizedBox.fromSize(
-                                  size: Size.fromRadius(MediaQuery.of(context).size.width * 0.05),
-                                  child: Image.asset('assets/images/salmon.jpg'),
-                                ),
-                              ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                const Text(
-                                  'Caja sorpresa de',
-                                  style: TextStyle( // TODO deshardcodear estilo
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                Text(
-                                  info.business?.name ?? '',
-                                  style: const TextStyle( // TODO deshardcodear estilo
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold
-                                  ),
-                                ),
-                              ],
-                            )
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
                 Container(
                   margin: EdgeInsets.symmetric(

@@ -1,4 +1,4 @@
-import 'package:wefood/models/product_model.dart';
+import 'package:wefood/models/models.dart';
 
 class BusinessProductsResumeModel {
   ProductModel? breakfast;

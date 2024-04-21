@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wefood/components/back_arrow.dart';
-import 'package:wefood/components/item_favourite_list.dart';
-import 'package:wefood/components/wefood_screen.dart';
+import 'package:wefood/components/components.dart';
 
 class FavouritesScreen extends StatefulWidget {
   const FavouritesScreen({super.key});

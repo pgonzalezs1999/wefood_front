@@ -5,9 +5,7 @@ import 'package:flutter/gestures.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:wefood/components/back_arrow.dart';
-import 'package:wefood/components/wefood_input.dart';
-import 'package:wefood/components/wefood_screen.dart';
+import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
 import 'package:wefood/services/auth/api/api.dart';
 

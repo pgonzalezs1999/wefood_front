@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:wefood/components/loading_icon.dart';
-import 'package:wefood/components/item_button.dart';
-import 'package:wefood/models/product_expanded_model.dart';
+import 'package:wefood/components/components.dart';
+import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api/api.dart';
 
 class ItemNearbyList extends StatefulWidget {

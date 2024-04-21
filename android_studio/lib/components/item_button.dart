@@ -1,12 +1,10 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:wefood/components/product_tag.dart';
-import 'package:wefood/models/image_model.dart';
-import 'package:wefood/models/product_expanded_model.dart';
+import 'package:wefood/components/components.dart';
+import 'package:wefood/models/models.dart';
 import 'package:wefood/commands/utils.dart';
 import 'package:wefood/services/auth/api/api.dart';
-import 'package:wefood/views/item.dart';
-import 'package:wefood/views/order_customer.dart';
+import 'package:wefood/views/views.dart';
 
 enum NextScreen {
   item,
@@ -68,7 +66,7 @@ class _ItemButtonState extends State<ItemButton> {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => Item(
-                id: widget.productExpanded.item!.id!,
+                productExpanded: widget.productExpanded,
               )),
             );
           } else if(widget.nextScreen == NextScreen.orderCustomer) {

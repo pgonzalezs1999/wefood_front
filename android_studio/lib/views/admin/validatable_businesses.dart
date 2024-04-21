@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:wefood/commands/custom_parsers.dart';
-import 'package:wefood/components/back_arrow.dart';
-import 'package:wefood/components/loading_icon.dart';
-import 'package:wefood/components/wefood_popup.dart';
-import 'package:wefood/models/business_expanded_model.dart';
+import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api/api.dart';
-
-import '../../components/wefood_screen.dart';
+import 'package:wefood/components/components.dart';
 
 class ValidatableBusinesses extends StatefulWidget {
   const ValidatableBusinesses({super.key});

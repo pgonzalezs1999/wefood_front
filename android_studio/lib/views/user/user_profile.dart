@@ -1,22 +1,15 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/commands/share_app.dart';
-import 'package:wefood/components/profile_name.dart';
-import 'package:wefood/components/settings_element.dart';
-import 'package:wefood/components/wefood_navigation_screen.dart';
-import 'package:wefood/components/wefood_popup.dart';
+import 'package:wefood/components/components.dart';
 import 'package:wefood/main.dart';
-import 'package:wefood/models/image_model.dart';
+import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/services/secure_storage.dart';
-import 'package:wefood/views/user/favourites_screen.dart';
-import 'package:wefood/views/terms_and_conditions.dart';
-import 'package:wefood/views/user/pending_orders_customer.dart';
-import 'package:http/http.dart' as http;
+import 'package:wefood/views/views.dart';
 
 class UserProfile extends StatefulWidget {
   const UserProfile({super.key});
@@ -55,14 +48,14 @@ class _UserProfileState extends State<UserProfile> {
     );
   }
 
-  void _getProfileImageRoute() async {
+  void _getProfileImage() async {
       try {
         ImageModel? imageModel = await Api.getImage(
           idUser: context.read<UserInfoCubit>().state.user.id!,
           meaning: 'profile',
         );
         setState(() {
-          imageRoute = imageModel?.image;
+          imageRoute = imageModel.image;
         });
       } catch(e) {
         print('No se ha encontrado la imagen en la base de datos');
@@ -76,7 +69,7 @@ class _UserProfileState extends State<UserProfile> {
         _selectedImage = File(returnedImage.path);
       });
       ImageModel responseImage = await Api.uploadImage(
-        idUser: 34,
+        idUser: context.read<UserInfoCubit>().state.user.id!,
         meaning: 'profile',
         file: _selectedImage!,
       );
@@ -112,7 +105,7 @@ class _UserProfileState extends State<UserProfile> {
 
   @override
   void initState() {
-    _getProfileImageRoute();
+    _getProfileImage();
     super.initState();
   }
 

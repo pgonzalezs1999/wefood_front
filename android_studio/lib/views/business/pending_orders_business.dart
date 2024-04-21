@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:wefood/commands/custom_parsers.dart';
-import 'package:wefood/components/back_arrow.dart';
-import 'package:wefood/components/order_pending_list_business.dart';
-import 'package:wefood/components/wefood_screen.dart';
+import 'package:wefood/components/components.dart';
 import 'package:wefood/services/auth/api/api.dart';
 
 class PendingOrdersBusiness extends StatefulWidget {

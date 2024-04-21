@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wefood/components/back_arrow.dart';
-import 'package:wefood/components/order_pending_list_customer.dart';
-import 'package:wefood/components/wefood_screen.dart';
+import 'package:wefood/components/components.dart';
 
 class PendingOrdersCustomer extends StatefulWidget {
   const PendingOrdersCustomer({super.key});

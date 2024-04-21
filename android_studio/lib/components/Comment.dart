@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wefood/models/comment_expanded_model.dart';
+import 'package:wefood/models/models.dart';
 
 class Comment extends StatefulWidget {
 
@@ -34,9 +34,11 @@ class _CommentState extends State<Comment> {
             borderRadius: BorderRadius.circular(999),
             child: SizedBox.fromSize(
               size: Size.fromRadius(MediaQuery.of(context).size.width * 0.05),
-              child: Image.asset(
-                'assets/images/salmon.jpg',
-                fit: BoxFit.cover,
+              child: Container(
+                color: Colors.grey.withOpacity(0.333), // TODO deshardcodear este color
+                child: const Icon(
+                  Icons.person,
+                ),
               ),
             ),
           ),

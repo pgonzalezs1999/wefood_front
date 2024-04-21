@@ -1,25 +1,10 @@
 import 'dart:io';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:wefood/environment.dart';
-import 'package:wefood/models/auth_model.dart';
-import 'package:wefood/models/business_expanded_model.dart';
-import 'package:wefood/models/business_products_resume_model.dart';
-import 'package:wefood/models/country_model.dart';
-import 'package:wefood/models/exceptions.dart';
-import 'package:wefood/models/favourite_model.dart';
-import 'package:wefood/models/image_model.dart';
-import 'package:wefood/models/order_model.dart';
-import 'package:wefood/models/product_expanded_model.dart';
-import 'package:wefood/models/product_model.dart';
-import 'package:wefood/models/user_model.dart';
+import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/middleware.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/types.dart';
-import 'package:wefood/views/home.dart';
-import 'package:http_parser/http_parser.dart';
-import 'package:path/path.dart';
-import 'package:async/async.dart';
+import 'package:wefood/views/views.dart';
 import 'dart:convert';
 
 class Api {

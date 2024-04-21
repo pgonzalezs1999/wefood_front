@@ -5,7 +5,7 @@ import 'package:wefood/components/editable_field.dart';
 import 'package:wefood/components/loading_icon.dart';
 import 'package:wefood/models/business_expanded_model.dart';
 import 'package:wefood/services/auth/api/api.dart';
-import 'package:wefood/views/business/business_edit_directions.dart';
+import 'package:wefood/views/views.dart';
 
 class BusinessInfo extends StatefulWidget {
   const BusinessInfo({super.key});

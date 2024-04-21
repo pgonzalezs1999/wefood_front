@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wefood/blocs/blocs.dart';
-import 'package:wefood/models/auth_model.dart';
+import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/services/secure_storage.dart';
-import 'package:wefood/views/home.dart';
-import 'package:wefood/views/loading_screen.dart';
-import 'package:wefood/views/login.dart';
+import 'package:wefood/views/views.dart';
 
 void main() {
   runApp(const BlocsProvider());

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wefood/components/loading_icon.dart';
-import 'package:wefood/components/wefood_input.dart';
+import 'package:wefood/components/components.dart';
 
 class EditableField extends StatefulWidget {
   final String feedbackText;

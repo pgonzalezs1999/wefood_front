@@ -1,5 +1,4 @@
-import 'package:wefood/models/comment_model.dart';
-import 'package:wefood/models/user_model.dart';
+import 'package:wefood/models/models.dart';
 
 class CommentExpandedModel {
   CommentModel content;

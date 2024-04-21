@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wefood/types.dart';
-import 'package:wefood/views/business/create_product.dart';
+import 'package:wefood/views/views.dart';
 
 class CreateProductButton extends StatefulWidget {
 

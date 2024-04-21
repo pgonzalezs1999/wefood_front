@@ -1,6 +1,4 @@
-import 'package:wefood/models/user_model.dart';
-
-import 'business_model.dart';
+import 'package:wefood/models/models.dart';
 
 class BusinessExpandedModel {
   UserModel user;

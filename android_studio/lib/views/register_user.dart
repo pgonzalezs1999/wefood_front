@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:wefood/components/back_arrow.dart';
-import 'package:wefood/components/loading_icon.dart';
-import 'package:wefood/components/wefood_input.dart';
-import 'package:wefood/components/wefood_screen.dart';
-import 'package:wefood/models/auth_model.dart';
-import 'package:wefood/models/user_model.dart';
+import 'package:wefood/components/components.dart';
+import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/types.dart';
-import 'package:wefood/views/register_business.dart';
-import 'package:wefood/views/terms_and_conditions.dart';
+import 'package:wefood/views/views.dart';
 
 class RegisterUser extends StatefulWidget {
   const RegisterUser({super.key});

@@ -1,9 +1,5 @@
-import 'package:wefood/models/business_model.dart';
-import 'package:wefood/models/item_model.dart';
-import 'package:wefood/models/order_model.dart';
-import 'package:wefood/models/product_model.dart';
+import 'package:wefood/models/models.dart';
 import 'package:wefood/commands/utils.dart';
-import 'package:wefood/models/user_model.dart';
 
 class ProductExpandedModel {
   ProductModel? product;

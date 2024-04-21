@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wefood/components/item_favourite_list.dart';
-import 'package:wefood/components/item_nearby_list.dart';
-import 'package:wefood/components/item_recommended_list.dart';
-import 'package:wefood/components/search_input.dart';
-import 'package:wefood/components/wefood_navigation_screen.dart';
+import 'package:wefood/components/components.dart';
 
 class UserExplore extends StatefulWidget {
   const UserExplore({super.key});

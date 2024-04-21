@@ -15,22 +15,7 @@ class UserModel {
   int? idBusiness;
   int? businessVerified;
 
-  UserModel.empty():
-    id = null,
-    realName = null,
-    realSurname = null,
-    username = null,
-    email = null,
-    emailVerified = null,
-    isAdmin = null,
-    phone = null,
-    phonePrefix = null,
-    sex = null,
-    lastLongitude = null,
-    lastLatitude = null,
-    lastLoginDate = null,
-    idBusiness = null,
-    businessVerified = null;
+  UserModel.empty();
 
   UserModel.fromJson(Map<String, dynamic> json):
     id = json['id'] as int?,

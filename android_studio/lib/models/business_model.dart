@@ -1,4 +1,4 @@
-import 'package:wefood/models/comment_expanded_model.dart';
+import 'package:wefood/models/models.dart';
 
 class BusinessModel {
   int? id;

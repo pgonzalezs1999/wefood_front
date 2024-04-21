@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:wefood/commands/custom_parsers.dart';
-import 'package:wefood/components/back_arrow.dart';
-import 'package:wefood/components/loading_icon.dart';
-import 'package:wefood/components/wefood_screen.dart';
-import 'package:wefood/models/product_expanded_model.dart';
+import 'package:wefood/components/components.dart';
+import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api/api.dart';
 
 class OrderCustomer extends StatefulWidget {
