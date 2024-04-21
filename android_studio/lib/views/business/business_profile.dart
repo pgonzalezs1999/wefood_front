@@ -121,6 +121,13 @@ class _BusinessProfileState extends State<BusinessProfile> {
               },
             ),
             SettingsElement(
+              iconData: Icons.credit_card_outlined,
+              title: 'Cobros - FALTA',
+              onTap: () {
+                // TODO falta por hacer
+              },
+            ),
+            SettingsElement(
               iconData: Icons.business,
               title: 'Términos y condiciones',
               onTap: () {

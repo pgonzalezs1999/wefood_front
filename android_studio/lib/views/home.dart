@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/components/wefood_screen.dart';
 import 'package:wefood/models/user_model.dart';
 import 'package:wefood/services/auth/api/api.dart';
@@ -101,6 +103,7 @@ class _HomeState extends State<Home> {
             child: const Text('Error'),
           );
         } else if(response.hasData) {
+          context.read<UserInfoCubit>().setUser(response.data!);
           final List<Widget> screens = [
             if(response.data!.idBusiness == null && response.data!.isAdmin != true) const UserExplore(),
             if(response.data!.idBusiness == null && response.data!.isAdmin != true) const UserProfile(),

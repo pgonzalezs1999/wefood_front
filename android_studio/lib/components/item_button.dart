@@ -33,12 +33,12 @@ class ItemButton extends StatefulWidget {
 class _ItemButtonState extends State<ItemButton> {
 
   void retrieveData() async {
-    ImageModel imageModel = await Api.getImage(
+    ImageModel? imageModel = await Api.getImage(
       idUser: widget.productExpanded.user!.id!,
       meaning: '${widget.productExpanded.product!.type!.toLowerCase()}1',
     );
     setState(() {
-      imageUrl = imageModel.image;
+      imageUrl = imageModel?.image;
     });
   }
 
@@ -85,15 +85,15 @@ class _ItemButtonState extends State<ItemButton> {
             borderRadius: BorderRadius.circular(10),
           ),
           child: Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: (imageUrl != null)
-                  ? NetworkImage(imageUrl!)
-                  : const AssetImage('assets/images/salmon.jpg'),
-                fit: BoxFit.cover,
-              ),
-              borderRadius: BorderRadius.circular(10),
-            ),
+            decoration: (imageUrl != null)
+              ? BoxDecoration(
+                image: DecorationImage(
+                  image: NetworkImage(imageUrl!),
+                  fit: BoxFit.cover,
+                ),
+                borderRadius: BorderRadius.circular(10),
+              )
+              : null,
             child: Column(
               children: <Widget>[
                 Container(
@@ -116,13 +116,21 @@ class _ItemButtonState extends State<ItemButton> {
                           if(widget.productExpanded.product!.vegetarian == false && widget.productExpanded.product!.vegan == false && widget.productExpanded.product!.bakery == false && widget.productExpanded.product!.fresh == false) const Text(''),
                         ],
                       ),
-                      if(widget.productExpanded.isFavourite == true) Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(999),
-                          color: Colors.white.withOpacity(0.5),
+                      if(widget.productExpanded.isFavourite == true) ClipRect(
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(
+                            sigmaX: 8,
+                            sigmaY: 8,
+                          ),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(999),
+                              color: Colors.white.withOpacity(0.66),
+                            ),
+                            padding: const EdgeInsets.all(5),
+                            child: const Icon(Icons.favorite),
+                          ),
                         ),
-                        padding: const EdgeInsets.all(5),
-                        child: const Icon(Icons.favorite),
                       ),
                     ],
                   ),

@@ -1,5 +1,6 @@
+import 'dart:io';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:wefood/environment.dart';
 import 'package:wefood/models/auth_model.dart';
 import 'package:wefood/models/business_expanded_model.dart';
@@ -16,6 +17,10 @@ import 'package:wefood/services/auth/middleware.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/types.dart';
 import 'package:wefood/views/home.dart';
+import 'package:http_parser/http_parser.dart';
+import 'package:path/path.dart';
+import 'package:async/async.dart';
+import 'dart:convert';
 
 class Api {
 
@@ -845,7 +850,7 @@ class Api {
     }
   }
 
-  static Future<ImageModel> getImage({
+  static Future<ImageModel?> getImage({
     required int idUser,
     required String meaning,
   }) async {
@@ -858,9 +863,6 @@ class Api {
             'meaning': meaning.toString(),
           }
       );
-      if(response['image'] == null) {
-        throw Exception('ERROR WHILE GETTING IMAGE');
-      }
       ImageModel imageModel = ImageModel.fromJson(response['image']);
       imageModel.image = '${Environment.storageUrl}${imageModel.image}';
       return imageModel;

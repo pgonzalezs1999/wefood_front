@@ -32,11 +32,11 @@ class _BusinessManagementState extends State<BusinessManagement> {
   }
 
   void _retrieveData() async {
-    ImageModel picture = await Api.getImage(
+    ImageModel? picture = await Api.getImage(
         idUser: 26,
         meaning: 'profile',
     );
-    imageUrl = picture.image;
+    imageUrl = picture?.image;
     await Api.businessProductsResume().then((BusinessProductsResumeModel value) {
       context.read<BusinessBreakfastCubit>().set(value.breakfast);
       context.read<BusinessLunchCubit>().set(value.lunch);
