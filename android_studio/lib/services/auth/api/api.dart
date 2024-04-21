@@ -850,7 +850,7 @@ class Api {
     }
   }
 
-  static Future<ImageModel?> getImage({
+  static Future<ImageModel> getImage({
     required int idUser,
     required String meaning,
   }) async {
@@ -864,7 +864,30 @@ class Api {
           }
       );
       ImageModel imageModel = ImageModel.fromJson(response['image']);
-      imageModel.image = '${Environment.storageUrl}${imageModel.image}';
+      return imageModel;
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static Future<ImageModel> uploadImage({
+    required int idUser,
+    required String meaning,
+    required File file,
+  }) async {
+    try {
+      final response = await Middleware.endpoint(
+        name: 'uploadImage',
+        type: HttpType.multipartPost,
+        body: {
+          'id_user': idUser.toString(),
+          'meaning': meaning.toString(),
+        },
+        file: file,
+      );
+      final responseBody = jsonDecode(response.body);
+      print('RESPONSE DEL API.UPLOAD_IMAGE(): $responseBody');
+      ImageModel imageModel = ImageModel.fromJson(responseBody['image']);
       return imageModel;
     } catch(error) {
       throw Exception(error);

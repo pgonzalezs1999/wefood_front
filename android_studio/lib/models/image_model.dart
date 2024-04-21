@@ -1,3 +1,5 @@
+import 'package:wefood/environment.dart';
+
 class ImageModel {
   int? id;
   String? image;
@@ -10,16 +12,20 @@ class ImageModel {
     idUser = null,
     meaning = null;
 
-  ImageModel.fromJson(Map<String, dynamic> json):
-    id = json['id'] as int?,
-    image = json['image'] as String?,
-    idUser = json['id_user'] as int?,
-    meaning = json['image'] as String?;
+  ImageModel.fromJson(Map<String, dynamic> json) {
+    id = json['id'] as int?;
+    image = json['image'] as String?;
+    idUser = int.tryParse('${json['id_user']}');
+    meaning = json['meaning'] as String?;
+    if(image != null) {
+      image = '${Environment.storageUrl}$image';
+    }
+  }
 
-  static void printInfo(ImageModel product) {
-    print('IMPRIMIENDO IMAGE CON ID: ${product.id}');
-    print('-> image: ${product.image}');
-    print('-> idUser: ${product.idUser}');
-    print('-> meaning: ${product.meaning}');
+  static void printInfo(ImageModel image) {
+    print('IMPRIMIENDO IMAGE CON ID: ${image.id}');
+    print('-> image: ${image.image}');
+    print('-> idUser: ${image.idUser}');
+    print('-> meaning: ${image.meaning}');
   }
 }

@@ -75,28 +75,31 @@ class _UserProfileState extends State<UserProfile> {
       setState(() {
         _selectedImage = File(returnedImage.path);
       });
-      print('HA SELECCIONADO LA IMAGEN PERFECTAMENTE');
-      final uri = Uri.parse('http://192.168.1.37:8000/api/auth/uploadImage');
-      var request = http.MultipartRequest('POST', uri);
-      request.headers.addAll({
-        'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTkyLjE2OC4xLjM3OjgwMDAvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3MTM2MzAxNjAsImV4cCI6MTcxMzgwMjk2MCwibmJmIjoxNzEzNjMwMTYwLCJqdGkiOiJrclpteGVsVGVPaFUyeUVKIiwic3ViIjoiMzQiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0.bvWrAq3w9_YTkh3dg8FjuBym9rSj51OPoNQZnl3Zca8',
-      });
-      request.fields.addAll({
-        'id_user': '34',
-        'meaning': 'profile'
-      });
-      final file = await http.MultipartFile.fromPath(
-        'image',
-        _selectedImage!.path,
+      ImageModel responseImage = await Api.uploadImage(
+        idUser: 34,
+        meaning: 'profile',
+        file: _selectedImage!,
       );
-      request.files.add(file);
-      print((await returnedImage.readAsBytes()).toString());
-      print('----------------');
-      print('HEADERS = ${request.headers}');
-      print('FIELDS = ${request.fields}');
-      print('FILES = ${request.files[0]}');
-      final response = await http.Response.fromStream(await request.send());
-      print('BODY = ${response.body}');
+      setState(() {
+        imageRoute = responseImage.image;
+      });
+    }
+  }
+
+  Future _pickImageFromCamera() async {
+    final returnedImage = await ImagePicker().pickImage(source: ImageSource.camera);
+    if(returnedImage != null) {
+      setState(() {
+        _selectedImage = File(returnedImage.path);
+      });
+      ImageModel responseImage = await Api.uploadImage(
+        idUser: 34,
+        meaning: 'profile',
+        file: _selectedImage!,
+      );
+      setState(() {
+        imageRoute = responseImage.image;
+      });
     }
   }
 
@@ -148,7 +151,7 @@ class _UserProfileState extends State<UserProfile> {
                                 ),
                                 TextButton(
                                   onPressed: () async {
-                                    // TODO FALTA ESTO
+                                    _pickImageFromCamera();
                                   },
                                   child: const Text('SACAR FOTO CON LA CÁMARA'),
                                 ),
@@ -175,7 +178,7 @@ class _UserProfileState extends State<UserProfile> {
                   );
                 },
                 child: Container(
-                  padding: EdgeInsets.only(
+                  margin: EdgeInsets.only(
                     right: MediaQuery.of(context).size.width * 0.05,
                   ),
                   child: Stack(
@@ -184,21 +187,26 @@ class _UserProfileState extends State<UserProfile> {
                       const Icon(
                         Icons.edit,
                       ),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(1000),
-                        child: SizedBox.fromSize(
-                          size: Size.fromRadius(MediaQuery.of(context).size.width * 0.1),
-                          child: (imageRoute != null)
-                              ? Image.network(
-                            imageRoute!,
-                            fit: BoxFit.cover,
-                          )
-                              : Container(
-                            color: Colors.grey.withOpacity(0.25),
-                            child: Icon(
-                              Icons.person,
-                              size: MediaQuery.of(context).size.width * 0.1,
-                              color: Colors.black.withOpacity(0.5),
+                      Container(
+                        padding: EdgeInsets.only(
+                          right: MediaQuery.of(context).size.width * 0.025,
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(1000),
+                          child: SizedBox.fromSize(
+                            size: Size.fromRadius(MediaQuery.of(context).size.width * 0.1),
+                            child: (imageRoute != null)
+                                ? Image.network(
+                              imageRoute!,
+                              fit: BoxFit.cover,
+                            )
+                                : Container(
+                              color: Colors.grey.withOpacity(0.25),
+                              child: Icon(
+                                Icons.person,
+                                size: MediaQuery.of(context).size.width * 0.1,
+                                color: Colors.black.withOpacity(0.5),
+                              ),
                             ),
                           ),
                         ),
@@ -306,8 +314,6 @@ class _UserProfileState extends State<UserProfile> {
                 );
               },
             ),
-            if(_selectedImage == null) const Text('No image selected'),
-            if(_selectedImage != null) Image.file(_selectedImage!),
           ],
         ),
       ],

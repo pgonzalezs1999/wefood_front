@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:wefood/environment.dart';
 import 'package:wefood/services/secure_storage.dart';
@@ -38,30 +37,25 @@ class Middleware {
     required String url,
     required Map<String, String> auth,
     body,
+    file,
   }) async {
     var request = http.MultipartRequest('POST', Uri.parse(url),);
-    auth.forEach((key, value) {
-      request.headers[key] = value;
-    });
-    if(body != null) {
-      body.forEach((key, value) {
-        request.fields[key] = value;
-      });
-    }
-    var picture = http.MultipartFile.fromBytes(
-      'logo_file',
-      (await rootBundle.load('assets/images/logo.png')).buffer.asUint8List(),
-      filename: 'testImage.png',
+    request.headers.addAll(auth);
+    request.fields.addAll(body);
+    final sendFile = await http.MultipartFile.fromPath(
+      'image',
+      file.path,
     );
-    request.files.add(picture);
-    var response = await request.send();
-    return response.stream.toBytes();
+    request.files.add(sendFile);
+    final response = await http.Response.fromStream(await request.send());
+    return response;
   }
 
   static Future endpoint({
     required String name,
     required HttpType type,
     body,
+    file,
     bool needsAccessToken = true,
   }) async {
     String? accessToken = await UserSecureStorage().read(key: 'accessToken');
@@ -91,9 +85,10 @@ class Middleware {
           response = await multipartPost(
             url: fullUrl,
             body: body,
+            file: file,
             auth: auth!,
           ).timeout(timeOutDuration);
-          jsonDecode(utf8.decode(response));
+          return response;
         default:
           throw Exception("Unsupported HTTP method");
       }
