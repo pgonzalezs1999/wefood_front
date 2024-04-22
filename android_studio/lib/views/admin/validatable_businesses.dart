@@ -72,19 +72,19 @@ class _ValidatableBusinessesState extends State<ValidatableBusinesses> {
                         ),
                         _ValidatableRow(
                           title: 'Nombre',
-                          value: item.business!.name,
+                          value: item.business.name,
                         ),
                         _ValidatableRow(
                           title: 'Descripción',
-                          value: item.business!.description,
+                          value: item.business.description,
                         ),
                         _ValidatableRow(
                           title: 'RUC',
-                          value: item.business!.taxId,
+                          value: item.business.taxId,
                         ),
                         _ValidatableRow(
                           title: 'Dirección',
-                          value: '${item.business!.directions} - (long: ${item.business!.longitude}, lat: ${item.business!.latitude})',
+                          value: '${item.business.directions} - (long: ${item.business.longitude}, lat: ${item.business.latitude})',
                         ),
                         const Divider(
                           height: 30,
@@ -100,19 +100,19 @@ class _ValidatableBusinessesState extends State<ValidatableBusinesses> {
                         ),
                         _ValidatableRow(
                           title: 'Username',
-                          value: item.user?.username,
+                          value: item.user.username,
                         ),
                         _ValidatableRow(
                           title: 'Correo',
-                          value: item.user?.email,
+                          value: item.user.email,
                         ),
                         _ValidatableRow(
                           title: 'Teléfono',
-                          value: '(+${item.user?.phone}) ${item.user?.phone}',
+                          value: '(+${item.user.phone}) ${item.user.phone}',
                         ),
                         _ValidatableRow(
                           title: 'Solicitado a fecha',
-                          value: CustomParsers.dateTimeToString(item.business!.createdAt),
+                          value: CustomParsers.dateTimeToString(item.business.createdAt),
                         ),
                         const Divider(
                           height: 30,
@@ -127,15 +127,20 @@ class _ValidatableBusinessesState extends State<ValidatableBusinesses> {
                                   builder: (BuildContext context) {
                                     return WefoodPopup(
                                       title: '¿Rechazar establecimiento?',
-                                      onYes: () async {
-                                        await Api.refuseBusiness(
-                                          id: item.business!.id!,
-                                        ).then((value) async {
-                                          _retrieveData();
-                                        }).then((value) {
-                                          Navigator.pop(context);
-                                        });
-                                      },
+                                      actions: <TextButton>[
+                                        TextButton(
+                                          onPressed: () async {
+                                            await Api.refuseBusiness(
+                                              id: item.business.id!,
+                                            ).then((value) async {
+                                              _retrieveData();
+                                            }).then((value) {
+                                              Navigator.pop(context);
+                                            });
+                                          },
+                                          child: const Text('SÍ'),
+                                        ),
+                                      ],
                                     );
                                   }
                                 );
@@ -149,15 +154,20 @@ class _ValidatableBusinessesState extends State<ValidatableBusinesses> {
                                   builder: (BuildContext context) {
                                     return WefoodPopup(
                                       title: '¿Aceptar establecimiento?',
-                                      onYes: () async {
-                                        await Api.validateBusiness(
-                                          id: item.business!.id!,
-                                        ).then((value) async {
-                                          _retrieveData();
-                                        }).then((value) {
-                                          Navigator.pop(context);
-                                        });
-                                      },
+                                      actions: <TextButton>[
+                                        TextButton(
+                                          onPressed: () async {
+                                            await Api.validateBusiness(
+                                              id: item.business.id!,
+                                            ).then((value) async {
+                                              _retrieveData();
+                                            }).then((value) {
+                                              Navigator.pop(context);
+                                            });
+                                          },
+                                          child: const Text('SÍ'),
+                                        ),
+                                      ],
                                     );
                                   }
                                 );

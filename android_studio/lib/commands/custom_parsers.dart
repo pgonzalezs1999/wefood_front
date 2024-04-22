@@ -80,4 +80,28 @@ class CustomParsers {
     }
     return result;
   }
+
+  static String? productTypeInitialToName({
+    String? string,
+    bool isCapitalized = false,
+    bool isPlural = false,
+  }) {
+    String? result;
+   if(string != null) {
+     if(string.toLowerCase() == 'b') {
+       result = 'desayuno';
+     } else if(string.toLowerCase() == 'l') {
+       result =  'almuerzo';
+     } else if(string.toLowerCase() == 'd') {
+       result =  'cena';
+     }
+     if(isCapitalized == true) {
+       result = result![0].toUpperCase() + result.substring(1);
+     }
+     if(isPlural == true) {
+       result = '${result}s';
+     }
+   }
+   return result;
+  }
 }

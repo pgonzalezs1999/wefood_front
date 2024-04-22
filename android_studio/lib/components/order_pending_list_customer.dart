@@ -25,7 +25,7 @@ class _OrderPendingListCustomerState extends State<OrderPendingListCustomer> {
             margin: EdgeInsets.symmetric(
               vertical: MediaQuery.of(context).size.height * 0.05,
             ),
-            child: const Text('Error'),
+            child: Text('Error: ${response.error}'),
           );
         } else if(response.hasData) {
           if(response.data!.isNotEmpty) {

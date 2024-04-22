@@ -2,6 +2,8 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:maps_launcher/maps_launcher.dart';
+import 'package:wefood/commands/custom_parsers.dart';
+import 'package:wefood/commands/utils.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
 import 'package:wefood/models/models.dart';
@@ -129,6 +131,7 @@ class _ItemState extends State<Item> {
                       options: CarouselOptions(
                         viewportFraction: 1,
                         height: MediaQuery.of(context).size.height * 0.25,
+                        enableInfiniteScroll: (backgroundImageRoutes.length > 1),
                       ),
                     ),
                     Container(
@@ -180,7 +183,7 @@ class _ItemState extends State<Item> {
                               gradient: LinearGradient(
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
-                                colors: [Colors.transparent, Color.fromRGBO(0, 0, 0, 0.666)],
+                                colors: [Colors.transparent, Color.fromRGBO(0, 0, 0, 0.75)],
                               ),
                             ),
                             child: Row(
@@ -208,10 +211,15 @@ class _ItemState extends State<Item> {
                                   ),
                                 ),
                                 Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
-                                    const Text(
-                                      'Caja sorpresa de',
-                                      style: TextStyle( // TODO deshardcodear estilo
+                                    Text(
+                                      '${CustomParsers.productTypeInitialToName(
+                                        string: widget.productExpanded.product!.type!,
+                                        isCapitalized: true,
+                                        isPlural: true,
+                                      )} de',
+                                      style: const TextStyle( // TODO deshardcodear estilo
                                         color: Colors.white,
                                       ),
                                     ),
@@ -241,17 +249,54 @@ class _ItemState extends State<Item> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      if(info.business!.description != null) Text(info.business!.description!),
+                      if(info.business!.description != null) Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Text>[
+                          Text(
+                            'Acerca de ${info.business!.name}:',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold, // TODO deshardcodear este estilo
+                            ),
+                          ),
+                          Text(info.business!.description!),
+                        ],
+                      ),
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+                      Row(
+                        children: <Text>[
+                          const Text(
+                            'Precio: ',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold, // TODO deshardcodear este estilo
+                            ),
+                          ),
+                          Text('${info.product!.price} Sol/.'),
+                        ],
+                      ),
                       SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-                      Text('Precio: ${info.product!.price} Sol/.'),
-                      SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-                      Text('Hora de recogida: De ${_parseTime(info.product!.startingHour)} a ${_parseTime(info.product!.endingHour)} h'),
+                      Row(
+                        children: <Text>[
+                          const Text(
+                            'Hora de recogida: ',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold, // TODO deshardcodear este estilo
+                            ),
+                          ),
+                          Text('De ${_parseTime(info.product!.startingHour)} a ${_parseTime(info.product!.endingHour)} h'),
+                        ],
+                      ),
                       if(info.business?.rate != null) if(info.business!.rate! > 0) Column(
                         children: <Widget>[
                           SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                           Row(
                             children: <Widget>[
-                              Text('Valoración: ${info.business?.rate}  '),
+                              const Text(
+                                'Valoración: ',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold, // TODO deshardcodear este estilo
+                                ),
+                              ),
+                              Text('${info.business?.rate}  '),
                             ] + _printStarts(info.business!.rate!),
                           ),
                         ],
@@ -259,7 +304,17 @@ class _ItemState extends State<Item> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          Text('Ubicación: ${info.business?.directions}'),
+                          Row(
+                            children: <Text>[
+                              const Text(
+                                'Ubicación: ',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold, // TODO deshardcodear este estilo
+                                ),
+                              ),
+                              Text('${info.business?.directions}'),
+                            ],
+                          ),
                           Card(
                             child: Container(
                               decoration: BoxDecoration(
@@ -280,7 +335,12 @@ class _ItemState extends State<Item> {
                         children: <Widget>[
                           const Align(
                             alignment: Alignment.centerLeft,
-                            child: Text('Categoría:'),
+                            child: Text(
+                              'Categorías: ',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold, // TODO deshardcodear este estilo
+                              ),
+                            ),
                           ),
                           SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                           Row(
@@ -354,10 +414,21 @@ class _ItemState extends State<Item> {
                                                   idItem: info.item!.id!,
                                                   amount: selectedAmount,
                                                 ).then((_) {
-                                                  setState(() {
-                                                    Navigator.pop(context);
-                                                    Navigator.pop(context);
-                                                  });
+                                                  Navigator.pop(context);
+                                                  showDialog(
+                                                    context: context,
+                                                    builder: (BuildContext context) {
+                                                      return WefoodPopup(
+                                                        title: '¡Producto comprado!',
+                                                        description: 'Esto es todavía un entorno de pruebas. Más adelante, aquí aparecerá la pasarela de pago',
+                                                        cancelButtonTitle: 'OK',
+                                                        cancelButtonBehaviour: () {
+                                                          Navigator.pop(context);
+                                                          Navigator.pop(context);
+                                                        },
+                                                      );
+                                                    }
+                                                  );
                                                 });
                                               },
                                               child: const Text('COMPRAR'),

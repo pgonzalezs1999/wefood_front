@@ -36,7 +36,7 @@ class _ItemButtonState extends State<ItemButton> {
       meaning: '${widget.productExpanded.product!.type!.toLowerCase()}1',
     );
     setState(() {
-      imageUrl = imageModel?.image;
+      imageUrl = imageModel.image;
     });
   }
 
@@ -82,115 +82,122 @@ class _ItemButtonState extends State<ItemButton> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Container(
-            decoration: (imageUrl != null)
-              ? BoxDecoration(
-                image: DecorationImage(
-                  image: NetworkImage(imageUrl!),
-                  fit: BoxFit.cover,
-                ),
-                borderRadius: BorderRadius.circular(10),
-              )
-              : null,
-            child: Column(
+          child: SizedBox(
+            height: 150,
+            child: Stack(
+              alignment: Alignment.topCenter,
               children: <Widget>[
-                Container(
-                  padding: const EdgeInsets.only(
-                    top: 10,
-                    bottom: 10,
-                    left: 10,
-                    right: 12,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Row(
+                if(imageUrl != null) Image(
+                  image: NetworkImage(imageUrl!),
+                  fit: BoxFit.fitWidth,
+                  width: double.infinity,
+                ),
+                if(imageUrl == null) Image(
+                  image: const AssetImage('assets/images/logo.png'),
+                  width: MediaQuery.of(context).size.width * 0.666,
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Container(
+                      padding: const EdgeInsets.only(
+                        top: 10,
+                        bottom: 10,
+                        left: 10,
+                        right: 12,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
-                          if(widget.productExpanded.product!.vegetarian == true) const ProductTag(title: 'Vegetariano'),
-                          if(widget.productExpanded.product!.vegan == true) const ProductTag(title: 'Vegano'),
-                          if(widget.productExpanded.product!.bakery == true) const ProductTag(title: 'Bollería'),
-                          if(widget.productExpanded.product!.fresh == true) const ProductTag(title: 'Frescos'),
-                          if(widget.productExpanded.product!.vegetarian == false && widget.productExpanded.product!.vegan == false && widget.productExpanded.product!.bakery == false && widget.productExpanded.product!.fresh == false) const Text(''),
+                          Row(
+                            children: <Widget>[
+                              if(widget.productExpanded.product!.vegetarian == true) const ProductTag(title: 'Vegetariano'),
+                              if(widget.productExpanded.product!.vegan == true) const ProductTag(title: 'Vegano'),
+                              if(widget.productExpanded.product!.bakery == true) const ProductTag(title: 'Bollería'),
+                              if(widget.productExpanded.product!.fresh == true) const ProductTag(title: 'Frescos'),
+                              if(widget.productExpanded.product!.vegetarian == false && widget.productExpanded.product!.vegan == false && widget.productExpanded.product!.bakery == false && widget.productExpanded.product!.fresh == false) const Text(''),
+                            ],
+                          ),
+                          if(widget.productExpanded.isFavourite == true) ClipRect(
+                            child: BackdropFilter(
+                              filter: ImageFilter.blur(
+                                sigmaX: 8,
+                                sigmaY: 8,
+                              ),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(999),
+                                  color: Colors.white.withOpacity(0.66),
+                                ),
+                                padding: const EdgeInsets.all(5),
+                                child: const Icon(Icons.favorite),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
-                      if(widget.productExpanded.isFavourite == true) ClipRect(
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(
-                            sigmaX: 8,
-                            sigmaY: 8,
+                    ),
+                    ClipRect(
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(
+                          sigmaX: 8,
+                          sigmaY: 8,
+                        ),
+                        child: Container(
+                          color: Colors.white.withOpacity(0.75),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 10,
                           ),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(999),
-                              color: Colors.white.withOpacity(0.66),
-                            ),
-                            padding: const EdgeInsets.all(5),
-                            child: const Icon(Icons.favorite),
+                          width: double.infinity,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Text>[
+                                  Text('${Utils.productTypeCharToString(
+                                    type: widget.productExpanded.product?.type,
+                                    isCapitalized: true,
+                                  )} de'),
+                                  if(widget.productExpanded.item?.date != null) Text((widget.productExpanded.item?.date?.day == DateTime.now().day) ? '(hoy)' : '(mañana)'),
+                                ],
+                              ),
+                              Text(
+                                widget.productExpanded.business?.name ?? '',
+                                style: const TextStyle(fontWeight: FontWeight.w600), // TODO deshardcodear este estilo
+                              ),
+                              Row(
+                                children: [
+                                  if(widget.productExpanded.business?.rate != null) if(widget.productExpanded.business!.rate! > 0) Row(
+                                    children: <Widget>[
+                                      const Icon(
+                                        Icons.star,
+                                        size: 15,
+                                      ),
+                                      Text(' ${widget.productExpanded.business?.rate ?? 0} | '),
+                                    ],
+                                  ),
+                                  const Icon(
+                                    Icons.price_change,
+                                    size: 15,
+                                  ),
+                                  Text(' ${widget.productExpanded.product!.price} Sol/. | '),
+                                  const Icon(
+                                    Icons.watch_later,
+                                    size: 15,
+                                  ),
+                                  Text(' ${widget.productExpanded.product!.startingHour?.hour}:${widget.productExpanded.product!.startingHour?.minute}h - ${widget.productExpanded.product!.endingHour?.hour}:${widget.productExpanded.product!.endingHour?.minute}h'),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-                ClipRect(
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(
-                      sigmaX: 8,
-                      sigmaY: 8,
                     ),
-                    child: Container(
-                      color: Colors.white.withOpacity(0.75),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 10,
-                      ),
-                      width: double.infinity,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Text>[
-                              Text('${Utils.productTypeCharToString(
-                                type: widget.productExpanded.product?.type,
-                                isCapitalized: true,
-                              )} de'),
-                              if(widget.productExpanded.item?.date != null) Text((widget.productExpanded.item?.date?.day == DateTime.now().day) ? '(hoy)' : '(mañana)'),
-                            ],
-                          ),
-                          Text(
-                            widget.productExpanded.business?.name ?? '',
-                            style: const TextStyle(fontWeight: FontWeight.w600), // TODO deshardcodear este estilo
-                          ),
-                          Row(
-                            children: [
-                              if(widget.productExpanded.business?.rate != null) if(widget.productExpanded.business!.rate! > 0) Row(
-                                children: <Widget>[
-                                  const Icon(
-                                    Icons.star,
-                                    size: 15,
-                                  ),
-                                  Text(' ${widget.productExpanded.business?.rate ?? 0} | '),
-                                ],
-                              ),
-                              const Icon(
-                                Icons.price_change,
-                                size: 15,
-                              ),
-                              Text(' ${widget.productExpanded.product!.price} Sol/. | '),
-                              const Icon(
-                                Icons.watch_later,
-                                size: 15,
-                              ),
-                              Text(' ${widget.productExpanded.product!.startingHour?.hour}:${widget.productExpanded.product!.startingHour?.minute}h - ${widget.productExpanded.product!.endingHour?.hour}:${widget.productExpanded.product!.endingHour?.minute}h'),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  ],
                 ),
               ],
             ),

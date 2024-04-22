@@ -1,6 +1,11 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wefood/blocs/blocs.dart';
+import 'package:wefood/commands/custom_parsers.dart';
+import 'package:wefood/commands/utils.dart';
 import 'package:wefood/models/models.dart';
+import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/types.dart';
 import 'package:wefood/views/views.dart';
 
@@ -21,10 +26,24 @@ class EditProductButton extends StatefulWidget {
 
 class _EditProductButtonState extends State<EditProductButton> {
 
+  void _retrieveData() async {
+    ImageModel? imageModel = await Api.getImage(
+        idUser: context.read<UserInfoCubit>().state.user.id!,
+        meaning: '${Utils.productTypeToChar(widget.productType)}1',
+    );
+    setState(() {
+      imageRoute = imageModel.image;
+    });
+  }
+
   @override
   void initState() {
+    _retrieveData();
+    print('PRODUCT_TYPE: ${Utils.productTypeToChar(widget.productType)}');
     super.initState();
   }
+
+  String? imageRoute;
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +69,12 @@ class _EditProductButtonState extends State<EditProductButton> {
             child: Stack(
               alignment: Alignment.center,
               children: <Widget>[
-                Image.asset(
+                if(imageRoute != null) Image.network(
+                  imageRoute!,
+                  fit: BoxFit.fitWidth,
+                  width: double.infinity,
+                ),
+                if(imageRoute == null) Image.asset(
                   'assets/images/salmon.jpg',
                   fit: BoxFit.fitWidth,
                   width: double.infinity,

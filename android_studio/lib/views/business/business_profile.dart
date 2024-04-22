@@ -106,12 +106,17 @@ class _BusinessProfileState extends State<BusinessProfile> {
                     builder: (BuildContext context) {
                       return WefoodPopup(
                         title: '¿Seguro que quieres cerrar sesión?',
-                        onYes: () async {
-                          await Api.logout();
-                          _deleteTokens();
-                          Navigator.pop(context);
-                          _navigateToMain();
-                        },
+                        actions: <TextButton>[
+                          TextButton(
+                            onPressed: () async {
+                              await Api.logout();
+                              _deleteTokens();
+                              Navigator.pop(context);
+                              _navigateToMain();
+                            },
+                            child: const Text('SÍ'),
+                          )
+                        ],
                       );
                     }
                 );
@@ -141,12 +146,17 @@ class _BusinessProfileState extends State<BusinessProfile> {
                       return WefoodPopup(
                         title: '¿Seguro que quieres darte de baja?',
                         description: 'Perderás toda tu información y no podrás recuperarla más adelante.',
-                        onYes: () async {
-                          await Api.signOut();
-                          _deleteTokens();
-                          Navigator.pop(context);
-                          _navigateToMain();
-                        },
+                        actions: <TextButton>[
+                          TextButton(
+                            onPressed: () async {
+                              await Api.signOut();
+                              _deleteTokens();
+                              Navigator.pop(context);
+                              _navigateToMain();
+                            },
+                            child: const Text('SÍ'),
+                          )
+                        ],
                       );
                     }
                 );
