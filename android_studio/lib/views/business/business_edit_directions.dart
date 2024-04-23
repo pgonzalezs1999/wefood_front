@@ -2,23 +2,20 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
 import 'package:wefood/services/auth/api/api.dart';
 
 class BusinessEditDirections extends StatefulWidget {
 
-  final double longitude;
-  final double latitude;
-
-  const BusinessEditDirections({
-    super.key,
-    required this.longitude,
-    required this.latitude,
-  });
+  const BusinessEditDirections({super.key});
 
   @override
   State<BusinessEditDirections> createState() => _BusinessEditDirectionsState();
@@ -26,34 +23,61 @@ class BusinessEditDirections extends StatefulWidget {
 
 class _BusinessEditDirectionsState extends State<BusinessEditDirections> {
 
-  String directions = '';
-  String businessCountry = '';
+  LatLng? initialUserLocation;
+  LatLng? initialBusinessLocation;
+  String finalDirections = '';
+  String? typedLocation;
+  LatLng? typedLatLng;
+  String finalBusinessCountry = '';
   final Completer<GoogleMapController> _mapController = Completer<GoogleMapController>();
-  LatLng userLocation = const LatLng(-12.063449, -77.014574);
-  LatLng? businessLocation;
-  String businessLocationString = '';
-  CameraPosition cameraPosition = const CameraPosition(
-    target: LatLng(-12.063449, -77.014574),
-    zoom: 16,
-  );
+  CameraPosition? cameraPosition;
   bool errorOnFindingLocation = false;
   String error = '';
 
-  updateMarker(businessLocationString) async {
-    LatLng newLocation = await getLatLngFromAddress(businessLocationString);
+  _getBusinessLocation() async {
+    finalDirections = context.read<UserInfoCubit>().state.business.directions ?? '';
+    initialBusinessLocation = LatLng(
+      context.read<UserInfoCubit>().state.business.latitude ?? 0,
+      context.read<UserInfoCubit>().state.business.longitude ?? 0,
+    );
     setState(() {
-      directions = businessLocationString;
-      businessLocation = newLocation;
       cameraPosition = CameraPosition(
-        target: businessLocation!,
-        zoom: 16,
+        target: LatLng(
+          initialBusinessLocation!.latitude,
+          initialBusinessLocation!.longitude,
+        ),
+        zoom: 17,
       );
+    });
+  }
+
+  _getUserLocation() async {
+    PermissionStatus permissionStatus = await Permission.location.request();
+    if(permissionStatus.isGranted) {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.best,
+      );
+      setState(() {
+        initialUserLocation = LatLng(position.latitude, position.longitude);
+      });
+      if(initialUserLocation != null) {
+        // await _cameraToPosition(userLocation!);
+      }
+    }
+  }
+
+  updateMarker(typedLocation) async {
+    LatLng newLocation = await getLatLngFromAddress(typedLocation);
+    setState(() {
+      typedLatLng = newLocation;
+      _cameraToPosition(newLocation);
     });
   }
 
   Future<LatLng> getLatLngFromAddress(String address) async {
     final query = Uri.encodeQueryComponent(address);
     final url = 'https://maps.googleapis.com/maps/api/geocode/json?address=$query&key=${Environment.googleMapsApiKey}';
+    print(url);
     try {
       final response = await http.get(Uri.parse(url));
       if(response.statusCode == 200) {
@@ -63,13 +87,12 @@ class _BusinessEditDirectionsState extends State<BusinessEditDirections> {
           final location = results[0]['geometry']['location'];
           final lat = location['lat'] as double;
           final lng = location['lng'] as double;
-          directions = results[0]['formatted_address'];
-
+          finalDirections = results[0]['formatted_address'];
           final addressComponents = results[0]['address_components'] as List<dynamic>;
           for(var component in addressComponents) {
             final types = component['types'] as List<dynamic>;
             if(types.contains('country')) {
-              businessCountry = component['long_name'] as String;
+              finalBusinessCountry = component['long_name'] as String;
               break;
             }
           }
@@ -88,10 +111,24 @@ class _BusinessEditDirectionsState extends State<BusinessEditDirections> {
   Future<void> _cameraToPosition(LatLng newPosition) async {
     final GoogleMapController controller = await _mapController.future;
     CameraPosition newCameraPosition = CameraPosition(
-      target: newPosition,
+      target: LatLng(
+        newPosition.latitude,
+        newPosition.longitude,
+      ),
       zoom: 16,
     );
     await controller.animateCamera(CameraUpdate.newCameraPosition(newCameraPosition));
+  }
+
+  _retrieveData() async {
+    await _getBusinessLocation();
+    await _getUserLocation();
+  }
+
+  @override
+  void initState() {
+    _retrieveData();
+    super.initState();
   }
 
   @override
@@ -109,86 +146,118 @@ class _BusinessEditDirectionsState extends State<BusinessEditDirections> {
               Text('Elija su nueva ubicación'),
             ],
           ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
+          if(cameraPosition != null) Column(
             children: <Widget>[
-              Expanded(
-                child: WefoodInput(
-                  upperDescription: 'Escriba la dirección lo más exacta posible, y compruebe en el mapa que es correcta',
-                  labelText: 'Ubicación de su negocio',
-                  onChanged: (String value) {
-                    setState(() {
-                      businessLocationString = value;
-                      error = '';
-                    });
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: <Widget>[
+                  Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.only(
+                        top: 20,
+                      ),
+                      child: WefoodInput(
+                        upperDescription: 'Escriba la dirección lo más exacta posible, y compruebe en el mapa que es correcta',
+                        labelText: 'Ubicación de su negocio',
+                        onChanged: (String value) {
+                          setState(() {
+                            typedLocation = value;
+                            error = '';
+                          });
+                        },
+                        errorText: (errorOnFindingLocation == true) ? 'No se ha encontrado ubicación para esas direcciones' : null,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () async {
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      if(typedLocation != '') {
+                        try {
+                          await updateMarker(typedLocation);
+                          // await _cameraToPosition(businessLocation!);
+                          errorOnFindingLocation = false;
+                        } catch(e) {
+                          setState(() {
+                            errorOnFindingLocation = true;
+                            finalDirections = '';
+                          });
+                        }
+                      }
+                    },
+                    icon: Container(
+                      padding: const EdgeInsets.all(15),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: Colors.grey.withOpacity(0.25), // TODO poner esto con los colores del estilo
+                      ),
+                      child: const Icon(
+                        Icons.search,
+                      ),
+                    ),
+                  )
+                ],
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              SizedBox(
+                height: MediaQuery.of(context).size.width,
+                width: MediaQuery.of(context).size.width,
+                child: GoogleMap(
+                  gestureRecognizers: <Factory<OneSequenceGestureRecognizer>> {
+                    Factory<OneSequenceGestureRecognizer>(
+                      () => EagerGestureRecognizer() // Skip screen scroll on GoogleMap touch
+                    ),
                   },
-                  errorText: (errorOnFindingLocation == true) ? 'No se ha encontrado ubicación para esas direcciones' : null,
+                  initialCameraPosition: cameraPosition!,
+                  markers: {
+                    if(initialBusinessLocation != null) Marker(
+                      markerId: const MarkerId('current'),
+                      icon: BitmapDescriptor.defaultMarker,
+                      position: LatLng(
+                        context.read<UserInfoCubit>().state.business.latitude ?? 0,
+                        context.read<UserInfoCubit>().state.business.longitude ?? 0,
+                      ),
+                    ),
+                    if(typedLatLng != null) Marker(
+                      markerId: const MarkerId('typed'),
+                      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+                      position: LatLng(
+                        typedLatLng!.latitude,
+                        typedLatLng!.longitude,
+                      ),
+                    ),
+                  },
+                  onMapCreated: (GoogleMapController controller) async {
+                    _mapController.complete(controller);
+                  },
+                  myLocationEnabled: true,
+                  myLocationButtonEnabled: true,
                 ),
               ),
-              IconButton(
-                onPressed: () async {
-                  FocusManager.instance.primaryFocus?.unfocus();
-                  if(businessLocationString != '') {
-                    try {
-                      await updateMarker(businessLocationString);
-                      await _cameraToPosition(businessLocation!);
-                      errorOnFindingLocation = false;
-                    } catch(e) {
-                      setState(() {
-                        errorOnFindingLocation = true;
-                        businessLocation = null;
-                        directions = '';
-                      });
-                    }
-                  }
-                },
-                icon: Container(
-                  padding: const EdgeInsets.all(15),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    color: Colors.green, // TODO poner esto con los colores del estilo
+              if(typedLatLng != null) Column(
+                children: <Widget>[
+                  const SizedBox(
+                    height: 10,
                   ),
-                  child: const Icon(
-                    Icons.search,
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      const Text(
+                        'Se guardará: ',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold, // TODO deshardcodear este estilo
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(finalDirections),
+                      ),
+                    ],
                   ),
-                ),
+                ],
               )
             ],
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          SizedBox(
-            height: MediaQuery.of(context).size.width * 0.75,
-            width: MediaQuery.of(context).size.width,
-            child: GoogleMap(
-              gestureRecognizers: <Factory<OneSequenceGestureRecognizer>> {
-                Factory<OneSequenceGestureRecognizer>(
-                        () => EagerGestureRecognizer() // Skip screen scroll on GoogleMap touch
-                ),
-              },
-              initialCameraPosition:  CameraPosition(
-                target: LatLng(widget.latitude, widget.longitude),
-                zoom: 16,
-              ),
-              markers: {
-                if(businessLocation != null) Marker(
-                  markerId: const MarkerId('typed'),
-                  icon: BitmapDescriptor.defaultMarker,
-                  position: LatLng(businessLocation!.latitude, businessLocation!.longitude),
-                ),
-                if(businessLocation == null) Marker(
-                  markerId: const MarkerId('current'),
-                  icon: BitmapDescriptor.defaultMarker,
-                  position: LatLng(widget.latitude, widget.longitude),
-                ),
-              },
-              onMapCreated: (GoogleMapController controller) async {
-                _mapController.complete(controller);
-              },
-              myLocationEnabled: true,
-              myLocationButtonEnabled: true,
-            ),
           ),
           SizedBox(
             height: MediaQuery.of(context).size.height * 0.05,
@@ -200,15 +269,35 @@ class _BusinessEditDirectionsState extends State<BusinessEditDirections> {
                 setState(() {
                   error = '';
                 });
-                if(directions != '' && businessCountry != '' && businessLocation != null) {
+                if(finalDirections != '' && finalBusinessCountry != '' && typedLatLng != null) {
                   try {
                     await Api.updateBusinessDirections(
-                      directions: directions,
-                      country: businessCountry,
-                      longitude: businessLocation!.longitude,
-                      latitude: businessLocation!.latitude,
+                      directions: finalDirections,
+                      country: finalBusinessCountry,
+                      longitude: typedLatLng!.longitude,
+                      latitude: typedLatLng!.latitude,
                     );
-                    Navigator.pop(context);
+                    context.read<UserInfoCubit>().setBusinessDirections(finalDirections);
+                    context.read<UserInfoCubit>().setBusinessLatLng(
+                      LatLng(
+                        typedLatLng!.latitude,
+                        typedLatLng!.longitude
+                      ),
+                    );
+                    await showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return WefoodPopup(
+                          title: '¡Enhorabuena! Las direcciones hay cambiado correctamente a "$finalDirections"',
+                          cancelButtonTitle: 'OK',
+                          cancelButtonBehaviour: () {
+                            Navigator.pop(context);
+                          },
+                        );
+                      }
+                    ).then((onValue) {
+                      Navigator.pop(context);
+                    });
                   } catch(e) {
                     setState(() {
                       error = 'Error al guardar los datos. Por favor, inténtelo de nuevo más tarde';

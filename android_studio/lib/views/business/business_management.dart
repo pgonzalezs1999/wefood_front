@@ -48,8 +48,6 @@ class _BusinessManagementState extends State<BusinessManagement> {
     super.initState();
   }
 
-  String? imageUrl;
-
   @override
   Widget build(BuildContext context) {
 

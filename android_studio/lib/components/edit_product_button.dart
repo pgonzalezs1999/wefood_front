@@ -2,7 +2,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wefood/blocs/blocs.dart';
-import 'package:wefood/commands/custom_parsers.dart';
 import 'package:wefood/commands/utils.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api/api.dart';
@@ -75,9 +74,9 @@ class _EditProductButtonState extends State<EditProductButton> {
                   width: double.infinity,
                 ),
                 if(imageRoute == null) Image.asset(
-                  'assets/images/salmon.jpg',
+                  'assets/images/logo.png',
                   fit: BoxFit.fitWidth,
-                  width: double.infinity,
+                  width: MediaQuery.of(context).size.width * 0.5,
                 ),
                 Container(
                   color: Colors.white.withOpacity(0.66),
@@ -87,8 +86,8 @@ class _EditProductButtonState extends State<EditProductButton> {
                 ClipRect(
                   child: BackdropFilter(
                     filter: ImageFilter.blur(
-                      sigmaX: 3,
-                      sigmaY: 3,
+                      sigmaX: 6,
+                      sigmaY: 6,
                     ),
                     child: Container(
                       height: double.infinity,

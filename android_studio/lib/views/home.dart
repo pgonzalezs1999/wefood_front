@@ -105,9 +105,9 @@ class _HomeState extends State<Home> {
             if(response.data!.isAdmin == true) const AdminManagement(),
             if(response.data!.isAdmin == true) const AdminProfile(),
           ];
-          return (shouldWaitForValidation(
-              idBusiness: response.data!.idBusiness,
-              businessVerified: response.data!.businessVerified
+          return(shouldWaitForValidation(
+            idBusiness: response.data!.idBusiness,
+            businessVerified: response.data!.businessVerified
           ) == false) ? WefoodScreen(
             canPop: false,
             body: screens[_selectedScreenIndex],

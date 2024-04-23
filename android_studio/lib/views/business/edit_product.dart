@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/commands/custom_parsers.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/models/models.dart';
@@ -516,6 +518,13 @@ class _EditProductState extends State<EditProduct> {
                                   : (widget.productType == ProductType.lunch) ? 'L'
                                   : (widget.productType == ProductType.dinner) ? 'D' : '',
                               );
+                              if(widget.productType == ProductType.breakfast) {
+                                context.read<BusinessBreakfastCubit>().set(null);
+                              } else if(widget.productType == ProductType.lunch) {
+                                context.read<BusinessLunchCubit>().set(null);
+                              } else {
+                                context.read<BusinessDinnerCubit>().set(null);
+                              }
                               Navigator.pop(context);
                               Navigator.pop(context);
                             } catch(e) {

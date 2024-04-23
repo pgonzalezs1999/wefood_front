@@ -76,6 +76,7 @@ class _UserProfileState extends State<UserProfile> {
       setState(() {
         imageRoute = responseImage.image;
       });
+      Navigator.pop(context);
     }
   }
 
@@ -86,13 +87,14 @@ class _UserProfileState extends State<UserProfile> {
         _selectedImage = File(returnedImage.path);
       });
       ImageModel responseImage = await Api.uploadImage(
-        idUser: 34,
+        idUser: context.read<UserInfoCubit>().state.user.id!,
         meaning: 'profile',
         file: _selectedImage!,
       );
       setState(() {
         imageRoute = responseImage.image;
       });
+      Navigator.pop(context);
     }
   }
 

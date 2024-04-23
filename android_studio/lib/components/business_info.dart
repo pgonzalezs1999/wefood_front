@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:wefood/blocs/user_info_cubit.dart';
-import 'package:wefood/components/editable_field.dart';
-import 'package:wefood/components/loading_icon.dart';
-import 'package:wefood/models/business_expanded_model.dart';
+import 'package:wefood/components/components.dart';
+import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/views/views.dart';
 
@@ -16,14 +16,15 @@ class BusinessInfo extends StatefulWidget {
 
 class _BusinessInfoState extends State<BusinessInfo> {
 
-  void _navigateToBusinessEditDirections(double longitude, double latitude) {
-    Navigator.push(
+  void _navigateToBusinessEditDirections() async {
+    await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => BusinessEditDirections(
-        longitude: longitude,
-        latitude: latitude,
-      )),
-    );
+      MaterialPageRoute(builder: (context) => const BusinessEditDirections()),
+    ).then((_) {
+      setState(() {
+        context.read<UserInfoCubit>();
+      });
+    });
   }
 
   void retrieveData() async {
@@ -31,6 +32,12 @@ class _BusinessInfoState extends State<BusinessInfo> {
       context.read<UserInfoCubit>().setBusinessName(data.business.name);
       context.read<UserInfoCubit>().setBusinessDescription(data.business.description);
       context.read<UserInfoCubit>().setBusinessDirections(data.business.directions);
+      context.read<UserInfoCubit>().setBusinessLatLng(
+        LatLng(
+          data.business.latitude ?? 0,
+          data.business.longitude ?? 0,
+        )
+      );
     }).onError((error, stackTrace) {
       setState(() {
         retrievingDataError = true;
@@ -53,6 +60,9 @@ class _BusinessInfoState extends State<BusinessInfo> {
 
   @override
   Widget build(BuildContext context) {
+
+    final UserInfoCubit userInfoCubit = context.watch<UserInfoCubit>();
+
     if(isRetrievingData == true) {
       return const LoadingIcon();
     } else if(retrievingDataError == true) {
@@ -68,9 +78,9 @@ class _BusinessInfoState extends State<BusinessInfo> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             EditableField(
-              feedbackText: (context.read<UserInfoCubit>().state.business.name != null) ? 'Nombre: ${context.read<UserInfoCubit>().state.business.name!}' : 'Añade tu nombre',
+              feedbackText: (userInfoCubit.state.business.name != null) ? 'Nombre: ${userInfoCubit.state.business.name!}' : 'Añade tu nombre',
               firstTopic: 'nombre',
-              firstInitialValue: (context.read<UserInfoCubit>().state.business.name != null) ? context.read<UserInfoCubit>().state.business.name! : '',
+              firstInitialValue: (userInfoCubit.state.business.name != null) ? userInfoCubit.state.business.name! : '',
               firstMinimumLength: 6,
               firstMaximumLength: 100,
               onSave: (newValue, newSecondValue) async {
@@ -101,27 +111,6 @@ class _BusinessInfoState extends State<BusinessInfo> {
             const SizedBox(
               height: 10,
             ),
-            GestureDetector(
-              onTap: () {
-                _navigateToBusinessEditDirections(
-                  context.read<UserInfoCubit>().state.business.longitude ?? 0,
-                  context.read<UserInfoCubit>().state.business.latitude ?? 0,
-                );
-              },
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text('Ubicación: ${context.read<UserInfoCubit>().state.business.directions!}'),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  const Icon(
-                      Icons.edit
-                  ),
-                ],
-              ),
-            )
           ],
         ),
       );

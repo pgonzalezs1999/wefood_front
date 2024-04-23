@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
-import 'package:wefood/models/business_expanded_model.dart';
-import 'package:wefood/models/user_model.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:wefood/models/models.dart';
 
 class UserInfoCubit extends Cubit<BusinessExpandedModel> {
 
@@ -9,6 +9,12 @@ class UserInfoCubit extends Cubit<BusinessExpandedModel> {
   void setUser(UserModel value) {
     BusinessExpandedModel updatedState = state;
     updatedState.user = value;
+    emit(updatedState);
+  }
+
+  void setBusiness(BusinessModel value) {
+    BusinessExpandedModel updatedState = state;
+    updatedState.business = value;
     emit(updatedState);
   }
 
@@ -27,6 +33,13 @@ class UserInfoCubit extends Cubit<BusinessExpandedModel> {
   void setBusinessDirections(String? value) {
     BusinessExpandedModel updatedState = state;
     updatedState.business.directions = value;
+    emit(updatedState);
+  }
+
+  void setBusinessLatLng(LatLng? latLng) {
+    BusinessExpandedModel updatedState = state;
+    updatedState.business.latitude = latLng?.latitude;
+    updatedState.business.longitude = latLng?.longitude;
     emit(updatedState);
   }
 }
