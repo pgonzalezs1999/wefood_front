@@ -225,7 +225,7 @@ class _BusinessProfileState extends State<BusinessProfile> {
               child: Row(
                 children: [
                   Expanded(
-                    child: Text('Ubicación: ${userInfoCubit.state.business.directions!}'),
+                    child: Text('Ubicación: ${userInfoCubit.state.business.directions}'),
                   ),
                   const SizedBox(
                     width: 10,

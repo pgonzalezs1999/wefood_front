@@ -105,6 +105,12 @@ class _UserProfileState extends State<UserProfile> {
     await UserSecureStorage().delete(key: 'password');
   }
 
+  _rebuildDirectionsCubit() async {
+    setState(() {
+      context.read<UserInfoCubit>().state;
+    });
+  }
+
   @override
   void initState() {
     _getProfileImage();
@@ -116,6 +122,7 @@ class _UserProfileState extends State<UserProfile> {
 
   @override
   Widget build(BuildContext context) {
+    _rebuildDirectionsCubit();
     return WefoodNavigationScreen(
       children: [
         Container(
