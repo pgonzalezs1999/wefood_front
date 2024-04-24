@@ -2,14 +2,18 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import 'package:wefood/blocs/blocs.dart';
+import 'package:wefood/commands/contact_support.dart';
 import 'package:wefood/commands/share_app.dart';
 import 'package:wefood/components/components.dart';
+import 'package:wefood/environment.dart';
 import 'package:wefood/main.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/views/views.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class UserProfile extends StatefulWidget {
   const UserProfile({super.key});
@@ -263,9 +267,21 @@ class _UserProfileState extends State<UserProfile> {
             ),
             SettingsElement(
               iconData: Icons.support_agent,
-              title: 'Contáctanos - FALTA',
-              onTap: () {
-                // TODO falta esto
+              title: 'Contáctanos',
+              onTap: () async {
+                await launchWhatsapp(
+                  onError: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return WefoodPopup(
+                          title: 'No se ha podido abrir WhatsApp. Esto suele deberse a problemas de conexión, o a que no tenga la aplicación de WhatsApp instalada.\n\nSi el error persiste, por favor escríbanos a ${Environment.supportEmail}',
+                          cancelButtonTitle: 'OK',
+                        );
+                      }
+                    );
+                  },
+                );
               },
             ),
             SettingsElement(

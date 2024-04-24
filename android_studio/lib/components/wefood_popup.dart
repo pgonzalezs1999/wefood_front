@@ -50,7 +50,10 @@ class _WefoodPopupState extends State<WefoodPopup> {
                   : const AssetImage('assets/images/logo.png'),
             ),
           ),
-          Text(widget.title),
+          Text(
+            widget.title,
+            textAlign: TextAlign.center,
+          ),
           const SizedBox(
             height: 20,
           ),

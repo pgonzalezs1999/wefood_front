@@ -268,6 +268,13 @@ class _BusinessProfileState extends State<BusinessProfile> {
               },
             ),
             SettingsElement(
+              iconData: Icons.credit_card_outlined,
+              title: 'Cobros - FALTA',
+              onTap: () {
+                // TODO falta por hacer
+              },
+            ),
+            SettingsElement(
               iconData: Icons.logout,
               title: 'Cerrar sesión',
               onTap: () {
@@ -290,13 +297,6 @@ class _BusinessProfileState extends State<BusinessProfile> {
                       );
                     }
                 );
-              },
-            ),
-            SettingsElement(
-              iconData: Icons.credit_card_outlined,
-              title: 'Cobros - FALTA',
-              onTap: () {
-                // TODO falta por hacer
               },
             ),
             SettingsElement(
