@@ -31,13 +31,20 @@ class _OrderPendingListCustomerState extends State<OrderPendingListCustomer> {
           if(response.data!.isNotEmpty) {
             resultWidget = SingleChildScrollView(
               child: Column(
-                children: response.data!.map((ProductExpandedModel product) =>
-                  ItemButton(
-                    horizontalScroll: false,
-                    productExpanded: product,
-                    nextScreen: NextScreen.orderCustomer,
-                  )).toList(),
-                ),
+                children: <Widget>[
+                  Column(
+                    children: response.data!.map((ProductExpandedModel product) =>
+                      ItemButton(
+                        horizontalScroll: false,
+                        productExpanded: product,
+                        nextScreen: NextScreen.orderCustomer,
+                      )).toList(),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                ],
+              )
             );
           }
           else {

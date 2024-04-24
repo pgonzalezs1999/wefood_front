@@ -87,14 +87,21 @@ class _ItemButtonState extends State<ItemButton> {
             child: Stack(
               alignment: Alignment.topCenter,
               children: <Widget>[
-                if(imageUrl != null) Image(
-                  image: NetworkImage(imageUrl!),
-                  fit: BoxFit.fitWidth,
-                  width: double.infinity,
-                ),
-                if(imageUrl == null) Image(
-                  image: const AssetImage('assets/images/logo.png'),
-                  width: MediaQuery.of(context).size.width * 0.666,
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: SizedBox(
+                    height: 150,
+                    child: (imageUrl != null)
+                    ? Image(
+                      image: NetworkImage(imageUrl!),
+                      fit: BoxFit.fitWidth,
+                      width: double.infinity,
+                    )
+                    : Image(
+                      image: const AssetImage('assets/images/logo.png'),
+                      width: MediaQuery.of(context).size.width * 0.666,
+                    ),
+                  ),
                 ),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,

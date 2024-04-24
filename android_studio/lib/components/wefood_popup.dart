@@ -66,7 +66,11 @@ class _WefoodPopupState extends State<WefoodPopup> {
       ),
       actions: [
         TextButton(
-          onPressed: widget.cancelButtonBehaviour ?? () {
+          onPressed: (widget.cancelButtonBehaviour != null)
+            ? () {
+              widget.cancelButtonBehaviour!();
+            }
+            : () {
             Navigator.of(context).pop();
           },
           child: Text(widget.cancelButtonTitle ?? 'NO'),

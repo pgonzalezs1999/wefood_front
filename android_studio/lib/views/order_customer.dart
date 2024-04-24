@@ -126,41 +126,38 @@ class _OrderCustomerState extends State<OrderCustomer> {
                       onPressed: () async {
                         showDialog(
                           context: context,
-                          builder: (context) {
-                            return StatefulBuilder(
-                              builder: (context, setState) {
-                                return AlertDialog(
-                                  title: const Text('¿Confirmar recogida?'),
-                                  content: const Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      Text('Confirme que el encargado está de acuerdo en confirmar el pedido de esta forma, ya que no podrá deshacer esta acción.'),
-                                    ],
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: const Text('CANCELAR'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () async {
-                                        await Api.completeOrderCustomer(
-                                          idOrder: widget.id,
-                                        ).then((_) {
-                                          setState(() {
-                                            Navigator.pop(context);
-                                            Navigator.pop(context);
-                                            Navigator.pop(context);
-                                          });
-                                        });
-                                      },
-                                      child: const Text('COMPRAR'),
-                                    ),
-                                  ],
-                                );
-                              },
+                          builder: (_) {
+                            return WefoodPopup(
+                              title: '¿Confirmar recogida?\n\nConfirme que el encargado está de acuerdo en confirmar el pedido de esta forma, ya que no podrá deshacer esta acción.',
+                              cancelButtonTitle: 'CANCELAR',
+                              actions: <TextButton>[
+                                TextButton(
+                                  child: const Text('CONFIRMAR'),
+                                  onPressed: () async {
+                                    Navigator.pop(context);
+                                    await Api.completeOrderCustomer(
+                                      idOrder: widget.id,
+                                    ).then((_) {
+                                      showDialog(
+                                        context: context,
+                                        builder: (_) {
+                                          return WefoodPopup(
+                                            title: '¡Producto recogido!\n\n¡Muchas gracias por confiar en WeFood! ¡Esperamos volver a verle pronto!',
+                                            cancelButtonTitle: 'OK',
+                                            cancelButtonBehaviour: () async {
+                                              setState(() {
+                                                Navigator.pop(context);
+                                                Navigator.pop(context);
+                                                Navigator.pop(context);
+                                              });
+                                            },
+                                          );
+                                        },
+                                      );
+                                    });
+                                  },
+                                ),
+                              ],
                             );
                           },
                         );
