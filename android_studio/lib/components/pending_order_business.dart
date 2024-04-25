@@ -6,11 +6,13 @@ class PendingOrderBusiness extends StatefulWidget {
 
   final int id;
   final OrderReceptionMethod? receptionMethod;
+  final bool isFirst;
 
   const PendingOrderBusiness({
     super.key,
     required this.id,
     this.receptionMethod,
+    required this.isFirst,
   });
 
   @override
@@ -21,15 +23,12 @@ class _PendingOrderBusinessState extends State<PendingOrderBusiness> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        border: Border(
+      decoration: BoxDecoration(
+        border: (widget.isFirst == true) ? const Border(
           top: BorderSide(
             width: 0.25,
           ),
-        ),
-      ),
-      margin: const EdgeInsets.symmetric(
-        vertical: 10,
+        ) : null,
       ),
       padding: const EdgeInsets.symmetric(
         horizontal: 10,
@@ -50,7 +49,12 @@ class _PendingOrderBusinessState extends State<PendingOrderBusiness> {
               const Text(':'),
             ],
           ),
-          Text(widget.receptionMethod != null ? 'Entregado' : 'Pendiente'),
+          Text(
+            (widget.receptionMethod != null) ? 'Entregado' : 'Pendiente',
+            style: TextStyle(
+              color: (widget.receptionMethod != null) ? Colors.green : Colors.red, // TODO deshardcodear por colores de Matthew
+            ),
+          ),
         ],
       ),
     );

@@ -270,17 +270,7 @@ class _UserProfileState extends State<UserProfile> {
               title: 'Contáctanos',
               onTap: () async {
                 await launchWhatsapp(
-                  onError: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return WefoodPopup(
-                          title: 'No se ha podido abrir WhatsApp. Esto suele deberse a problemas de conexión, o a que no tenga la aplicación de WhatsApp instalada.\n\nSi el error persiste, por favor escríbanos a ${Environment.supportEmail}',
-                          cancelButtonTitle: 'OK',
-                        );
-                      }
-                    );
-                  },
+                  context: context,
                 );
               },
             ),

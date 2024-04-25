@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/commands/contact_support.dart';
 import 'package:wefood/commands/share_app.dart';
@@ -267,17 +268,7 @@ class _BusinessProfileState extends State<BusinessProfile> {
               title: 'Contáctanos',
               onTap: () async {
                 await launchWhatsapp(
-                  onError: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return WefoodPopup(
-                          title: 'No se ha podido abrir WhatsApp. Esto suele deberse a problemas de conexión, o a que no tenga la aplicación de WhatsApp instalada.\n\nSi el error persiste, por favor escríbanos a ${Environment.supportEmail}',
-                          cancelButtonTitle: 'OK',
-                        );
-                      }
-                    );
-                  },
+                  context: context,
                 );
               },
             ),

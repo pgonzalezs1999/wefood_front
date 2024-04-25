@@ -17,6 +17,6 @@ export 'package:wefood/views/home.dart';
 export 'package:wefood/views/user/item.dart';
 export 'package:wefood/views/loading_screen.dart';
 export 'package:wefood/views/login.dart';
-export 'package:wefood/views/order_customer.dart';
+export 'package:wefood/views/user/order_customer.dart';
 export 'package:wefood/views/register_business.dart';
 export 'package:wefood/views/register_user.dart';

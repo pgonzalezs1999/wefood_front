@@ -14,7 +14,6 @@ export 'package:wefood/components/item_button.dart';
 export 'package:wefood/components/item_favourite_list.dart';
 export 'package:wefood/components/item_nearby_list.dart';
 export 'package:wefood/components/item_recommended_list.dart';
-export 'package:wefood/components/order_pending_list_business.dart';
 export 'package:wefood/components/order_pending_list_customer.dart';
 export 'package:wefood/components/pending_order_business.dart';
 export 'package:wefood/components/product_tag.dart';
