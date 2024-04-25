@@ -15,7 +15,7 @@ class CommentModel {
     idBusiness = json['id_business'] as int?;
 
   static void printInfo(CommentModel comment) {
-    print('IMPRIMIENDO BUSINESS CON ID: ${comment.id}');
+    print('IMPRIMIENDO COMMENT CON ID: ${comment.id}');
     print('-> idUser: ${comment.idUser}');
     print('-> rate: ${comment.rate}');
     print('-> message: ${comment.message}');

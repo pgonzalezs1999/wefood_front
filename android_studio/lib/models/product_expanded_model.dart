@@ -38,11 +38,11 @@ class ProductExpandedModel {
     OrderModel.printInfo(product.order);
     UserModel.printInfo(product.user);
     BusinessModel.printInfo(product.business);
+    ImageModel.printInfo(product.image);
     print('--------');
     print('-> isFavourite: ${product.isFavourite}');
     print('-> favourites: ${product.favourites}');
     print('-> available: ${product.available}');
-    ImageModel.printInfo(product.image);
     print('------------------------------');
   }
 }

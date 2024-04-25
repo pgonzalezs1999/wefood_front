@@ -24,7 +24,7 @@ class CountryModel {
     googleMapsName = newGoogleMapsName;
 
   static void printInfo(CountryModel country) {
-    print('IMPRIMIENDO BUSINESS CON ID: ${country.id}');
+    print('IMPRIMIENDO COUNTRY CON ID: ${country.id}');
     print('-> name: ${country.name}');
     print('-> prefix: ${country.prefix}');
     print('-> googleMapsName: ${country.googleMapsName}');

@@ -11,7 +11,7 @@ class FavouriteModel {
     idBusiness = json['id_business'] as int?;
 
   static void printInfo(FavouriteModel favourite) {
-    print('IMPRIMIENDO BUSINESS CON ID: ${favourite.id}');
+    print('IMPRIMIENDO FAVOURITE CON ID: ${favourite.id}');
     print('-> idUser: ${favourite.idUser}');
     print('-> idBusiness: ${favourite.idBusiness}');
   }

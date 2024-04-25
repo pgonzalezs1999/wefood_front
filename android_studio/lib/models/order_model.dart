@@ -27,7 +27,7 @@ class OrderModel {
     idItem = json['id_item'] as int?;
 
   static void printInfo(OrderModel order) {
-    print('IMPRIMIENDO BUSINESS CON ID: ${order.id}');
+    print('IMPRIMIENDO ORDER CON ID: ${order.id}');
     print('-> idUser: ${order.idUser}');
     print('-> orderDate: ${order.orderDate}');
     print('-> receptionDate: ${order.receptionDate}');

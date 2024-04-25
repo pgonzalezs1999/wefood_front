@@ -22,7 +22,7 @@ class ItemModel {
   }
 
   static void printInfo(ItemModel item) {
-    print('IMPRIMIENDO BUSINESS CON ID: ${item.id}');
+    print('IMPRIMIENDO ITEM CON ID: ${item.id}');
     print('-> idProduct: ${item.idProduct}');
     print('-> date: ${item.date}');
   }
