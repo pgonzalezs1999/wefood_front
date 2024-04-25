@@ -5,7 +5,6 @@ import 'package:wefood/blocs/user_info_cubit.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api/api.dart';
-import 'package:wefood/views/views.dart';
 
 class BusinessInfo extends StatefulWidget {
   const BusinessInfo({super.key});
@@ -15,17 +14,6 @@ class BusinessInfo extends StatefulWidget {
 }
 
 class _BusinessInfoState extends State<BusinessInfo> {
-
-  void _navigateToBusinessEditDirections() async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const BusinessEditDirections()),
-    ).then((_) {
-      setState(() {
-        context.read<UserInfoCubit>();
-      });
-    });
-  }
 
   void retrieveData() async {
     await Api.getSessionBusiness().then((BusinessExpandedModel data) {

@@ -1,8 +1,10 @@
 class CountryModel {
-  int id;
-  String name;
-  int prefix;
-  String googleMapsName;
+  int? id;
+  String? name;
+  int? prefix;
+  String? googleMapsName;
+
+  CountryModel.empty();
 
   CountryModel.fromJson(Map<String, dynamic> json):
     id = json['id'] as int,
@@ -20,4 +22,11 @@ class CountryModel {
     name = newName,
     prefix = newPrefix,
     googleMapsName = newGoogleMapsName;
+
+  static void printInfo(CountryModel country) {
+    print('IMPRIMIENDO BUSINESS CON ID: ${country.id}');
+    print('-> name: ${country.name}');
+    print('-> prefix: ${country.prefix}');
+    print('-> googleMapsName: ${country.googleMapsName}');
+  }
 }

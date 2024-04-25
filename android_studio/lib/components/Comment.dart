@@ -45,8 +45,8 @@ class _CommentState extends State<Comment> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(widget.comment.user?.username ?? 'Sin nombre'),
-              Text(widget.comment.content.message ?? 'Sin rate'),
+              Text(widget.comment.user.username ?? 'Sin nombre'),
+              Text(widget.comment.comment.message ?? 'Sin rate'),
             ],
           ),
         ],

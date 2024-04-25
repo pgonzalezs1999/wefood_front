@@ -1,7 +1,7 @@
 import 'package:wefood/commands/utils.dart';
 
 class ProductModel {
-  int id;
+  int? id;
   double? price;
   int? amount;
   DateTime? endingDate;
@@ -20,8 +20,10 @@ class ProductModel {
   bool? workingOnSunday;
   String? type;
 
+  ProductModel.empty();
+
   ProductModel.fromJson(Map<String, dynamic> json):
-    id = json['id'] as int,
+    id = int.tryParse('${json['id']}'),
     price = double.tryParse('${json['price']}'),
     amount = int.tryParse('${json['amount']}'),
     endingDate = (json['ending_date'] != null) ? DateTime.parse(json['ending_date']) as DateTime? : null,

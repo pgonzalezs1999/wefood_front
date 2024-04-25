@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/commands/utils.dart';
-import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/views/views.dart';
 
 enum NextScreen {
@@ -30,23 +29,10 @@ class ItemButton extends StatefulWidget {
 
 class _ItemButtonState extends State<ItemButton> {
 
-  void retrieveData() async {
-    ImageModel? imageModel = await Api.getImage(
-      idUser: widget.productExpanded.user!.id!,
-      meaning: '${widget.productExpanded.product!.type!.toLowerCase()}1',
-    );
-    setState(() {
-      imageUrl = imageModel.image;
-    });
-  }
-
   @override
   void initState() {
-    retrieveData();
     super.initState();
   }
-
-  String? imageUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +59,7 @@ class _ItemButtonState extends State<ItemButton> {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => OrderCustomer(
-                id: widget.productExpanded.order!.id!,
+                id: widget.productExpanded.order.id!,
               )),
             );
           }
@@ -91,9 +77,9 @@ class _ItemButtonState extends State<ItemButton> {
                   borderRadius: BorderRadius.circular(10),
                   child: SizedBox(
                     height: 150,
-                    child: (imageUrl != null)
+                    child: (widget.productExpanded.image.route != null)
                     ? Image(
-                      image: NetworkImage(imageUrl!),
+                      image: NetworkImage(widget.productExpanded.image.route!),
                       fit: BoxFit.fitWidth,
                       width: double.infinity,
                     )
@@ -119,11 +105,11 @@ class _ItemButtonState extends State<ItemButton> {
                         children: <Widget>[
                           Row(
                             children: <Widget>[
-                              if(widget.productExpanded.product!.vegetarian == true) const ProductTag(title: 'Vegetariano'),
-                              if(widget.productExpanded.product!.vegan == true) const ProductTag(title: 'Vegano'),
-                              if(widget.productExpanded.product!.bakery == true) const ProductTag(title: 'Bollería'),
-                              if(widget.productExpanded.product!.fresh == true) const ProductTag(title: 'Frescos'),
-                              if(widget.productExpanded.product!.vegetarian == false && widget.productExpanded.product!.vegan == false && widget.productExpanded.product!.bakery == false && widget.productExpanded.product!.fresh == false) const Text(''),
+                              if(widget.productExpanded.product.vegetarian == true) const ProductTag(title: 'Vegetariano'),
+                              if(widget.productExpanded.product.vegan == true) const ProductTag(title: 'Vegano'),
+                              if(widget.productExpanded.product.bakery == true) const ProductTag(title: 'Bollería'),
+                              if(widget.productExpanded.product.fresh == true) const ProductTag(title: 'Frescos'),
+                              if(widget.productExpanded.product.vegetarian == false && widget.productExpanded.product.vegan == false && widget.productExpanded.product.bakery == false && widget.productExpanded.product.fresh == false) const Text(''),
                             ],
                           ),
                           if(widget.productExpanded.isFavourite == true) ClipRect(
@@ -166,37 +152,37 @@ class _ItemButtonState extends State<ItemButton> {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: <Text>[
                                   Text('${Utils.productTypeCharToString(
-                                    type: widget.productExpanded.product?.type,
+                                    type: widget.productExpanded.product.type,
                                     isCapitalized: true,
                                   )} de'),
-                                  if(widget.productExpanded.item?.date != null) Text((widget.productExpanded.item?.date?.day == DateTime.now().day) ? '(hoy)' : '(mañana)'),
+                                  if(widget.productExpanded.item.date != null) Text((widget.productExpanded.item.date!.day == DateTime.now().day) ? '(hoy)' : '(mañana)'),
                                 ],
                               ),
                               Text(
-                                widget.productExpanded.business?.name ?? '',
+                                widget.productExpanded.business.name ?? '',
                                 style: const TextStyle(fontWeight: FontWeight.w600), // TODO deshardcodear este estilo
                               ),
                               Row(
                                 children: [
-                                  if(widget.productExpanded.business?.rate != null) if(widget.productExpanded.business!.rate! > 0) Row(
+                                  if(widget.productExpanded.business.rate != null) if(widget.productExpanded.business.rate! > 0) Row(
                                     children: <Widget>[
                                       const Icon(
                                         Icons.star,
                                         size: 15,
                                       ),
-                                      Text(' ${widget.productExpanded.business?.rate ?? 0} | '),
+                                      Text(' ${widget.productExpanded.business.rate ?? 0} | '),
                                     ],
                                   ),
                                   const Icon(
                                     Icons.price_change,
                                     size: 15,
                                   ),
-                                  Text(' ${widget.productExpanded.product!.price} Sol/. | '),
+                                  Text(' ${widget.productExpanded.product.price} Sol/. | '),
                                   const Icon(
                                     Icons.watch_later,
                                     size: 15,
                                   ),
-                                  Text(' ${widget.productExpanded.product!.startingHour?.hour}:${widget.productExpanded.product!.startingHour?.minute}h - ${widget.productExpanded.product!.endingHour?.hour}:${widget.productExpanded.product!.endingHour?.minute}h'),
+                                  Text(' ${widget.productExpanded.product.startingHour?.hour}:${widget.productExpanded.product.startingHour?.minute}h - ${widget.productExpanded.product.endingHour?.hour}:${widget.productExpanded.product.endingHour?.minute}h'),
                                 ],
                               ),
                             ],

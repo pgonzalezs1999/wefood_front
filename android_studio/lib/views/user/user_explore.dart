@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wefood/blocs/recommended_items_cubit.dart';
 import 'package:wefood/components/components.dart';
+import 'package:wefood/services/auth/api/api.dart';
+import 'package:wefood/models/models.dart';
 
 class UserExplore extends StatefulWidget {
   const UserExplore({super.key});
@@ -13,16 +17,12 @@ class _UserExploreState extends State<UserExplore> {
   double userLongitude = -77; // TODO deshardcodear
   double userLatitude = -12.5; // TODO deshardcodear
 
-  Widget recommendedList = const SizedBox();
-  Widget nearbyList =  const SizedBox();
-  Widget favouriteList = const SizedBox();
+  Widget recommendedList = const LoadingIcon();
+  Widget nearbyList =  const LoadingIcon();
+  Widget favouriteList = const LoadingIcon();
 
   _reloadLists() async {
     setState(() {
-      recommendedList = ItemRecommendedList(
-        longitude: userLongitude,
-        latitude: userLatitude,
-      );
       nearbyList = ItemNearbyList(
         longitude: userLongitude,
         latitude: userLatitude,
@@ -38,6 +38,64 @@ class _UserExploreState extends State<UserExplore> {
       ),
       child: Text(title),
     );
+  }
+
+  _retrieveRecommended() async {
+    try {
+      if(context.read<RecommendedItemsCubit>().state.isEmpty) {
+        Api.getRecommendedItems(
+          longitude: userLongitude,
+          latitude: userLatitude,
+        ).then((List<ProductExpandedModel> list) {
+          context.read<RecommendedItemsCubit>().set(list);
+          setState(() {
+            recommendedList = Column(
+              children: context.read<RecommendedItemsCubit>().state.map((ProductExpandedModel i) {
+                Api.getImage(
+                  idUser: i.user.id!,
+                  meaning: '${i.product.type!.toLowerCase()}1',
+                ).then((ImageModel image) {
+                  setState(() {
+                    context.read<RecommendedItemsCubit>().setImageById(
+                      itemId: i.item.id!,
+                      imageModel: image,
+                    );
+                    print('EL PRIMER PRODUCT_EXPANDED QUEDA:');
+                    ProductExpandedModel.printInfo(context.read<RecommendedItemsCubit>().state.first);
+                  });
+                });
+                return ItemButton(
+                  productExpanded: i,
+                );
+              }).toList(),
+            );
+          });
+        });
+      } else {
+        setState(() {
+          recommendedList = Column(
+            children: context.read<RecommendedItemsCubit>().state.map((ProductExpandedModel product) => ItemButton(
+              productExpanded: product,
+            )).toList(),
+          );
+        });
+      }
+    } catch(error) {
+      setState(() {
+        recommendedList = Container(
+          margin: EdgeInsets.symmetric(
+            vertical: MediaQuery.of(context).size.height * 0.05,
+          ),
+          child: Text('Error $error'),
+        );
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    _retrieveRecommended();
+    super.initState();
   }
 
   @override

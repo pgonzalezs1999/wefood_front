@@ -59,15 +59,15 @@ class _ItemState extends State<Item> {
     ImageModel? imageModel;
     try {
       imageModel = await Api.getImage(
-        idUser: widget.productExpanded.user!.id!,
-        meaning: '${widget.productExpanded.product!.type!.toLowerCase()}$searchedPosition',
+        idUser: widget.productExpanded.user.id!,
+        meaning: '${widget.productExpanded.product.type!.toLowerCase()}$searchedPosition',
       );
     } catch(e) {
       print('No se ha encontrado la imagen en la base de datos');
     }
     if(imageModel != ImageModel.empty()) {
       setState(() {
-        backgroundImageRoutes.addIf(true, imageModel!.image!);
+        backgroundImageRoutes.addIf(true, imageModel!.route!);
       });
       _getBackgroundImages(
         searchedPosition: searchedPosition + 1,
@@ -78,11 +78,11 @@ class _ItemState extends State<Item> {
   void _getProfileImage() async {
     try {
       ImageModel? imageModel = await Api.getImage(
-        idUser: widget.productExpanded.user!.id!,
+        idUser: widget.productExpanded.user.id!,
         meaning: 'profile',
       );
       setState(() {
-        profileImageRoute = imageModel.image;
+        profileImageRoute = imageModel.route;
       });
     } catch(e) {
       print('No se ha encontrado la imagen en la base de datos');
@@ -102,7 +102,7 @@ class _ItemState extends State<Item> {
   Widget build(BuildContext context) {
     return FutureBuilder<ProductExpandedModel>(
       future: Api.getItem(
-        id: widget.productExpanded.item!.id!,
+        id: widget.productExpanded.item.id!,
       ),
       builder: (BuildContext context, AsyncSnapshot<ProductExpandedModel> response) {
         if(response.hasError) {
@@ -165,10 +165,10 @@ class _ItemState extends State<Item> {
                                     late FavouriteModel favourite;
                                     if(info.isFavourite == true) {
                                       _chooseFavouriteIcon(false);
-                                      favourite = await Api.removeFavourite(idBusiness: info.business!.id!);
+                                      favourite = await Api.removeFavourite(idBusiness: info.business.id!);
                                     } else {
                                       _chooseFavouriteIcon(true);
-                                      favourite = await Api.addFavourite(idBusiness: info.business!.id!);
+                                      favourite = await Api.addFavourite(idBusiness: info.business.id!);
                                     }
                                   } catch(e) {
                                     _chooseFavouriteIcon(info.isFavourite!);
@@ -214,7 +214,7 @@ class _ItemState extends State<Item> {
                                   children: <Widget>[
                                     Text(
                                       '${CustomParsers.productTypeInitialToName(
-                                        string: widget.productExpanded.product!.type!,
+                                        string: widget.productExpanded.product.type!,
                                         isCapitalized: true,
                                         isPlural: true,
                                       )} de',
@@ -223,7 +223,7 @@ class _ItemState extends State<Item> {
                                       ),
                                     ),
                                     Text(
-                                      info.business?.name ?? '',
+                                      info.business.name ?? '',
                                       style: const TextStyle( // TODO deshardcodear estilo
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold
@@ -248,16 +248,16 @@ class _ItemState extends State<Item> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      if(info.business!.description != null) Column(
+                      if(info.business.description != null) Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Text>[
                           Text(
-                            'Acerca de ${info.business!.name}:',
+                            'Acerca de ${info.business.name}:',
                             style: const TextStyle(
                               fontWeight: FontWeight.bold, // TODO deshardcodear este estilo
                             ),
                           ),
-                          Text(info.business!.description!),
+                          Text(info.business.description!),
                         ],
                       ),
                       SizedBox(height: MediaQuery.of(context).size.height * 0.03),
@@ -269,7 +269,7 @@ class _ItemState extends State<Item> {
                               fontWeight: FontWeight.bold, // TODO deshardcodear este estilo
                             ),
                           ),
-                          Text('${info.product!.price} Sol/.'),
+                          Text('${info.product.price} Sol/.'),
                         ],
                       ),
                       SizedBox(height: MediaQuery.of(context).size.height * 0.01),
@@ -281,10 +281,10 @@ class _ItemState extends State<Item> {
                               fontWeight: FontWeight.bold, // TODO deshardcodear este estilo
                             ),
                           ),
-                          Text('De ${_parseTime(info.product!.startingHour)} a ${_parseTime(info.product!.endingHour)} h'),
+                          Text('De ${_parseTime(info.product.startingHour)} a ${_parseTime(info.product.endingHour)} h'),
                         ],
                       ),
-                      if(info.business?.rate != null) if(info.business!.rate! > 0) Column(
+                      if(info.business.rate != null) if(info.business.rate! > 0) Column(
                         children: <Widget>[
                           SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                           Row(
@@ -295,8 +295,8 @@ class _ItemState extends State<Item> {
                                   fontWeight: FontWeight.bold, // TODO deshardcodear este estilo
                                 ),
                               ),
-                              Text('${info.business?.rate}  '),
-                            ] + _printStarts(info.business!.rate!),
+                              Text('${info.business.rate}  '),
+                            ] + _printStarts(info.business.rate!),
                           ),
                         ],
                       ),
@@ -311,7 +311,7 @@ class _ItemState extends State<Item> {
                                   fontWeight: FontWeight.bold, // TODO deshardcodear este estilo
                                 ),
                               ),
-                              Text('${info.business?.directions}'),
+                              Text('${info.business.directions}'),
                             ],
                           ),
                           Card(
@@ -323,14 +323,14 @@ class _ItemState extends State<Item> {
                               child: GestureDetector(
                                 child: const Icon(Icons.location_pin),
                                 onTap: () {
-                                  MapsLauncher.launchQuery(info.business!.directions ?? '');
+                                  MapsLauncher.launchQuery(info.business.directions ?? '');
                                 },
                               ),
                             ),
                           )
                         ],
                       ),
-                      if(info.product!.vegetarian == true || info.product!.vegan == true || info.product!.bakery == true || info.product!.fresh == true) Column(
+                      if(info.product.vegetarian == true || info.product.vegan == true || info.product.bakery == true || info.product.fresh == true) Column(
                         children: <Widget>[
                           const Align(
                             alignment: Alignment.centerLeft,
@@ -344,10 +344,10 @@ class _ItemState extends State<Item> {
                           SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                           Row(
                             children: <Widget>[
-                              if(info.product!.vegetarian == true) const ProductTag(title: 'Vegetariano'),
-                              if(info.product!.vegan == true) const ProductTag(title: 'Vegano'),
-                              if(info.product!.bakery == true) const ProductTag(title: 'Bollería'),
-                              if(info.product!.fresh == true) const ProductTag(title: 'Frescos'),
+                              if(info.product.vegetarian == true) const ProductTag(title: 'Vegetariano'),
+                              if(info.product.vegan == true) const ProductTag(title: 'Vegano'),
+                              if(info.product.bakery == true) const ProductTag(title: 'Bollería'),
+                              if(info.product.fresh == true) const ProductTag(title: 'Frescos'),
                             ],
                           ),
                         ],
@@ -361,7 +361,7 @@ class _ItemState extends State<Item> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            if(info.available != null) if(info.available! > 0) Text('${info.available} de ${info.product?.amount} disponibles'),
+                            if(info.available != null) if(info.available! > 0) Text('${info.available} de ${info.product.amount} disponibles'),
                             if(info.available != null) if(info.available! <= 0) const Text('¡Agotado!'),
                             if(info.available != null) if(info.available! > 0) ElevatedButton(
                               child: const Text('COMPRAR'),
@@ -390,9 +390,9 @@ class _ItemState extends State<Item> {
                                           const Text(' packs'),
                                         ],
                                       ),
-                                      if(info.product?.price != null) Align(
+                                      if(info.product.price != null) Align(
                                         alignment: Alignment.centerLeft,
-                                        child: Text('Precio: ${(info.product!.price! * selectedAmount).toStringAsFixed(2)} Sol/.'),
+                                        child: Text('Precio: ${(info.product.price! * selectedAmount).toStringAsFixed(2)} Sol/.'),
                                       ),
                                     ],
                                   ),
@@ -401,7 +401,7 @@ class _ItemState extends State<Item> {
                                     TextButton(
                                       onPressed: () async {
                                         await Api.orderItem(
-                                          idItem: info.item!.id!,
+                                          idItem: info.item.id!,
                                           amount: selectedAmount,
                                         ).then((_) {
                                           Navigator.pop(context);
@@ -426,13 +426,13 @@ class _ItemState extends State<Item> {
                           ],
                         ),
                       ),
-                      if(info.business?.comments != null && info.business!.comments!.isNotEmpty) Column(
+                      if(info.business.comments != null && info.business.comments!.isNotEmpty) Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           const Divider(),
                           const Text('¿Qué opinan los compradores?'),
                           Column(
-                            children: info.business!.comments!.map((CommentExpandedModel c) => Comment(comment: c)).toList(),
+                            children: info.business.comments!.map((CommentExpandedModel c) => Comment(comment: c)).toList(),
                           ),
                         ],
                       )

@@ -1,10 +1,21 @@
 import 'package:wefood/models/models.dart';
 
 class CommentExpandedModel {
-  CommentModel content;
-  UserModel? user;
+  CommentModel comment;
+  UserModel user;
+
+  CommentExpandedModel.empty():
+    comment = CommentModel.empty(),
+    user = UserModel.empty();
 
   CommentExpandedModel.fromJson(Map<String, dynamic> json):
-    content = CommentModel.fromJson(json['content'] as Map<String, dynamic>),
-    user = UserModel.fromJson(json['user'] as Map<String, dynamic>);
+    comment = (json['content'] != null) ? CommentModel.fromJson(json['content'] as Map<String, dynamic>) : CommentModel.empty(),
+    user = (json['user'] != null) ? UserModel.fromJson(json['user'] as Map<String, dynamic>) : UserModel.empty();
+
+  static void printInfo(CommentExpandedModel comment) {
+    print('------------------------------');
+    CommentModel.printInfo(comment.comment);
+    UserModel.printInfo(comment.user);
+    print('------------------------------');
+  }
 }

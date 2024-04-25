@@ -56,7 +56,7 @@ class _UserProfileState extends State<UserProfile> {
           meaning: 'profile',
         );
         setState(() {
-          imageRoute = imageModel.image;
+          imageRoute = imageModel.route;
         });
       } catch(e) {
         print('No se ha encontrado la imagen en la base de datos');
@@ -75,7 +75,7 @@ class _UserProfileState extends State<UserProfile> {
         file: _selectedImage!,
       );
       setState(() {
-        imageRoute = responseImage.image;
+        imageRoute = responseImage.route;
       });
       Navigator.pop(context);
     }
@@ -93,7 +93,7 @@ class _UserProfileState extends State<UserProfile> {
         file: _selectedImage!,
       );
       setState(() {
-        imageRoute = responseImage.image;
+        imageRoute = responseImage.route;
       });
       Navigator.pop(context);
     }

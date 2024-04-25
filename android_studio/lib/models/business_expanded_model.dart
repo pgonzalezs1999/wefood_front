@@ -9,8 +9,8 @@ class BusinessExpandedModel {
     business = BusinessModel.empty();
 
   BusinessExpandedModel.fromJson(Map<String, dynamic> json):
-    user = UserModel.fromJson(json['user'] as Map<String, dynamic>),
-    business = BusinessModel.fromJson(json['business'] as Map<String, dynamic>);
+    user = (json['user'] != null) ? UserModel.fromJson(json['user'] as Map<String, dynamic>) : UserModel.empty(),
+    business = (json['business'] != null) ? BusinessModel.fromJson(json['business'] as Map<String, dynamic>) : BusinessModel.empty();
 
   static void printInfo(BusinessExpandedModel model) {
     print('------------------------------');

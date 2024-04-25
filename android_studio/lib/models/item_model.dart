@@ -3,6 +3,8 @@ class ItemModel {
   int? idProduct;
   DateTime? date;
 
+  ItemModel.empty();
+
   ItemModel.fromJson(Map<String, dynamic> json):
     id = json['id'] as int?,
     idProduct = json['id_product'] as int?,
@@ -17,5 +19,11 @@ class ItemModel {
     } else {
       return null;
     }
+  }
+
+  static void printInfo(ItemModel item) {
+    print('IMPRIMIENDO BUSINESS CON ID: ${item.id}');
+    print('-> idProduct: ${item.idProduct}');
+    print('-> date: ${item.date}');
   }
 }

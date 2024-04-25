@@ -11,6 +11,8 @@ class OrderModel {
   int? idPayment;
   int? idItem;
 
+  OrderModel.empty();
+
   OrderModel.fromJson(Map<String, dynamic> json):
     id = json['id'] as int?,
     idUser = json['id_user'] as int?,
@@ -23,4 +25,18 @@ class OrderModel {
     mealType = json['meal_type'] as String?,
     idPayment = json['id_payment'] as int?,
     idItem = json['id_item'] as int?;
+
+  static void printInfo(OrderModel order) {
+    print('IMPRIMIENDO BUSINESS CON ID: ${order.id}');
+    print('-> idUser: ${order.idUser}');
+    print('-> orderDate: ${order.orderDate}');
+    print('-> receptionDate: ${order.receptionDate}');
+    print('-> receptionMethod: ${order.receptionMethod}');
+    print('-> amount: ${order.amount}');
+    print('-> available: ${order.available}');
+    print('-> idBusiness: ${order.idBusiness}');
+    print('-> mealType: ${order.mealType}');
+    print('-> idPayment: ${order.idPayment}');
+    print('-> idItem: ${order.idItem}');
+  }
 }

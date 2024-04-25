@@ -81,29 +81,29 @@ class _EditProductState extends State<EditProduct> {
     ProductExpandedModel response = await Api.getProduct(
       id: widget.productId,
     );
-    price = response.product!.price;
+    price = response.product.price;
     startTime = TimeOfDay(
-      hour: response.product!.startingHour!.hour,
-      minute: response.product!.startingHour!.minute,
+      hour: response.product.startingHour!.hour,
+      minute: response.product.startingHour!.minute,
     );
     endTime = TimeOfDay(
-      hour: response.product!.endingHour!.hour,
-      minute: response.product!.endingHour!.minute,
+      hour: response.product.endingHour!.hour,
+      minute: response.product.endingHour!.minute,
     );
     setState(() {
-      amount = response.product!.amount!;
-      fresh = response.product!.fresh!;
-      bakery = response.product!.bakery!;
-      vegetarian = response.product!.vegetarian!;
-      vegan = response.product!.vegan!;
-      mondays = response.product!.workingOnMonday!;
-      tuesdays = response.product!.workingOnTuesday!;
-      wednesdays = response.product!.workingOnWednesday!;
-      thursdays = response.product!.workingOnThursday!;
-      fridays = response.product!.workingOnFriday!;
-      saturdays = response.product!.workingOnSaturday!;
-      sundays = response.product!.workingOnSunday!;
-      endDate = response.product!.endingDate;
+      amount = response.product.amount!;
+      fresh = response.product.fresh!;
+      bakery = response.product.bakery!;
+      vegetarian = response.product.vegetarian!;
+      vegan = response.product.vegan!;
+      mondays = response.product.workingOnMonday!;
+      tuesdays = response.product.workingOnTuesday!;
+      wednesdays = response.product.workingOnWednesday!;
+      thursdays = response.product.workingOnThursday!;
+      fridays = response.product.workingOnFriday!;
+      saturdays = response.product.workingOnSaturday!;
+      sundays = response.product.workingOnSunday!;
+      endDate = response.product.endingDate;
       endless = (endDate == null);
       isRetrievingData = false;
     });

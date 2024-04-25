@@ -17,22 +17,7 @@ class BusinessModel {
   DateTime? createdAt;
   List<CommentExpandedModel>? comments;
 
-  BusinessModel.empty():
-    id = null,
-    idCountry = null,
-    taxId = null,
-    description = null,
-    name = null,
-    longitude = null,
-    latitude = null,
-    idBreakFastProduct = null,
-    idLunchProduct = null,
-    idDinnerProduct = null,
-    directions = null,
-    isValidated = null,
-    rate = null,
-    createdAt = null,
-    comments = null;
+  BusinessModel.empty();
 
   BusinessModel.fromJson(Map<String, dynamic> json):
     id = json['id'] as int?,

@@ -77,7 +77,6 @@ class _BusinessEditDirectionsState extends State<BusinessEditDirections> {
   Future<LatLng> getLatLngFromAddress(String address) async {
     final query = Uri.encodeQueryComponent(address);
     final url = 'https://maps.googleapis.com/maps/api/geocode/json?address=$query&key=${Environment.googleMapsApiKey}';
-    print(url);
     try {
       final response = await http.get(Uri.parse(url));
       if(response.statusCode == 200) {

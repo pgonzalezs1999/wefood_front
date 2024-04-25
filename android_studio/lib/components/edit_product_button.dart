@@ -31,14 +31,13 @@ class _EditProductButtonState extends State<EditProductButton> {
         meaning: '${Utils.productTypeToChar(widget.productType)}1',
     );
     setState(() {
-      imageRoute = imageModel.image;
+      imageRoute = imageModel.route;
     });
   }
 
   @override
   void initState() {
     _retrieveData();
-    print('PRODUCT_TYPE: ${Utils.productTypeToChar(widget.productType)}');
     super.initState();
   }
 
@@ -54,7 +53,7 @@ class _EditProductButtonState extends State<EditProductButton> {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => EditProduct(
-              productId: widget.product.id,
+              productId: widget.product.id!,
               productType: widget.productType,
             )),
           );

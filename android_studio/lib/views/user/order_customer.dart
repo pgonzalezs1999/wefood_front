@@ -62,7 +62,7 @@ class _OrderCustomerState extends State<OrderCustomer> {
                     ),
                     Align(
                       alignment: Alignment.centerLeft,
-                      child: Text('${info.business!.name}'),
+                      child: Text('${info.business.name}'),
                     ),
                     const SizedBox(
                       height: 20,
@@ -79,7 +79,7 @@ class _OrderCustomerState extends State<OrderCustomer> {
                             child: GestureDetector(
                               child: const Icon(Icons.location_pin),
                               onTap: () {
-                                MapsLauncher.launchQuery(info.business!.directions ?? '');
+                                MapsLauncher.launchQuery(info.business.directions ?? '');
                               },
                             ),
                           ),
@@ -88,7 +88,7 @@ class _OrderCustomerState extends State<OrderCustomer> {
                           width: 10,
                         ),
                         Expanded(
-                          child: Text('${info.business!.directions}'),
+                          child: Text('${info.business.directions}'),
                         ),
                       ],
                     ),

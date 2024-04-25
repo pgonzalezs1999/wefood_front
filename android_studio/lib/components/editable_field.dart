@@ -155,7 +155,6 @@ class _EditableFieldState extends State<EditableField> {
                             confirmed = true;
                           });
                           final response = await widget.onSave(newFirst, newSecond);
-                          print('RESPONSE EN EDITABLE_FIELD: $response');
                           if(response['error'] == null) {
                             Navigator.pop(context);
                           } else {
