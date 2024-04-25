@@ -122,54 +122,46 @@ class _ValidatableBusinessesState extends State<ValidatableBusinesses> {
                           children: <ElevatedButton>[
                             ElevatedButton(
                               onPressed: () async {
-                                showDialog(
+                                WefoodPopup.show(
                                   context: context,
-                                  builder: (BuildContext context) {
-                                    return WefoodPopup(
-                                      title: '¿Rechazar establecimiento?',
-                                      actions: <TextButton>[
-                                        TextButton(
-                                          onPressed: () async {
-                                            await Api.refuseBusiness(
-                                              id: item.business.id!,
-                                            ).then((value) async {
-                                              _retrieveData();
-                                            }).then((value) {
-                                              Navigator.pop(context);
-                                            });
-                                          },
-                                          child: const Text('SÍ'),
-                                        ),
-                                      ],
-                                    );
-                                  }
+                                  title: '¿Rechazar establecimiento?',
+                                  actions: <TextButton>[
+                                    TextButton(
+                                      onPressed: () async {
+                                        await Api.refuseBusiness(
+                                          id: item.business.id!,
+                                        ).then((value) async {
+                                          _retrieveData();
+                                        }).then((value) {
+                                          Navigator.pop(context);
+                                        });
+                                      },
+                                      child: const Text('SÍ'),
+                                    ),
+                                  ],
                                 );
                               },
                               child: const Text('RECHAZAR'),
                             ),
                             ElevatedButton(
                               onPressed: () async {
-                                showDialog(
+                                WefoodPopup.show(
                                   context: context,
-                                  builder: (BuildContext context) {
-                                    return WefoodPopup(
-                                      title: '¿Aceptar establecimiento?',
-                                      actions: <TextButton>[
-                                        TextButton(
-                                          onPressed: () async {
-                                            await Api.validateBusiness(
-                                              id: item.business.id!,
-                                            ).then((value) async {
-                                              _retrieveData();
-                                            }).then((value) {
-                                              Navigator.pop(context);
-                                            });
-                                          },
-                                          child: const Text('SÍ'),
-                                        ),
-                                      ],
-                                    );
-                                  }
+                                  title: '¿Aceptar establecimiento?',
+                                  actions: <TextButton>[
+                                    TextButton(
+                                      onPressed: () async {
+                                        await Api.validateBusiness(
+                                          id: item.business.id!,
+                                        ).then((value) async {
+                                          _retrieveData();
+                                        }).then((value) {
+                                          Navigator.pop(context);
+                                        });
+                                      },
+                                      child: const Text('SÍ'),
+                                    ),
+                                  ],
                                 );
                               },
                               child: const Text('ACEPTAR'),

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:wefood/commands/custom_parsers.dart';
-import 'package:wefood/commands/utils.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
 import 'package:wefood/models/models.dart';
@@ -367,77 +366,60 @@ class _ItemState extends State<Item> {
                             if(info.available != null) if(info.available! > 0) ElevatedButton(
                               child: const Text('COMPRAR'),
                               onPressed: () {
-                                showDialog(
+                                WefoodPopup.show(
                                   context: context,
-                                  builder: (context) {
-                                    return StatefulBuilder(
-                                      builder: (context, setState) {
-                                        return AlertDialog(
-                                          title: const Text('Comprar producto'),
-                                          content: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: <Widget>[
-                                              Row(
-                                                children: <Widget>[
-                                                  const Text('Cantidad:'),
-                                                  const SizedBox(
-                                                    width: 10,
-                                                  ),
-                                                  DropdownButton<int>(
-                                                    value: selectedAmount,
-                                                    items: _amountOptions(info.available!),
-                                                    onChanged: (value) {
-                                                      setState(() {
-                                                        selectedAmount = value!;
-                                                      });
-                                                    },
-                                                  ),
-                                                  const Text(' packs'),
-                                                ],
-                                              ),
-                                              if(info.product?.price != null) Align(
-                                                alignment: Alignment.centerLeft,
-                                                child: Text('Precio: ${(info.product!.price! * selectedAmount).toStringAsFixed(2)} Sol/.'),
-                                              ),
-                                            ],
+                                  title: 'Comprar producto',
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      Row(
+                                        children: <Widget>[
+                                          const Text('Cantidad:'),
+                                          const SizedBox(
+                                            width: 10,
                                           ),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                              },
-                                              child: const Text('CANCELAR'),
-                                            ),
-                                            TextButton(
-                                              onPressed: () async {
-                                                await Api.orderItem(
-                                                  idItem: info.item!.id!,
-                                                  amount: selectedAmount,
-                                                ).then((_) {
-                                                  Navigator.pop(context);
-                                                  showDialog(
-                                                    context: context,
-                                                    builder: (BuildContext context) {
-                                                      return WefoodPopup(
-                                                        title: '¡Producto comprado!',
-                                                        description: 'Esto es todavía un entorno de pruebas. Más adelante, aquí aparecerá la pasarela de pago',
-                                                        cancelButtonTitle: 'OK',
-                                                        cancelButtonBehaviour: () {
-                                                          Navigator.pop(context);
-                                                          Navigator.pop(context);
-                                                        },
-                                                      );
-                                                    }
-                                                  );
-                                                });
-                                              },
-                                              child: const Text('COMPRAR'),
-                                            ),
-                                          ],
-                                        );
+                                          DropdownButton<int>(
+                                            value: selectedAmount,
+                                            items: _amountOptions(info.available!),
+                                            onChanged: (value) {
+                                              setState(() {
+                                                selectedAmount = value!;
+                                              });
+                                            },
+                                          ),
+                                          const Text(' packs'),
+                                        ],
+                                      ),
+                                      if(info.product?.price != null) Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Text('Precio: ${(info.product!.price! * selectedAmount).toStringAsFixed(2)} Sol/.'),
+                                      ),
+                                    ],
+                                  ),
+                                  cancelButtonTitle: 'CANCELAR',
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () async {
+                                        await Api.orderItem(
+                                          idItem: info.item!.id!,
+                                          amount: selectedAmount,
+                                        ).then((_) {
+                                          Navigator.pop(context);
+                                          WefoodPopup.show(
+                                            context: context,
+                                            title: '¡Producto comprado!',
+                                            description: 'Esto es todavía un entorno de pruebas. Más adelante, aquí aparecerá la pasarela de pago',
+                                            cancelButtonTitle: 'OK',
+                                            cancelButtonBehaviour: () {
+                                              Navigator.pop(context);
+                                              Navigator.pop(context);
+                                            },
+                                          );
+                                        });
                                       },
-                                    );
-                                  },
+                                      child: const Text('COMPRAR'),
+                                    ),
+                                  ],
                                 );
                               },
                             ),

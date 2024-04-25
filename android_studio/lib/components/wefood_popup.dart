@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
-class WefoodPopup extends StatefulWidget {
+class WefoodDialog extends StatefulWidget {
 
   final File? image;
   final String title;
@@ -12,7 +12,7 @@ class WefoodPopup extends StatefulWidget {
   final Function()? cancelButtonBehaviour;
   final List<TextButton>? actions;
 
-  WefoodPopup({
+  WefoodDialog({
     super.key,
     this.image,
     required this.title,
@@ -24,11 +24,10 @@ class WefoodPopup extends StatefulWidget {
   });
 
   @override
-  State<WefoodPopup> createState() => _WefoodPopupState();
+  State<WefoodDialog> createState() => _WefoodDialogState();
 }
 
-class _WefoodPopupState extends State<WefoodPopup> {
-
+class _WefoodDialogState extends State<WefoodDialog> {
 
   @override
   Widget build(BuildContext context) {
@@ -46,8 +45,8 @@ class _WefoodPopupState extends State<WefoodPopup> {
             ),
             child: Image(
               image: (widget.image != null)
-                  ? FileImage(widget.image!)
-                  : const AssetImage('assets/images/logo.png'),
+                ? FileImage(widget.image!)
+                : const AssetImage('assets/images/logo.png'),
             ),
           ),
           Text(
@@ -76,6 +75,35 @@ class _WefoodPopupState extends State<WefoodPopup> {
           child: Text(widget.cancelButtonTitle ?? 'NO'),
         ),
       ] + actions,
+    );
+  }
+}
+
+class WefoodPopup {
+  static Future<void> show({
+    required BuildContext context,
+    File? image,
+    required  String title,
+    String? description,
+    Widget? content,
+    String? cancelButtonTitle,
+    Function()? cancelButtonBehaviour,
+    List<TextButton>? actions,
+  }) async {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return WefoodDialog(
+          image: image,
+          title: title,
+          description: description,
+          content: content,
+          cancelButtonTitle: cancelButtonTitle,
+          cancelButtonBehaviour: cancelButtonBehaviour,
+          actions: actions,
+        );
+      }
     );
   }
 }

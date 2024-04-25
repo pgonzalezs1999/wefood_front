@@ -124,42 +124,34 @@ class _OrderCustomerState extends State<OrderCustomer> {
                     ),
                     ElevatedButton(
                       onPressed: () async {
-                        showDialog(
+                        WefoodPopup.show(
                           context: context,
-                          builder: (_) {
-                            return WefoodPopup(
-                              title: '¿Confirmar recogida?\n\nConfirme que el encargado está de acuerdo en confirmar el pedido de esta forma, ya que no podrá deshacer esta acción.',
-                              cancelButtonTitle: 'CANCELAR',
-                              actions: <TextButton>[
-                                TextButton(
-                                  child: const Text('CONFIRMAR'),
-                                  onPressed: () async {
-                                    Navigator.pop(context);
-                                    await Api.completeOrderCustomer(
-                                      idOrder: widget.id,
-                                    ).then((_) {
-                                      showDialog(
-                                        context: context,
-                                        builder: (_) {
-                                          return WefoodPopup(
-                                            title: '¡Producto recogido!\n\n¡Muchas gracias por confiar en WeFood! ¡Esperamos volver a verle pronto!',
-                                            cancelButtonTitle: 'OK',
-                                            cancelButtonBehaviour: () async {
-                                              setState(() {
-                                                Navigator.pop(context);
-                                                Navigator.pop(context);
-                                                Navigator.pop(context);
-                                              });
-                                            },
-                                          );
-                                        },
-                                      );
-                                    });
-                                  },
-                                ),
-                              ],
-                            );
-                          },
+                          title: '¿Confirmar recogida?\n\nConfirme que el encargado está de acuerdo en confirmar el pedido de esta forma, ya que no podrá deshacer esta acción.',
+                          cancelButtonTitle: 'CANCELAR',
+                          actions: <TextButton>[
+                            TextButton(
+                              child: const Text('CONFIRMAR'),
+                              onPressed: () async {
+                                Navigator.pop(context);
+                                await Api.completeOrderCustomer(
+                                  idOrder: widget.id,
+                                ).then((_) {
+                                  WefoodPopup.show(
+                                    context: context,
+                                    title: '¡Producto recogido!\n\n¡Muchas gracias por confiar en WeFood! ¡Esperamos volver a verle pronto!',
+                                    cancelButtonTitle: 'OK',
+                                    cancelButtonBehaviour: () async {
+                                      setState(() {
+                                        Navigator.pop(context);
+                                        Navigator.pop(context);
+                                        Navigator.pop(context);
+                                      });
+                                    },
+                                  );
+                                });
+                              },
+                            ),
+                          ],
                         );
                       },
                       child: const Text('CONFIRMAR RECOGIDA'),

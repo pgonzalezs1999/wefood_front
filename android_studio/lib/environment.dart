@@ -1,5 +1,5 @@
 class Environment {
-  static const String serverUrl = 'http://10.34.182.113:8000';
+  static const String serverUrl = 'http://192.168.1.37:8000';
   static const String apiUrl = '$serverUrl/api/auth/';
   static const String storageUrl = '$serverUrl/storage/';
 

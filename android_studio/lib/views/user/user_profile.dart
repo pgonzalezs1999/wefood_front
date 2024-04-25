@@ -2,18 +2,15 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/commands/contact_support.dart';
 import 'package:wefood/commands/share_app.dart';
 import 'package:wefood/components/components.dart';
-import 'package:wefood/environment.dart';
 import 'package:wefood/main.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/views/views.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class UserProfile extends StatefulWidget {
   const UserProfile({super.key});
@@ -278,26 +275,22 @@ class _UserProfileState extends State<UserProfile> {
               iconData: Icons.logout,
               title: 'Cerrar sesión',
               onTap: () {
-                showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return WefoodPopup(
-                        title: '¿Seguro que quieres cerrar sesión?',
-                        actions: <TextButton>[
-                          TextButton(
-                            onPressed: () async {
-                              await Api.logout();
-                              _deleteTokens();
-                              Navigator.pop(context);
-                              _navigateToMain();
-                            },
-                            child: const Text('SÍ'),
-                          )
-                        ],
-                      );
-                    }
+                WefoodPopup.show(
+                  context: context,
+                  title: '¿Seguro que quieres cerrar sesión?',
+                  actions: <TextButton>[
+                    TextButton(
+                      onPressed: () async {
+                        await Api.logout();
+                        _deleteTokens();
+                        Navigator.pop(context);
+                        _navigateToMain();
+                      },
+                      child: const Text('SÍ'),
+                    )
+                  ],
                 );
-              },
+              }
             ),
             SettingsElement(
               iconData: Icons.business,
@@ -310,27 +303,23 @@ class _UserProfileState extends State<UserProfile> {
               iconData: Icons.delete,
               title: 'Darme de baja',
               onTap: () {
-                showDialog(
+                WefoodPopup.show(
                   context: context,
-                  builder: (BuildContext context) {
-                    return WefoodPopup(
-                      title: '¿Seguro que quieres darte de baja?',
-                      description: 'Perderás toda tu información y no podrás recuperarla más adelante.',
-                      actions: <TextButton>[
-                        TextButton(
-                          onPressed: () async {
-                            await Api.signOut();
-                            _deleteTokens();
-                            Navigator.pop(context);
-                            _navigateToMain();
-                          },
-                          child: const Text('SÍ'),
-                        )
-                      ],
-                    );
-                  }
+                  title: '¿Seguro que quieres darte de baja?',
+                  description: 'Perderás toda tu información y no podrás recuperarla más adelante.',
+                  actions: <TextButton>[
+                    TextButton(
+                      onPressed: () async {
+                        await Api.signOut();
+                        _deleteTokens();
+                        Navigator.pop(context);
+                        _navigateToMain();
+                      },
+                      child: const Text('SÍ'),
+                    )
+                  ],
                 );
-              },
+              }
             ),
           ],
         ),

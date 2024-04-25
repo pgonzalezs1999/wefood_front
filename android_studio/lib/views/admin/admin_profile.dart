@@ -79,24 +79,20 @@ class _AdminProfileState extends State<AdminProfile> {
               iconData: Icons.logout,
               title: 'Cerrar sesión',
               onTap: () {
-                showDialog(
+                WefoodPopup.show(
                   context: context,
-                  builder: (BuildContext context) {
-                    return WefoodPopup(
-                      title: '¿Seguro que quieres cerrar sesión?',
-                      actions: <TextButton>[
-                        TextButton(
-                          onPressed: () async {
-                            await Api.logout();
-                            _deleteTokens();
-                            Navigator.pop(context);
-                            _navigateToMain();
-                          },
-                          child: const Text('SÍ'),
-                        ),
-                      ],
-                    );
-                  }
+                  title: '¿Seguro que quieres cerrar sesión?',
+                  actions: <TextButton>[
+                    TextButton(
+                      onPressed: () async {
+                        await Api.logout();
+                        _deleteTokens();
+                        Navigator.pop(context);
+                        _navigateToMain();
+                      },
+                      child: const Text('SÍ'),
+                    ),
+                  ],
                 );
               },
             ),
