@@ -3,7 +3,7 @@ import 'package:wefood/models/models.dart';
 
 class FavouriteItemsCubit extends Cubit<List<ProductExpandedModel>> {
 
-  FavouriteItemsCubit(): super(List<ProductExpandedModel>.empty());
+  FavouriteItemsCubit(): super(List<ProductExpandedModel>.empty(growable: true));
 
   void set(List<ProductExpandedModel> list) {
     emit(list);
@@ -24,9 +24,9 @@ class FavouriteItemsCubit extends Cubit<List<ProductExpandedModel>> {
     emit(updatedState);
   }
 
-  void removeItem(int itemId) {
+  void removeItemByBusinessId(int businessId) {
     List<ProductExpandedModel> updatedState = state;
-    updatedState.removeWhere((i) => i.item.id == itemId);
+    updatedState.removeWhere((i) => i.business.id == businessId);
     emit(updatedState);
   }
 }

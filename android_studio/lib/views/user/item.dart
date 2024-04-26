@@ -1,5 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wefood/blocs/blocs.dart';
 import 'package:get/get.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:wefood/commands/custom_parsers.dart';
@@ -30,7 +32,15 @@ class _ItemState extends State<Item> {
   List<String> backgroundImageRoutes = [];
   String? profileImageRoute;
 
-  _chooseFavouriteIcon(bool newState) {
+  _chooseFavouriteIcon(bool newState) async {
+    try {
+      List<ProductExpandedModel> favourites = await Api.getFavouriteItems();
+      setState(() {
+        context.read<FavouriteItemsCubit>().set(favourites);
+      });
+    } catch(error) {
+      return;
+    }
     setState(() {
       if(newState == true) {
         info.isFavourite = true;
@@ -63,9 +73,9 @@ class _ItemState extends State<Item> {
         meaning: '${widget.productExpanded.product.type!.toLowerCase()}$searchedPosition',
       );
     } catch(e) {
-      print('No se ha encontrado la imagen en la base de datos');
+      imageModel = null;
     }
-    if(imageModel != ImageModel.empty()) {
+    if(imageModel != ImageModel.empty() && imageModel != null) {
       setState(() {
         backgroundImageRoutes.addIf(true, imageModel!.route!);
       });
@@ -85,7 +95,7 @@ class _ItemState extends State<Item> {
         profileImageRoute = imageModel.route;
       });
     } catch(e) {
-      print('No se ha encontrado la imagen en la base de datos');
+      return;
     }
   }
 
@@ -162,14 +172,20 @@ class _ItemState extends State<Item> {
                                     favouriteIcon = const LoadingIcon();
                                   });
                                   try {
-                                    late FavouriteModel favourite;
                                     if(info.isFavourite == true) {
                                       _chooseFavouriteIcon(false);
-                                      favourite = await Api.removeFavourite(idBusiness: info.business.id!);
+                                      await Api.removeFavourite(idBusiness: info.business.id!);
                                     } else {
                                       _chooseFavouriteIcon(true);
-                                      favourite = await Api.addFavourite(idBusiness: info.business.id!);
+                                      await Api.addFavourite(idBusiness: info.business.id!);
                                     }
+                                    WefoodPopup.show(
+                                      context: context,
+                                      title: (info.isFavourite == true)
+                                        ? '¡Producto añadido a favoritos!'
+                                        : 'Producto eliminado de favoritos',
+                                      cancelButtonTitle: 'OK',
+                                    );
                                   } catch(e) {
                                     _chooseFavouriteIcon(info.isFavourite!);
                                   }

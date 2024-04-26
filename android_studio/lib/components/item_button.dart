@@ -15,12 +15,14 @@ class ItemButton extends StatefulWidget {
   final ProductExpandedModel productExpanded;
   final bool? horizontalScroll;
   final NextScreen? nextScreen;
+  final Function()? comebackBehaviour;
 
   const ItemButton({
     super.key,
     this.horizontalScroll,
     required this.productExpanded,
     this.nextScreen = NextScreen.item,
+    this.comebackBehaviour,
   });
 
   @override
@@ -54,14 +56,18 @@ class _ItemButtonState extends State<ItemButton> {
               MaterialPageRoute(builder: (context) => Item(
                 productExpanded: widget.productExpanded,
               )),
-            );
+            ).whenComplete(() {
+              (widget.comebackBehaviour != null) ? widget.comebackBehaviour!() : null;
+            });
           } else if(widget.nextScreen == NextScreen.orderCustomer) {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => OrderCustomer(
                 id: widget.productExpanded.order.id!,
               )),
-            );
+            ).whenComplete(() {
+              (widget.comebackBehaviour != null) ? widget.comebackBehaviour!() : null;
+            });
           }
         },
         child: Card(

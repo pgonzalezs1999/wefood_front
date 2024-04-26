@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wefood/blocs/blocs.dart';
-import 'package:wefood/blocs/favourite_items_cubit.dart';
 import 'package:wefood/blocs/recommended_items_cubit.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/models/models.dart';
+import 'package:wefood/types.dart';
 
 class UserExplore extends StatefulWidget {
   const UserExplore({super.key});
@@ -21,7 +21,8 @@ class _UserExploreState extends State<UserExplore> {
 
   Widget recommendedList = const LoadingIcon();
   Widget nearbyList =  const LoadingIcon();
-  Widget favouriteList = const LoadingIcon();
+
+  LoadingStatus _retrievingFavourites = LoadingStatus.unset;
 
   Widget _exploreTitle(String title) {
     return Container(
@@ -53,6 +54,9 @@ class _UserExploreState extends State<UserExplore> {
         recommendedList = Column(
           children: context.read<RecommendedItemsCubit>().state.map((ProductExpandedModel product) => ItemButton(
             productExpanded: product,
+            comebackBehaviour: () async {
+              await _retrieveFavourites();
+            },
           )).toList(),
         );
       });
@@ -109,6 +113,9 @@ class _UserExploreState extends State<UserExplore> {
             children: context.read<NearbyItemsCubit>().state.map((ProductExpandedModel i) => ItemButton(
               horizontalScroll: true,
               productExpanded: i,
+              comebackBehaviour: () async {
+                await _retrieveFavourites();
+              },
             )).toList(),
           ),
         );
@@ -126,55 +133,24 @@ class _UserExploreState extends State<UserExplore> {
   }
 
   _retrieveFavourites() async {
+    setState(() {
+      _retrievingFavourites = LoadingStatus.loading;
+    });
     try {
-      if(context.read<FavouriteItemsCubit>().state.isEmpty) {
-        List<ProductExpandedModel> items = await Api.getFavouriteItems();
-        if(items.isEmpty) {
-          setState(() {
-            favouriteList = Align( // TODO poner algo más currado
-              alignment: Alignment.center,
-              child: Card(
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: MediaQuery.of(context).size.width * 0.05,
-                    vertical: MediaQuery.of(context).size.width * 0.025,
-                  ),
-                  child: const Text('¡Añade productos a favoritos para encontrarlos más fácilmente!'),
-                ),
-              ),
-            );
-          });
-        } else {
-          for(int i=0; i<items.length; i++) {
-            items[i].image = await Api.getImage(
-              idUser: items[i].user.id!,
-              meaning: '${items[i].product.type!.toLowerCase()}1',
-            );
-          }
-          setState(() {
-            context.read<FavouriteItemsCubit>().set(items);
-          });
-        }
+    List<ProductExpandedModel> items = await Api.getFavouriteItems();
+      for(int i=0; i<items.length; i++) {
+        items[i].image = await Api.getImage(
+          idUser: items[i].user.id!,
+          meaning: '${items[i].product.type!.toLowerCase()}1',
+        );
       }
       setState(() {
-        favouriteList = SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: context.read<FavouriteItemsCubit>().state.map((ProductExpandedModel i) => ItemButton(
-              horizontalScroll: true,
-              productExpanded: i,
-            )).toList(),
-          ),
-        );
+        context.read<FavouriteItemsCubit>().set(items);
+        _retrievingFavourites = LoadingStatus.successful;
       });
     } catch(error) {
       setState(() {
-        favouriteList = Container(
-          margin: EdgeInsets.symmetric(
-            vertical: MediaQuery.of(context).size.height * 0.05,
-          ),
-          child: Text('Error $error'),
-        );
+        _retrievingFavourites = LoadingStatus.error;
       });
     }
   }
@@ -201,7 +177,37 @@ class _UserExploreState extends State<UserExplore> {
         _exploreTitle('Cerca de tí'),
         nearbyList,
         _exploreTitle('Ofertas de tus favoritos'),
-        favouriteList,
+        if(_retrievingFavourites == LoadingStatus.loading) const LoadingIcon(),
+        if(_retrievingFavourites == LoadingStatus.error) Container(
+          margin: EdgeInsets.symmetric(
+            vertical: MediaQuery.of(context).size.height * 0.05,
+          ),
+          child: const Text('Error'),
+        ),
+        if(_retrievingFavourites == LoadingStatus.successful && context.read<FavouriteItemsCubit>().state.isEmpty) Align(
+          alignment: Alignment.center,
+          child: Card(
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width * 0.05,
+                vertical: MediaQuery.of(context).size.width * 0.025,
+              ),
+              child: const Text('No hemos encontrado ofertas cerca...'),
+            ),
+          ),
+        ),
+        if(_retrievingFavourites == LoadingStatus.successful && context.read<FavouriteItemsCubit>().state.isNotEmpty) SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: context.read<FavouriteItemsCubit>().state.map((ProductExpandedModel i) => ItemButton(
+              horizontalScroll: true,
+              productExpanded: i,
+              comebackBehaviour: () async {
+                await _retrieveFavourites();
+              },
+            )).toList(),
+          ),
+        ),
       ],
     );
   }
