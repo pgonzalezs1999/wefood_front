@@ -172,6 +172,15 @@ class _UserExploreState extends State<UserExplore> {
             // TODO falta esto
           }
         ),
+        Text('Filtro de vegetariano: ${context.read<SearchFiltersCubit>().state.vegetarian}'),
+        Text('Filtro de vegan: ${context.read<SearchFiltersCubit>().state.vegan}'),
+        Text('Filtro de junk: ${context.read<SearchFiltersCubit>().state.junk}'),
+        Text('Filtro de dessert: ${context.read<SearchFiltersCubit>().state.dessert}'),
+        Text('Filtro de startTime: ${context.read<SearchFiltersCubit>().state.startTime}'),
+        Text('Filtro de endTime: ${context.read<SearchFiltersCubit>().state.endTime}'),
+        Text('Filtro de maximumPrice: ${context.read<SearchFiltersCubit>().state.maximumPrice}'),
+        Text('Filtro de onlyToday: ${context.read<SearchFiltersCubit>().state.onlyToday}'),
+        Text('Filtro de showRunOutProducts: ${context.read<SearchFiltersCubit>().state.showRunOutProducts}'),
         _exploreTitle('Recomendados'),
         recommendedList,
         _exploreTitle('Cerca de tí'),

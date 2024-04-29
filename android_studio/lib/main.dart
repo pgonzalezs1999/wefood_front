@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wefood/blocs/blocs.dart';
-import 'package:wefood/blocs/favourite_items_cubit.dart';
 import 'package:wefood/blocs/recommended_items_cubit.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api/api.dart';
@@ -28,6 +27,7 @@ class BlocsProvider extends StatelessWidget {
         BlocProvider(create: (context) => RecommendedItemsCubit(), lazy: false),
         BlocProvider(create: (context) => NearbyItemsCubit(), lazy: false),
         BlocProvider(create: (context) => FavouriteItemsCubit(), lazy: false),
+        BlocProvider(create: (context) => SearchFiltersCubit(), lazy: false),
       ],
       child: const MyApp(),
     );

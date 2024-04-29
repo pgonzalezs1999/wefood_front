@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wefood/blocs/blocs.dart';
+import 'package:wefood/views/views.dart';
 
 class SearchInput extends StatefulWidget {
 
@@ -14,7 +17,19 @@ class SearchInput extends StatefulWidget {
 }
 
 class _SearchInputState extends State<SearchInput> {
+
   static const double horizontalPadding = 20;
+
+  _navigateToSearchFilters() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const SearchFilters()),
+    ).whenComplete(() {
+      setState(() {
+        context.read<SearchFiltersCubit>().state;
+      });
+    });
+  }
 
   @override
   void initState() {
@@ -43,7 +58,7 @@ class _SearchInputState extends State<SearchInput> {
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
-            children: <GestureDetector>[
+            children: <Widget>[
               GestureDetector(
                 child: const Icon(
                   Icons.search,
@@ -52,12 +67,38 @@ class _SearchInputState extends State<SearchInput> {
 
                 },
               ),
+              const SizedBox(
+                width: 10,
+              ),
               GestureDetector(
-                child: const Icon(
-                  Icons.filter_list,
+                child: Stack(
+                  alignment: Alignment.topRight,
+                  children: [
+                    if(
+                      context.read<SearchFiltersCubit>().state.dessert == true
+                      || context.read<SearchFiltersCubit>().state.junk == true
+                      || context.read<SearchFiltersCubit>().state.vegan == true
+                      || context.read<SearchFiltersCubit>().state.vegetarian == true
+                      || context.read<SearchFiltersCubit>().state.maximumPrice != null
+                      || context.read<SearchFiltersCubit>().state.startTime != null
+                      || context.read<SearchFiltersCubit>().state.endTime != null
+                      || context.read<SearchFiltersCubit>().state.onlyToday == true
+                      || context.read<SearchFiltersCubit>().state.showRunOutProducts == true
+                    ) Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(999),
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      width: 10,
+                      height: 10,
+                    ),
+                    const Icon(
+                      Icons.filter_list,
+                    ),
+                  ],
                 ),
                 onTap: () {
-
+                  _navigateToSearchFilters();
                 },
               ),
             ],

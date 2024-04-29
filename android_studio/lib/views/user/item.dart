@@ -346,7 +346,7 @@ class _ItemState extends State<Item> {
                           )
                         ],
                       ),
-                      if(info.product.vegetarian == true || info.product.vegan == true || info.product.bakery == true || info.product.fresh == true) Column(
+                      if(info.product.vegetarian == true || info.product.vegan == true || info.product.junk == true || info.product.dessert == true) Column(
                         children: <Widget>[
                           const Align(
                             alignment: Alignment.centerLeft,
@@ -362,8 +362,8 @@ class _ItemState extends State<Item> {
                             children: <Widget>[
                               if(info.product.vegetarian == true) const ProductTag(title: 'Vegetariano'),
                               if(info.product.vegan == true) const ProductTag(title: 'Vegano'),
-                              if(info.product.bakery == true) const ProductTag(title: 'Bollería'),
-                              if(info.product.fresh == true) const ProductTag(title: 'Frescos'),
+                              if(info.product.junk == true) const ProductTag(title: 'C. rápida'),
+                              if(info.product.dessert == true) const ProductTag(title: 'Postres'),
                             ],
                           ),
                         ],

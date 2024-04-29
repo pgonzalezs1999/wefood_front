@@ -7,7 +7,7 @@ import 'package:wefood/types.dart';
 
 class Middleware {
 
-  static const Duration timeOutDuration = Duration(seconds: 20);
+  static const Duration timeOutDuration = Duration(seconds: 10);
 
   static Future get({
     required Uri url,

@@ -34,8 +34,8 @@ class _EditProductState extends State<EditProduct> {
   TimeOfDay? startTime;
   TimeOfDay? endTime;
   int? amount;
-  bool fresh = false;
-  bool bakery = false;
+  bool dessert = false;
+  bool junk = false;
   bool vegetarian = false;
   bool vegan = false;
   bool mondays = false;
@@ -92,8 +92,8 @@ class _EditProductState extends State<EditProduct> {
     );
     setState(() {
       amount = response.product.amount!;
-      fresh = response.product.fresh!;
-      bakery = response.product.bakery!;
+      dessert = response.product.dessert!;
+      junk = response.product.junk!;
       vegetarian = response.product.vegetarian!;
       vegan = response.product.vegan!;
       mondays = response.product.workingOnMonday!;
@@ -206,22 +206,22 @@ class _EditProductState extends State<EditProduct> {
             children: <Widget>[
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: <_CheckBoxRow>[
-                  _CheckBoxRow(
-                      title: 'Productos frescos',
-                      value: fresh,
+                children: <CheckBoxRow>[
+                  CheckBoxRow(
+                      title: 'Comida rápida',
+                      value: junk,
                       onChanged: () {
                         setState(() {
-                          fresh = !fresh;
+                          junk = !junk;
                         });
                       }
                   ),
-                  _CheckBoxRow(
-                      title: 'Bollería',
-                      value: bakery,
+                  CheckBoxRow(
+                      title: 'Postres',
+                      value: dessert,
                       onChanged: () {
                         setState(() {
-                          bakery = !bakery;
+                          dessert = !dessert;
                         });
                       }
                   ),
@@ -232,8 +232,8 @@ class _EditProductState extends State<EditProduct> {
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: <_CheckBoxRow>[
-                  _CheckBoxRow(
+                children: <CheckBoxRow>[
+                  CheckBoxRow(
                       title: 'Vegetariano',
                       value: vegetarian,
                       onChanged: () {
@@ -242,7 +242,7 @@ class _EditProductState extends State<EditProduct> {
                         });
                       }
                   ),
-                  _CheckBoxRow(
+                  CheckBoxRow(
                       title: 'Vegano',
                       value: vegan,
                       onChanged: () {
@@ -261,8 +261,8 @@ class _EditProductState extends State<EditProduct> {
             children: <Widget>[
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: <_CheckBoxRow>[
-                  _CheckBoxRow(
+                children: <CheckBoxRow>[
+                  CheckBoxRow(
                       title: 'Lunes',
                       value: mondays,
                       onChanged: () {
@@ -271,7 +271,7 @@ class _EditProductState extends State<EditProduct> {
                         });
                       }
                   ),
-                  _CheckBoxRow(
+                  CheckBoxRow(
                       title: 'Martes',
                       value: tuesdays,
                       onChanged: () {
@@ -280,7 +280,7 @@ class _EditProductState extends State<EditProduct> {
                         });
                       }
                   ),
-                  _CheckBoxRow(
+                  CheckBoxRow(
                       title: 'Miércoles',
                       value: wednesdays,
                       onChanged: () {
@@ -289,7 +289,7 @@ class _EditProductState extends State<EditProduct> {
                         });
                       }
                   ),
-                  _CheckBoxRow(
+                  CheckBoxRow(
                       title: 'Jueves',
                       value: thursdays,
                       onChanged: () {
@@ -305,8 +305,8 @@ class _EditProductState extends State<EditProduct> {
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: <_CheckBoxRow>[
-                  _CheckBoxRow(
+                children: <CheckBoxRow>[
+                  CheckBoxRow(
                       title: 'Viernes',
                       value: fridays,
                       onChanged: () {
@@ -315,7 +315,7 @@ class _EditProductState extends State<EditProduct> {
                         });
                       }
                   ),
-                  _CheckBoxRow(
+                  CheckBoxRow(
                       title: 'Sábados',
                       value: saturdays,
                       onChanged: () {
@@ -324,7 +324,7 @@ class _EditProductState extends State<EditProduct> {
                         });
                       }
                   ),
-                  _CheckBoxRow(
+                  CheckBoxRow(
                       title: 'Domingos',
                       value: sundays,
                       onChanged: () {
@@ -360,7 +360,7 @@ class _EditProductState extends State<EditProduct> {
                 margin: const EdgeInsets.only(
                   left: 25,
                 ),
-                child: _CheckBoxRow(
+                child: CheckBoxRow(
                   title: 'Indefinido',
                   value: endless,
                   onChanged: () {
@@ -467,8 +467,8 @@ class _EditProductState extends State<EditProduct> {
                         endHour: CustomParsers.timeOfDayToSqlTimeString(endTime!),
                         vegetarian: CustomParsers.boolToSqlString(vegetarian),
                         vegan: CustomParsers.boolToSqlString(vegan),
-                        bakery: CustomParsers.boolToSqlString(bakery),
-                        fresh: CustomParsers.boolToSqlString(fresh),
+                        junk: CustomParsers.boolToSqlString(junk),
+                        dessert: CustomParsers.boolToSqlString(dessert),
                         workingOnMonday: CustomParsers.boolToSqlString(mondays),
                         workingOnTuesday: CustomParsers.boolToSqlString(tuesdays),
                         workingOnWednesday: CustomParsers.boolToSqlString(wednesdays),
@@ -559,23 +559,23 @@ class _EditProductState extends State<EditProduct> {
   }
 }
 
-class _CheckBoxRow extends StatefulWidget {
+class CheckBoxRow extends StatefulWidget {
 
   final String title;
   final bool value;
   final Function() onChanged;
 
-  const _CheckBoxRow({
+  const CheckBoxRow({
     required this.title,
     required this.value,
     required this.onChanged,
   });
 
   @override
-  State<_CheckBoxRow> createState() => _CheckBoxState();
+  State<CheckBoxRow> createState() => _CheckBoxState();
 }
 
-class _CheckBoxState extends State<_CheckBoxRow> {
+class _CheckBoxState extends State<CheckBoxRow> {
   @override
   Widget build(BuildContext context) {
     return Row(

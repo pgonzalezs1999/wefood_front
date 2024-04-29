@@ -1,7 +1,22 @@
+import 'package:flutter/material.dart';
+
+class Filters {
+  double? maximumPrice;
+  TimeOfDay? startTime;
+  TimeOfDay? endTime;
+  bool onlyToday = false;
+  bool showRunOutProducts = false;
+  bool vegan = false;
+  bool vegetarian = false;
+  bool junk = false;
+  bool dessert = false;
+}
+
 enum InputType {
   normal,
   secret,
   integer,
+  decimal,
   date,
 }
 

@@ -129,7 +129,6 @@ class Api {
         name: 'getProfile',
         type: HttpType.get,
       );
-
       UserModel userModel = UserModel.fromJson(response['message']);
       return userModel;
     } catch(error) {
@@ -582,8 +581,8 @@ class Api {
     required String endHour,
     required String vegetarian,
     required String vegan,
-    required String bakery,
-    required String fresh,
+    required String junk,
+    required String dessert,
     required String workingOnMonday,
     required String workingOnTuesday,
     required String workingOnWednesday,
@@ -605,8 +604,8 @@ class Api {
           'ending_hour': endHour.toString(),
           'vegetarian': vegetarian.toString(),
           'vegan': vegan.toString(),
-          'bakery': bakery.toString(),
-          'fresh': fresh.toString(),
+          'junk': junk.toString(),
+          'dessert': dessert.toString(),
           'working_on_monday': workingOnMonday.toString(),
           'working_on_tuesday': workingOnTuesday.toString(),
           'working_on_wednesday': workingOnWednesday.toString(),

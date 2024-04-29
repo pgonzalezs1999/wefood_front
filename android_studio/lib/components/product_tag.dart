@@ -29,9 +29,9 @@ class _ProductTagState extends State<ProductTag> {
       break;
       case 'Vegano': icon = Icons.nature;
       break;
-      case 'Bollería': icon = Icons.free_breakfast;
+      case 'C. rápida': icon = Icons.fastfood;
       break;
-      case 'Frescos': icon = Icons.ac_unit;
+      case 'Postres': icon = Icons.cookie_outlined;
       break;
     }
 

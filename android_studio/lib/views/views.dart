@@ -20,3 +20,4 @@ export 'package:wefood/views/login.dart';
 export 'package:wefood/views/user/order_customer.dart';
 export 'package:wefood/views/register_business.dart';
 export 'package:wefood/views/register_user.dart';
+export 'package:wefood/views/user/search_filters.dart';

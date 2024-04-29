@@ -33,13 +33,21 @@ class WefoodInput extends StatefulWidget {
 }
 
 class WefoodInputState extends State<WefoodInput> {
+
   late bool _obscureText;
+  late TextInputFormatter? _inputFormatter;
 
   @override
   void initState() {
     _obscureText = widget.type == InputType.secret;
+    _inputFormatter = (widget.type == InputType.integer)
+      ? FilteringTextInputFormatter.digitsOnly
+      : (widget.type == InputType.decimal)
+        ? FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))
+        : null;
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -62,8 +70,8 @@ class WefoodInputState extends State<WefoodInput> {
           ],
         ),
         TextFormField(
-          keyboardType: widget.type == InputType.integer ? TextInputType.number : TextInputType.visiblePassword,
-          inputFormatters: widget.type == InputType.integer ? <TextInputFormatter>[FilteringTextInputFormatter.digitsOnly] : null,
+          keyboardType: (widget.type == InputType.integer || widget.type == InputType.decimal) ? TextInputType.number : TextInputType.visiblePassword,
+          inputFormatters: (_inputFormatter != null) ? [ _inputFormatter! ] : null,
           obscureText: _obscureText,
           onChanged: (text) => widget.onChanged(text),
           initialValue: widget.initialText,
