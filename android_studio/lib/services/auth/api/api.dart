@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:wefood/commands/custom_parsers.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/middleware.dart';
 import 'package:wefood/services/secure_storage.dart';
@@ -873,6 +874,64 @@ class Api {
       print('RESPONSE DEL API.UPLOAD_IMAGE(): $responseBody');
       ImageModel imageModel = ImageModel.fromJson(responseBody['image']);
       return imageModel;
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static Future<List<ProductExpandedModel>> searchItemsByFilters({
+    required double longitude,
+    required double latitude,
+    required double distance,
+    required bool vegetarian,
+    required bool vegan,
+    required bool dessert,
+    required bool junk,
+    required double price,
+    required TimeOfDay startingHour,
+    required TimeOfDay endingHour,
+    required bool onlyToday,
+    required bool onlyAvailable,
+  }) async {
+    try {
+      final response = await Middleware.endpoint(
+        name: 'searchItemsByFilters',
+        type: HttpType.post,
+        body: {
+          'longitude': longitude.toString(),
+          'latitude': latitude.toString(),
+          'distance': distance.toString(),
+          'vegetarian': vegetarian ? "1" : "0",
+          'vegan': vegan ? "1" : "0",
+          'dessert': dessert ? "1" : "0",
+          'junk': junk ? "1" : "0",
+          'price': price.toString(),
+          'starting_hour': CustomParsers.timeOfDayToSqlTimeString(startingHour),
+          'ending_hour': CustomParsers.timeOfDayToSqlTimeString(endingHour),
+          'only_today': onlyToday ? "1" : "0",
+          'only_available': onlyAvailable ? "1" : "0",
+        },
+      );
+      List<ProductExpandedModel> products = (response['items'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();
+      return products;
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static Future<List<ProductExpandedModel>> searchItemsByText({
+    required String text,
+  }) async {
+    try {
+      final response = await Middleware.endpoint(
+        name: 'searchItemsByText',
+        type: HttpType.post,
+        body: {
+          'text': text,
+        },
+      );
+      List<ProductExpandedModel> products = (response['items'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();
+      return products;
     } catch(error) {
       throw Exception(error);
     }

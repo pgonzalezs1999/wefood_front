@@ -285,7 +285,7 @@ class _ItemState extends State<Item> {
                               fontWeight: FontWeight.bold, // TODO deshardcodear este estilo
                             ),
                           ),
-                          Text('${info.product.price} Sol/.'),
+                          Text('${info.product.price?.toStringAsFixed(2)} Sol/.'),
                         ],
                       ),
                       SizedBox(height: MediaQuery.of(context).size.height * 0.01),

@@ -6,6 +6,8 @@ import 'package:wefood/components/components.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/types.dart';
+import 'package:wefood/views/user/searched_items.dart';
+import 'package:wefood/views/views.dart';
 
 class UserExplore extends StatefulWidget {
   const UserExplore({super.key});
@@ -18,11 +20,10 @@ class _UserExploreState extends State<UserExplore> {
 
   double userLongitude = -77; // TODO deshardcodear
   double userLatitude = -12.5; // TODO deshardcodear
-
   Widget recommendedList = const LoadingIcon();
   Widget nearbyList =  const LoadingIcon();
-
   LoadingStatus _retrievingFavourites = LoadingStatus.unset;
+  String searchText = '';
 
   Widget _exploreTitle(String title) {
     return Container(
@@ -155,6 +156,30 @@ class _UserExploreState extends State<UserExplore> {
     }
   }
 
+  _navigateToSearchFilters() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const SearchFilters()),
+    ).whenComplete(() {
+      setState(() {
+        context.read<SearchFiltersCubit>().state;
+      });
+    });
+  }
+
+  _navigateToSearchedFilters({
+    required List<ProductExpandedModel> items
+  }) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => SearchedItems(items: items)),
+    ).whenComplete(() {
+      setState(() {
+        context.read<SearchFiltersCubit>().state;
+      });
+    });
+  }
+
   @override
   void initState() {
     _retrieveRecommended();
@@ -167,20 +192,92 @@ class _UserExploreState extends State<UserExplore> {
   Widget build(BuildContext context) {
     return WefoodNavigationScreen(
       children: <Widget>[
-        SearchInput(
-          onChanged: (value) {
-            // TODO falta esto
-          }
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              child: TextFormField(
+                keyboardType: TextInputType.visiblePassword,
+                onChanged: (String value) {
+                  setState(() {
+                    searchText = value;
+                  });
+                },
+                decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                  ),
+                  hintText: 'Busca tu próxima comida',
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Theme.of(context).primaryColor,
+                    ),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  suffixIcon: Container(
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        GestureDetector(
+                          child: const Icon(
+                            Icons.search,
+                          ),
+                          onTap: () async {
+                            List<ProductExpandedModel> items = await Api.searchItemsByText(
+                              text: searchText,
+                            );
+                            _navigateToSearchedFilters(
+                              items: items,
+                            );
+                          },
+                        ),
+
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 60,
+              width: 10,
+            ),
+            GestureDetector(
+              child: Stack(
+                alignment: Alignment.topRight,
+                children: [
+                  if(
+                  context.read<SearchFiltersCubit>().state.dessert == true
+                    || context.read<SearchFiltersCubit>().state.junk == true
+                    || context.read<SearchFiltersCubit>().state.vegan == true
+                    || context.read<SearchFiltersCubit>().state.vegetarian == true
+                    || context.read<SearchFiltersCubit>().state.maximumPrice != null
+                    || context.read<SearchFiltersCubit>().state.startTime != null
+                    || context.read<SearchFiltersCubit>().state.endTime != null
+                    || context.read<SearchFiltersCubit>().state.onlyToday == true
+                    || context.read<SearchFiltersCubit>().state.onlyAvailable == true
+                  ) Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(999),
+                      color: Theme.of(context).primaryColor,
+                    ),
+                    width: 10,
+                    height: 10,
+                  ),
+                  const Icon(
+                    Icons.filter_list,
+                  ),
+                ],
+              ),
+              onTap: () {
+                _navigateToSearchFilters();
+              },
+            ),
+          ],
         ),
-        Text('Filtro de vegetariano: ${context.read<SearchFiltersCubit>().state.vegetarian}'),
-        Text('Filtro de vegan: ${context.read<SearchFiltersCubit>().state.vegan}'),
-        Text('Filtro de junk: ${context.read<SearchFiltersCubit>().state.junk}'),
-        Text('Filtro de dessert: ${context.read<SearchFiltersCubit>().state.dessert}'),
-        Text('Filtro de startTime: ${context.read<SearchFiltersCubit>().state.startTime}'),
-        Text('Filtro de endTime: ${context.read<SearchFiltersCubit>().state.endTime}'),
-        Text('Filtro de maximumPrice: ${context.read<SearchFiltersCubit>().state.maximumPrice}'),
-        Text('Filtro de onlyToday: ${context.read<SearchFiltersCubit>().state.onlyToday}'),
-        Text('Filtro de showRunOutProducts: ${context.read<SearchFiltersCubit>().state.showRunOutProducts}'),
         _exploreTitle('Recomendados'),
         recommendedList,
         _exploreTitle('Cerca de tí'),

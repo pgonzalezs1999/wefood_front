@@ -26,7 +26,7 @@ class ProductExpandedModel {
     order = (json['order'] != null) ? OrderModel.fromJson(json['order'] as Map<String, dynamic>) : OrderModel.empty(),
     business = (json['business'] != null) ? BusinessModel.fromJson(json['business'] as Map<String, dynamic>) : BusinessModel.empty(),
     user = (json['user'] != null) ? UserModel.fromJson(json['user'] as Map<String, dynamic>) : UserModel.empty(),
-    isFavourite = Utils.controlBool(json['is_favourite']) as bool?,
+    isFavourite = ((json['is_favourite'] != null) ? Utils.controlBool(json['is_favourite']) as bool? : null),
     favourites = json['favourites'] as int?,
     available = json['available'] as int?,
     image = (json['image'] != null) ? ImageModel.fromJson(json['image'] as Map<String, dynamic>) : ImageModel.empty();

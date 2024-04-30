@@ -30,9 +30,9 @@ class SearchFiltersCubit extends Cubit<Filters> {
     emit(updatedState);
   }
 
-  void setShowRunOutProducts(bool value) {
+  void setOnlyAvailable(bool value) {
     Filters updatedState = state;
-    updatedState.showRunOutProducts = value;
+    updatedState.onlyAvailable = value;
     emit(updatedState);
   }
 

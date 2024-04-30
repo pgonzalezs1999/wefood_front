@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/components/components.dart';
+import 'package:wefood/models/models.dart';
+import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/types.dart';
+import 'package:wefood/views/user/searched_items.dart';
 import 'package:wefood/views/views.dart';
 
 class SearchFilters extends StatefulWidget {
@@ -13,6 +16,13 @@ class SearchFilters extends StatefulWidget {
 }
 
 class _SearchFiltersState extends State<SearchFilters> {
+
+  void _navigateToSearchedItems(List<ProductExpandedModel> items) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => SearchedItems(items: items)),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -98,10 +108,10 @@ class _SearchFiltersState extends State<SearchFilters> {
             children: <Widget>[
               const Text('Ver productos agotados'),
               Switch(
-                value: context.read<SearchFiltersCubit>().state.showRunOutProducts,
+                value: context.read<SearchFiltersCubit>().state.onlyAvailable,
                 onChanged: (bool value) {
                   setState(() {
-                    context.read<SearchFiltersCubit>().setShowRunOutProducts(value);
+                    context.read<SearchFiltersCubit>().setOnlyAvailable(value);
                   });
                 }
               ),
@@ -148,9 +158,23 @@ class _SearchFiltersState extends State<SearchFilters> {
             alignment: Alignment.center,
             child: ElevatedButton(
               child: const Text('BUSCAR'),
-              onPressed: () {
+              onPressed: () async {
                 // TODO antes hacer comprobaciones!!! (startTime < endTime; y precio > 0
-                // TODO crear llamada a la API
+                List<ProductExpandedModel> items = await Api.searchItemsByFilters(
+                  longitude: -77, // TODO deshardcodear
+                  latitude: -12.5, // TODO deshardcodear
+                  distance: 99999, // TODO deshardcodear
+                  vegetarian: context.read<SearchFiltersCubit>().state.vegetarian,
+                  vegan: context.read<SearchFiltersCubit>().state.vegan,
+                  dessert: context.read<SearchFiltersCubit>().state.dessert,
+                  junk: context.read<SearchFiltersCubit>().state.junk,
+                  price: context.read<SearchFiltersCubit>().state.maximumPrice ?? 999999,
+                  startingHour: context.read<SearchFiltersCubit>().state.startTime ?? const TimeOfDay(hour: 0, minute: 0),
+                  endingHour: context.read<SearchFiltersCubit>().state.endTime ?? const TimeOfDay(hour: 23, minute: 59),
+                  onlyToday: context.read<SearchFiltersCubit>().state.onlyToday,
+                  onlyAvailable: context.read<SearchFiltersCubit>().state.onlyAvailable,
+                );
+                _navigateToSearchedItems(items);
               },
             ),
           )

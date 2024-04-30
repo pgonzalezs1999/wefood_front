@@ -5,7 +5,7 @@ class Filters {
   TimeOfDay? startTime;
   TimeOfDay? endTime;
   bool onlyToday = false;
-  bool showRunOutProducts = false;
+  bool onlyAvailable = false;
   bool vegan = false;
   bool vegetarian = false;
   bool junk = false;

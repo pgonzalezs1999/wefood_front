@@ -117,18 +117,22 @@ class _LoginState extends State<Login> {
             },
             child: const Text('INICIAR SESIÓN'),
           ),
+          const SizedBox(
+            height: 20,
+          ),
           if(authenticating == LoadingStatus.loading) const CircularProgressIndicator(),
-          Container(
+          /*Container(
             padding: EdgeInsets.symmetric(
               vertical: MediaQuery.of(context).size.height * 0.025,
             ),
             child: SignInButton(
               Buttons.google,
               onPressed: () {
+              // TODO faltar hacer esto
                 _showButtonPressDialog(context, 'Google');
               },
             ),
-          ),
+          ),*/
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
