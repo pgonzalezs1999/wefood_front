@@ -17,13 +17,8 @@ class _PendingOrdersCustomerState extends State<PendingOrdersCustomer> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: <Widget>[
-              BackArrow(
-                margin: EdgeInsets.zero,
-              ),
-              Text('Pedidos pendientes'),
-            ],
+          BackUpBar(
+            title: 'Pedidos pendientes',
           ),
           OrderPendingListCustomer(),
         ],

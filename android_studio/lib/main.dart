@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/blocs/recommended_items_cubit.dart';
 import 'package:wefood/models/models.dart';
@@ -45,8 +46,23 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'WeFood',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF392FAA),
+          primary: const Color(0xFF392FAA),
+          secondary: const Color(0xFFF96478),
+          brightness: Brightness.light,
+        ),
+        iconTheme: IconThemeData(
+          color: Theme.of(context).primaryColor,
+        ),
+        textTheme: TextTheme(
+          titleLarge: GoogleFonts.balooPaaji2(
+            fontSize: 25,
+            fontWeight: FontWeight.w600,
+            letterSpacing: -0.5,
+          ),
+        ),
       ),
       home: const MyHomePage(title: 'Inicio'),
     );

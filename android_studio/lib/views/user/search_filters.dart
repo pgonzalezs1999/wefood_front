@@ -31,13 +31,8 @@ class _SearchFiltersState extends State<SearchFilters> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
-            children: <Widget>[
-              BackArrow(
-                margin: EdgeInsets.zero,
-              ),
-              Text('Filtros de búsqueda'),
-            ],
+          const BackUpBar(
+            title: 'Filtros de búsqueda',
           ),
           SizedBox(
             width: MediaQuery.of(context).size.width * 0.5,

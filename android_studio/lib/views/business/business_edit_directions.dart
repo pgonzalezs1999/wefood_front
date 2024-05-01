@@ -137,13 +137,8 @@ class _BusinessEditDirectionsState extends State<BusinessEditDirections> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
-            children: <Widget>[
-              BackArrow(
-                margin: EdgeInsets.zero,
-              ),
-              Text('Elija su nueva ubicación'),
-            ],
+          const BackUpBar(
+            title: 'Elija su nueva ubicación',
           ),
           if(cameraPosition != null) Column(
             children: <Widget>[

@@ -44,13 +44,8 @@ class _SearchedItemsState extends State<SearchedItems> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          const Row(
-            children: <Widget>[
-              BackArrow(
-                margin: EdgeInsets.zero,
-              ),
-              Text('Resultados de la búsqueda'),
-            ],
+          const BackUpBar(
+            title: 'Resultados de la búsqueda'
           ),
           if(widget.items.isNotEmpty) Column(
             children: widget.items.map((i) {

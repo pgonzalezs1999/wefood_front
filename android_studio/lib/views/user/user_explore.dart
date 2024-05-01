@@ -234,7 +234,6 @@ class _UserExploreState extends State<UserExplore> {
                             );
                           },
                         ),
-
                       ],
                     ),
                   ),

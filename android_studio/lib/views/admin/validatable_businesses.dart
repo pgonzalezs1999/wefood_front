@@ -34,13 +34,8 @@ class _ValidatableBusinessesState extends State<ValidatableBusinesses> {
     return WefoodScreen(
       body: Column(
         children: <Widget>[
-          const Row(
-            children: <Widget>[
-              BackArrow(
-                margin: EdgeInsets.zero,
-              ),
-              Text('Validar establecimientos'),
-            ],
+          const BackUpBar(
+            title: 'Validar establecimientos',
           ),
           const SizedBox(
             height: 20,

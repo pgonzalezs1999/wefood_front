@@ -164,8 +164,8 @@ class _ItemState extends State<Item> {
                                   margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
                                   padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
                                   child: (info.isFavourite == true)
-                                      ? const Icon(Icons.favorite)
-                                      : const Icon(Icons.favorite_outline),
+                                    ? const Icon(Icons.favorite)
+                                    : const Icon(Icons.favorite_outline),
                                 ),
                                 onTap: () async {
                                   setState(() {

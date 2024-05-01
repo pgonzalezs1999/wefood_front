@@ -216,14 +216,8 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              BackArrow(
-                margin: EdgeInsets.zero,
-              ),
-              Text('Registro de establecimiento'),
-            ],
+          const BackUpBar(
+            title: 'Registro de establecimiento',
           ),
           const SizedBox(
             height: 10,

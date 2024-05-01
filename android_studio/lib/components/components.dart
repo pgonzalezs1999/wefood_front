@@ -17,3 +17,4 @@ export 'package:wefood/components/pending_order_business.dart';
 export 'package:wefood/components/product_tag.dart';
 export 'package:wefood/components/profile_name.dart';
 export 'package:wefood/components/wefood_input.dart';
+export 'package:wefood/components/back_up_bar.dart';

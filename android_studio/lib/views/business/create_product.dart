@@ -84,13 +84,8 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Row(
-            children: <Widget>[
-              const BackArrow(
-                margin: EdgeInsets.zero,
-              ),
-              Text('Crear $_productTypeString'),
-            ],
+          BackUpBar(
+            title: 'Crear $_productTypeString',
           ),
           Column(
             children: <Widget>[

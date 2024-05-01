@@ -126,13 +126,8 @@ class _EditProductState extends State<EditProduct> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Row(
-            children: <Widget>[
-              const BackArrow(
-                margin: EdgeInsets.zero,
-              ),
-              Text('Editar $_productTypeString'),
-            ],
+          BackUpBar(
+            title: 'Editar $_productTypeString',
           ),
           if(price == null) const LoadingIcon(),
           if(price != null) Column(

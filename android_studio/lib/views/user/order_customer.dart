@@ -30,13 +30,8 @@ class _OrderCustomerState extends State<OrderCustomer> {
     return WefoodScreen(
       body: Column(
         children: <Widget>[
-          const Row(
-            children: <Widget>[
-              BackArrow(
-                margin: EdgeInsets.zero,
-              ),
-              Text('Confirmar pedido'),
-            ],
+          const BackUpBar(
+            title: 'Confirmar pedido',
           ),
           FutureBuilder<ProductExpandedModel>(
             future: Api.getItem(

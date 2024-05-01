@@ -17,13 +17,8 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: <Widget>[
-              BackArrow(
-                margin: EdgeInsets.zero,
-              ),
-              Text('Productos de mis sitios favoritos'),
-            ],
+          BackUpBar(
+            title: 'Productos de mis favoritos',
           ),
           ItemFavouriteList(
             axis: Axis.vertical,

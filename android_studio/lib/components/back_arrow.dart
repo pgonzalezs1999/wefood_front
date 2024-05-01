@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 class BackArrow extends StatefulWidget {
 
   final EdgeInsets? margin;
+  final bool? whiteBackground;
 
   const BackArrow({
     super.key,
     this.margin,
+    this.whiteBackground,
   });
 
   @override
@@ -21,12 +23,12 @@ class _BackArrowState extends State<BackArrow> {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(999),
-          color: const Color.fromRGBO(255, 255, 255, 0.666),
+          color: (widget.whiteBackground == true) ? const Color.fromRGBO(255, 255, 255, 0.666) : null,
         ),
         margin: widget.margin ?? EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
         padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
         child: Icon(
-            Icons.arrow_back,
+          Icons.arrow_back,
           size: MediaQuery.of(context).size.width * 0.06,
         ),
       ),

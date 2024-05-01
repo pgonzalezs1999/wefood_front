@@ -185,13 +185,8 @@ class _PendingOrdersBusinessState extends State<PendingOrdersBusiness> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
-            children: <Widget>[
-              BackArrow(
-                margin: EdgeInsets.zero,
-              ),
-              Text('Pedidos pendientes'),
-            ],
+          const BackUpBar(
+            title: 'Pedidos pendientes',
           ),
           Container(
             margin: const EdgeInsets.only(
