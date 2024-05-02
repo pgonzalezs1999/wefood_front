@@ -3,7 +3,6 @@ import 'package:wefood/components/components.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/types.dart';
-import 'package:sign_in_button/sign_in_button.dart';
 import 'package:wefood/views/views.dart';
 
 class Login extends StatefulWidget {
@@ -65,7 +64,10 @@ class _LoginState extends State<Login> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                const Text('Bienvenido a'),
+                Text(
+                  'Bienvenido a',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
                 Container(
                   width: MediaQuery.of(context).size.width * 0.5,
                   margin: EdgeInsets.only(
@@ -128,7 +130,7 @@ class _LoginState extends State<Login> {
             child: SignInButton(
               Buttons.google,
               onPressed: () {
-              // TODO faltar hacer esto
+              // TODO faltar hacer autenticación por Google y otros
                 _showButtonPressDialog(context, 'Google');
               },
             ),

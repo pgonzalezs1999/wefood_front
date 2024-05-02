@@ -40,6 +40,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Color wefoodPrimaryColor = const Color(0xFF392FAA);
+    Color wefoodSecondaryColor = const Color(0xFFF96478);
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
@@ -48,19 +50,58 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF392FAA),
-          primary: const Color(0xFF392FAA),
-          secondary: const Color(0xFFF96478),
+          seedColor: wefoodPrimaryColor,
+          primary: wefoodPrimaryColor,
+          secondary: wefoodSecondaryColor,
           brightness: Brightness.light,
         ),
         iconTheme: IconThemeData(
           color: Theme.of(context).primaryColor,
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          labelStyle: TextStyle(
+            color: wefoodPrimaryColor.withOpacity(0.66),
+          ),
+          floatingLabelStyle: TextStyle(
+            color: wefoodPrimaryColor,
+          ),
+          suffixIconColor: wefoodPrimaryColor,
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ButtonStyle(
+            foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
+            backgroundColor: WidgetStateProperty.all<Color>(wefoodPrimaryColor),
+          ),
         ),
         textTheme: TextTheme(
           titleLarge: GoogleFonts.balooPaaji2(
             fontSize: 25,
             fontWeight: FontWeight.w600,
             letterSpacing: -0.5,
+          ),
+          titleMedium: GoogleFonts.balooPaaji2(), // TODO sin utilizar
+          titleSmall: GoogleFonts.balooPaaji2(
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+            letterSpacing: -0.5,
+          ),
+          headlineLarge: GoogleFonts.balooPaaji2(), // TODO sin utilizar
+          headlineMedium: GoogleFonts.balooPaaji2(), // TODO sin utilizar
+          headlineSmall: GoogleFonts.balooPaaji2(), // TODO sin utilizar
+          bodyLarge: GoogleFonts.anekDevanagari(), // TODO sin utilizar
+          bodyMedium: GoogleFonts.anekDevanagari(
+            fontSize: 15
+          ),
+          bodySmall: GoogleFonts.anekDevanagari(), // TODO sin utilizar
+          labelLarge: GoogleFonts.anekDevanagari(), // TODO sin utilizar
+          labelMedium: GoogleFonts.anekDevanagari(), // TODO sin utilizar
+          labelSmall: GoogleFonts.anekDevanagari(), // TODO sin utilizar
+          displayLarge: GoogleFonts.anekDevanagari(), // TODO sin utilizar
+          displayMedium: GoogleFonts.anekDevanagari(), // TODO sin utilizar
+          // Feedback de los WefoodInput
+          displaySmall: GoogleFonts.anekDevanagari(
+            color: wefoodSecondaryColor,
+            fontSize: 15,
           ),
         ),
       ),

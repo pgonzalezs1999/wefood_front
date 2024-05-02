@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:wefood/components/components.dart';
@@ -21,12 +22,22 @@ class _RegisterUserState extends State<RegisterUser> {
   LoadingStatus searchingEmailAvailability = LoadingStatus.unset;
   String error = '';
   String username = '';
+  String auxUsername = '';
   bool usernameIsAvailable = false;
   String email = '';
   bool emailIsAvailable = false;
   String password = '';
   String confirmPassword = '';
   bool conditionsAccepted = false;
+
+  Widget reducedLoadingIcon(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(15),
+      child: LoadingIcon(
+        size: Theme.of(context).textTheme.displaySmall?.fontSize,
+      ),
+    );
+  }
 
   void _navigateToRegisterBusiness() {
     Navigator.push(
@@ -40,6 +51,69 @@ class _RegisterUserState extends State<RegisterUser> {
       context,
       MaterialPageRoute(builder: (context) => const TermsAndConditions()),
     );
+  }
+
+  _handleUsernameChange(String value) async {
+    if(6 <= value.length && value.length <= 30) {
+      setState(() {
+        auxUsername = value;
+        error = '';
+        searchingUsernameAvailability = LoadingStatus.loading;
+      });
+      bool available = false;
+      Timer(
+          const Duration(seconds: 1),
+              () async {
+            if(value == auxUsername) {
+              Api.checkUsernameAvailability(username: value).then((bool availability) {
+                available = availability;
+                setState(() {
+                  username = value;
+                  usernameIsAvailable = available;
+                  searchingUsernameAvailability = LoadingStatus.successful;
+                });
+              }).onError(
+                      (Object error, StackTrace stackTrace) {
+                    available = false;
+                    setState(() {
+                      username = value;
+                      usernameIsAvailable = false;
+                      searchingUsernameAvailability = LoadingStatus.error;
+                    });
+                  }
+              );
+            }
+          }
+      );
+    } else {
+      setState(() {
+        auxUsername = '';
+        username = value;
+        error = '';
+        searchingUsernameAvailability = LoadingStatus.unset;
+      });
+    }
+  }
+
+  _handleEmailChange(String value) async {
+    setState(() {
+      error = '';
+      searchingEmailAvailability = LoadingStatus.loading;
+      email = value;
+    });
+    bool available = false;
+    if(email.isEmail) {
+      try {
+        available = await Api.checkEmailAvailability(email: value);
+      } catch(e) {
+        available = false;
+      }
+    }
+    setState(() {
+      email = value;
+      emailIsAvailable = available;
+      searchingEmailAvailability = LoadingStatus.successful;
+    });
   }
 
   bool _setError(String reason) {
@@ -93,7 +167,10 @@ class _RegisterUserState extends State<RegisterUser> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                const Text('Regístrate en'),
+                Text(
+                  'Regístrate en',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
                 Container(
                   width: MediaQuery.of(context).size.width * 0.5,
                   margin: EdgeInsets.only(
@@ -116,58 +193,41 @@ class _RegisterUserState extends State<RegisterUser> {
                   children: <Widget>[
                     WefoodInput(
                       labelText: 'Nombre de usuario',
-                      onChanged: (value) async {
-                        setState(() {
-                          error = '';
-                          searchingUsernameAvailability = LoadingStatus.loading;
-                        });
-                        bool available = false;
-                        try {
-                          available = await Api.checkUsernameAvailability(username: value);
-                        } catch(e) {
-                          available = false;
-                        }
-                        setState(() {
-                          username = value;
-                          usernameIsAvailable = available;
-                          searchingUsernameAvailability = LoadingStatus.successful;
-                        });
-                      },
+                      onChanged: (value) => _handleUsernameChange(value),
                     ),
-                    const SizedBox(height: 15),
-                    if(searchingUsernameAvailability == LoadingStatus.loading) const LoadingIcon(),
-                    if(searchingUsernameAvailability != LoadingStatus.loading && username != "") Text(
-                      (usernameIsAvailable == false)
-                        ? ("Nombre de usuario no disponible")
-                        : "¡Nombre de usuario libre!"
+                    if(searchingUsernameAvailability == LoadingStatus.loading) reducedLoadingIcon(context),
+                    if(searchingUsernameAvailability != LoadingStatus.loading && username != '') Container(
+                      margin: const EdgeInsets.only(
+                        top: 15,
+                      ),
+                      child: (username.length >= 6)
+                        ? (username.length <= 30)
+                          ? (usernameIsAvailable == false)
+                            ? const FeedbackMessage(
+                              message: 'Nombre de usuario no disponible',
+                              isError: true,
+                            )
+                            : const FeedbackMessage(
+                              message: '¡Nombre de usuario libre!',
+                              isError: false,
+                            )
+                          : const FeedbackMessage(
+                            message: 'Nombre de usuario demasiado largo',
+                            isError: true,
+                          )
+                        : const FeedbackMessage(
+                          message: 'Nombre de usuario demasiado corto',
+                          isError: true,
+                        ),
                     ),
                   ],
                 ),
                 WefoodInput(
                   labelText: 'Correo electrónico',
-                  onChanged: (value) async {
-                    setState(() {
-                      error = '';
-                      searchingEmailAvailability = LoadingStatus.loading;
-                      email = value;
-                    });
-                    bool available = false;
-                    if(email.isEmail) {
-                      try {
-                        available = await Api.checkEmailAvailability(email: value);
-                      } catch(e) {
-                        available = false;
-                      }
-                    }
-                    setState(() {
-                      email = value;
-                      emailIsAvailable = available;
-                      searchingEmailAvailability = LoadingStatus.successful;
-                    });
-                  },
+                  onChanged: (value) => _handleEmailChange(value),
                 ),
                 const SizedBox(height: 15),
-                if(searchingEmailAvailability == LoadingStatus.loading) const LoadingIcon(),
+                if(searchingEmailAvailability == LoadingStatus.loading) reducedLoadingIcon(context),
                 if(searchingEmailAvailability != LoadingStatus.loading && email != "") Text(
                   (emailIsAvailable == false)
                     ? ("Correo electrónico no disponible")
@@ -221,7 +281,7 @@ class _RegisterUserState extends State<RegisterUser> {
               ),
             ],
           ),
-          if(authenticating == LoadingStatus.loading) const LoadingIcon(),
+          if(authenticating == LoadingStatus.loading) reducedLoadingIcon(context),
           if(authenticating != LoadingStatus.loading) ElevatedButton(
             onPressed: () async {
               if(_readyToRegister() == true) {

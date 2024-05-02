@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:wefood/types.dart';
 
 List<String> positiveFeedback = [
@@ -75,14 +76,23 @@ class WefoodInputState extends State<WefoodInput> {
           obscureText: _obscureText,
           onChanged: (text) => widget.onChanged(text),
           initialValue: widget.initialText,
+          style: Theme.of(context).textTheme.bodyMedium,
           decoration: InputDecoration(
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                width: 0.5,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
             labelText: widget.labelText,
+            focusColor: Colors.green,
             focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: Theme.of(context).primaryColor,
-                ),
-                gapPadding: 4,
-                borderRadius: const BorderRadius.all(Radius.circular(10))
+              borderSide: BorderSide(
+                color: Theme.of(context).primaryColor,
+              ),
+              gapPadding: 4,
+              borderRadius: const BorderRadius.all(Radius.circular(10))
             ),
             suffixIcon: (widget.type == InputType.secret) ? IconButton(
               onPressed: () => {
