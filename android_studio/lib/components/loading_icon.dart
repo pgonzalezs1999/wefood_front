@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class LoadingIcon extends StatelessWidget {
 
   final double? size;
+  final double? strokeWidth;
 
   const LoadingIcon({
     super.key,
     this.size,
+    this.strokeWidth,
   });
 
   @override
@@ -18,8 +19,8 @@ class LoadingIcon extends StatelessWidget {
     return SizedBox(
       height: containerSize,
       width: containerSize,
-      child: const CircularProgressIndicator(
-        strokeWidth: 1.5,
+      child: CircularProgressIndicator(
+        strokeWidth: (strokeWidth != null) ? strokeWidth! : 4,
       ),
     );
   }

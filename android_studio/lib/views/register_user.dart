@@ -36,6 +36,7 @@ class _RegisterUserState extends State<RegisterUser> {
       margin: const EdgeInsets.all(15),
       child: LoadingIcon(
         size: Theme.of(context).textTheme.displaySmall?.fontSize,
+        strokeWidth: 1.5,
       ),
     );
   }
@@ -205,7 +206,7 @@ class _RegisterUserState extends State<RegisterUser> {
                       labelText: 'Nombre de usuario',
                       onChanged: (value) => _handleUsernameChange(value),
                     ),
-                    if(searchingUsernameAvailability == LoadingStatus.loading) const LoadingIcon(),
+                    if(searchingUsernameAvailability == LoadingStatus.loading) reducedLoadingIcon(context),
                     if(searchingUsernameAvailability != LoadingStatus.loading && username != '') (username.length >= 6)
                       ? (username.length <= 30)
                         ? (usernameIsAvailable == false)
@@ -302,6 +303,7 @@ class _RegisterUserState extends State<RegisterUser> {
               Checkbox(
                 value: conditionsAccepted,
                 onChanged: (value) {
+                  FocusManager.instance.primaryFocus?.unfocus();
                   setState(() {
                     error = '';
                     conditionsAccepted = !conditionsAccepted;
@@ -322,7 +324,7 @@ class _RegisterUserState extends State<RegisterUser> {
               ),
             ],
           ),
-          if(authenticating == LoadingStatus.loading) reducedLoadingIcon(context),
+          if(authenticating == LoadingStatus.loading) const LoadingIcon(),
           if(authenticating != LoadingStatus.loading) Container(
             margin: const EdgeInsets.symmetric(
               vertical: 10,
