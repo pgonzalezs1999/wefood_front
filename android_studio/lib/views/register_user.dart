@@ -25,6 +25,7 @@ class _RegisterUserState extends State<RegisterUser> {
   String auxUsername = '';
   bool usernameIsAvailable = false;
   String email = '';
+  String auxEmail = '';
   bool emailIsAvailable = false;
   String password = '';
   String confirmPassword = '';
@@ -62,28 +63,28 @@ class _RegisterUserState extends State<RegisterUser> {
       });
       bool available = false;
       Timer(
-          const Duration(seconds: 1),
-              () async {
-            if(value == auxUsername) {
-              Api.checkUsernameAvailability(username: value).then((bool availability) {
-                available = availability;
-                setState(() {
-                  username = value;
-                  usernameIsAvailable = available;
-                  searchingUsernameAvailability = LoadingStatus.successful;
-                });
-              }).onError(
-                      (Object error, StackTrace stackTrace) {
-                    available = false;
-                    setState(() {
-                      username = value;
-                      usernameIsAvailable = false;
-                      searchingUsernameAvailability = LoadingStatus.error;
-                    });
-                  }
-              );
-            }
+        const Duration(seconds: 1),
+          () async {
+          if(value == auxUsername) {
+            Api.checkUsernameAvailability(username: value).then((bool availability) {
+              available = availability;
+              setState(() {
+                username = value;
+                usernameIsAvailable = available;
+                searchingUsernameAvailability = LoadingStatus.successful;
+              });
+            }).onError(
+                (Object error, StackTrace stackTrace) {
+                  available = false;
+                  setState(() {
+                    username = value;
+                    usernameIsAvailable = false;
+                    searchingUsernameAvailability = LoadingStatus.error;
+                  });
+                }
+            );
           }
+        }
       );
     } else {
       setState(() {
@@ -96,24 +97,45 @@ class _RegisterUserState extends State<RegisterUser> {
   }
 
   _handleEmailChange(String value) async {
-    setState(() {
-      error = '';
-      searchingEmailAvailability = LoadingStatus.loading;
-      email = value;
-    });
-    bool available = false;
     if(email.isEmail) {
-      try {
-        available = await Api.checkEmailAvailability(email: value);
-      } catch(e) {
-        available = false;
-      }
+      setState(() {
+        auxEmail = value;
+        error = '';
+        searchingEmailAvailability = LoadingStatus.loading;
+      });
+      bool available = false;
+      Timer(
+        const Duration(seconds: 1),
+        () async {
+          if(value == auxEmail) {
+            Api.checkEmailAvailability(email: value).then((bool availability) {
+              available = availability;
+              setState(() {
+                email = value;
+                emailIsAvailable = available;
+                searchingEmailAvailability = LoadingStatus.successful;
+              });
+            }).onError(
+              (Object error, StackTrace stackTrace) {
+                available = false;
+                setState(() {
+                  email = value;
+                  emailIsAvailable = false;
+                  searchingEmailAvailability = LoadingStatus.error;
+                });
+              }
+            );
+          }
+        }
+      );
+    } else {
+      setState(() {
+        auxEmail = '';
+        email = value;
+        error = '';
+        searchingEmailAvailability = LoadingStatus.unset;
+      });
     }
-    setState(() {
-      email = value;
-      emailIsAvailable = available;
-      searchingEmailAvailability = LoadingStatus.successful;
-    });
   }
 
   bool _setError(String reason) {
@@ -140,9 +162,9 @@ class _RegisterUserState extends State<RegisterUser> {
     } else if(password.length > 20) {
       result = _setError('La contraseña debe tener 20 caracteres o menos');
     } else if(confirmPassword != password) {
-      result = _setError('La contraseña y confirmar contraseña no coinciden');
+      result = _setError('Las contraseñas no coinciden');
     } else if(conditionsAccepted == false) {
-      result = _setError('Necesitamos que aceptes los términos y condiciones para usar la app');
+      result = _setError('Debes aceptar los términos y condiciones');
     } else {
       setState(() {
         error = '';
@@ -158,29 +180,17 @@ class _RegisterUserState extends State<RegisterUser> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          const Align(
-            alignment: Alignment.centerLeft,
-            child: BackArrow(),
+          const BackUpBar(
+            title: 'Regístrate en'
           ),
-          SizedBox(
-            height: MediaQuery.of(context).size.height * 0.15,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  'Regístrate en',
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width * 0.5,
-                  margin: EdgeInsets.only(
-                    top: MediaQuery.of(context).size.height * 0.01,
-                  ),
-                  child: Image.asset('assets/images/logo.png'),
-                ),
-              ],
+          Container(
+            margin: const EdgeInsets.only(
+              top: 20,
+              bottom: 50,
             ),
-          ) ,
+            width: MediaQuery.of(context).size.width * 0.666,
+            child: Image.asset('assets/images/logo.png'),
+          ),
           Container(
             margin: EdgeInsets.symmetric(
               vertical: MediaQuery.of(context).size.height * 0.025,
@@ -195,68 +205,99 @@ class _RegisterUserState extends State<RegisterUser> {
                       labelText: 'Nombre de usuario',
                       onChanged: (value) => _handleUsernameChange(value),
                     ),
-                    if(searchingUsernameAvailability == LoadingStatus.loading) reducedLoadingIcon(context),
-                    if(searchingUsernameAvailability != LoadingStatus.loading && username != '') Container(
-                      margin: const EdgeInsets.only(
-                        top: 15,
-                      ),
-                      child: (username.length >= 6)
-                        ? (username.length <= 30)
-                          ? (usernameIsAvailable == false)
-                            ? const FeedbackMessage(
-                              message: 'Nombre de usuario no disponible',
-                              isError: true,
-                            )
-                            : const FeedbackMessage(
-                              message: '¡Nombre de usuario libre!',
-                              isError: false,
-                            )
-                          : const FeedbackMessage(
-                            message: 'Nombre de usuario demasiado largo',
+                    if(searchingUsernameAvailability == LoadingStatus.loading) const LoadingIcon(),
+                    if(searchingUsernameAvailability != LoadingStatus.loading && username != '') (username.length >= 6)
+                      ? (username.length <= 30)
+                        ? (usernameIsAvailable == false)
+                          ? const FeedbackMessage(
+                            message: 'No disponible',
                             isError: true,
                           )
+                          : const FeedbackMessage(
+                            message: '¡Libre!',
+                            isError: false,
+                          )
                         : const FeedbackMessage(
-                          message: 'Nombre de usuario demasiado corto',
+                          message: 'Demasiado largo',
                           isError: true,
-                        ),
+                        )
+                      : const FeedbackMessage(
+                        message: 'Demasiado corto',
+                        isError: true,
+                      ),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    WefoodInput(
+                      labelText: 'Correo electrónico',
+                      onChanged: (value) => _handleEmailChange(value),
+                    ),
+                    if(searchingEmailAvailability == LoadingStatus.loading) reducedLoadingIcon(context),
+                    if(searchingEmailAvailability != LoadingStatus.loading && email != '') (email.isEmail)
+                      ? (emailIsAvailable == false)
+                        ? const FeedbackMessage(
+                          message: 'No disponible',
+                          isError: true,
+                        )
+                        : const FeedbackMessage(
+                          message: '¡Libre!',
+                          isError: false,
+                        )
+                      : const FeedbackMessage(
+                        message: 'Formato incorrecto',
+                        isError: true,
+                      ),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    WefoodInput(
+                      labelText: 'Contraseña',
+                      type: InputType.secret,
+                      onChanged: (value) {
+                        setState(() {
+                          error = '';
+                          password = value;
+                        });
+                      },
+                    ),
+                    if(password != '' && password.length < 6) const FeedbackMessage(
+                        message: 'Demasiado corta',
+                        isError: true
+                    ),
+                    if(password != '' && password.length > 20) const FeedbackMessage(
+                        message: 'Demasiado larga',
+                        isError: true
                     ),
                   ],
                 ),
-                WefoodInput(
-                  labelText: 'Correo electrónico',
-                  onChanged: (value) => _handleEmailChange(value),
-                ),
-                const SizedBox(height: 15),
-                if(searchingEmailAvailability == LoadingStatus.loading) reducedLoadingIcon(context),
-                if(searchingEmailAvailability != LoadingStatus.loading && email != "") Text(
-                  (emailIsAvailable == false)
-                    ? ("Correo electrónico no disponible")
-                    : "¡Correo electrónico libre!"
-                ),
-                WefoodInput(
-                  labelText: 'Contraseña',
-                  type: InputType.secret,
-                  onChanged: (value) {
-                    setState(() {
-                      error = '';
-                      password = value;
-                    });
-                  },
-                ),
-                WefoodInput(
-                  labelText: 'Confirmar contraseña',
-                  type: InputType.secret,
-                  onChanged: (value) {
-                    setState(() {
-                      error = '';
-                      confirmPassword = value;
-                    });
-                  },
-                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    WefoodInput(
+                      labelText: 'Confirmar contraseña',
+                      type: InputType.secret,
+                      onChanged: (value) {
+                        setState(() {
+                          error = '';
+                          confirmPassword = value;
+                        });
+                      },
+                    ),
+                    if(confirmPassword != '' && confirmPassword != password) const FeedbackMessage(
+                      message: 'Las contraseñas no coinciden',
+                      isError: true,
+                    ),
+                  ],
+                )
               ],
             ),
           ),
           Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Checkbox(
                 value: conditionsAccepted,
@@ -282,41 +323,54 @@ class _RegisterUserState extends State<RegisterUser> {
             ],
           ),
           if(authenticating == LoadingStatus.loading) reducedLoadingIcon(context),
-          if(authenticating != LoadingStatus.loading) ElevatedButton(
-            onPressed: () async {
-              if(_readyToRegister() == true) {
-                setState(() {
-                  authenticating = LoadingStatus.loading;
-                });
-                try {
-                  UserModel user = await Api.signIn(
+          if(authenticating != LoadingStatus.loading) Container(
+            margin: const EdgeInsets.symmetric(
+              vertical: 10,
+            ),
+            child: ElevatedButton(
+              onPressed: () async {
+                if(_readyToRegister() == true) {
+                  setState(() {
+                    authenticating = LoadingStatus.loading;
+                  });
+                  try {
+                    Api.signIn(
                       username: username,
                       email: email,
                       password: password,
-                  );
-                  UserSecureStorage().write(key: 'username', value: username);
-                  UserSecureStorage().write(key: 'password', value: password);
-                  AuthModel? auth = await Api.login(
-                      context: context,
-                      username: username,
-                      password: password
-                  );
-                  authenticating = LoadingStatus.successful;
+                    ).then((UserModel userModel) async {
+                      UserSecureStorage().write(key: 'username', value: username);
+                      UserSecureStorage().write(key: 'password', value: password);
+                      Api.login(
+                        context: context,
+                        username: username,
+                        password: password
+                      ).then((AuthModel? authModel) {
+                        authenticating = LoadingStatus.successful;
+                      });
+                    });
+                  }
+                  catch(e) {
+                    setState(() {
+                      UserSecureStorage().delete(key: 'username');
+                      UserSecureStorage().delete(key: 'password');
+                      error = 'Ha ocurrido un error. Por favor, inténtalo de nuevo más tarde.';
+                      authenticating = LoadingStatus.error;
+                    });
+                  }
                 }
-                catch(e) {
-                  setState(() {
-                    UserSecureStorage().delete(key: 'username');
-                    UserSecureStorage().delete(key: 'password');
-                    error = 'Ha ocurrido un error. Por favor, inténtalo de nuevo más tarde.';
-                    authenticating = LoadingStatus.error;
-                    print('ERROR: $e');
-                  });
-                }
-              }
-            },
-            child: const Text('REGISTRARME'),
+              },
+              child: const Text('REGISTRARME'),
+            ),
           ),
-          if(error != '') Text(error),
+          if(error != '') FeedbackMessage(
+            message: error,
+            isError: true,
+            isCentered: true,
+          ),
+          const SizedBox(
+            height: 10,
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[

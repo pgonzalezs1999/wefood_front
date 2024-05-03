@@ -88,18 +88,22 @@ class MyApp extends StatelessWidget {
           headlineLarge: GoogleFonts.balooPaaji2(), // TODO sin utilizar
           headlineMedium: GoogleFonts.balooPaaji2(), // TODO sin utilizar
           headlineSmall: GoogleFonts.balooPaaji2(), // TODO sin utilizar
-          bodyLarge: GoogleFonts.anekDevanagari(), // TODO sin utilizar
-          bodyMedium: GoogleFonts.anekDevanagari(
-            fontSize: 15
+          bodyLarge: GoogleFonts.balooPaaji2(), // TODO sin utilizar
+          bodyMedium: GoogleFonts.balooPaaji2(
+            fontSize: 15,
           ),
-          bodySmall: GoogleFonts.anekDevanagari(), // TODO sin utilizar
-          labelLarge: GoogleFonts.anekDevanagari(), // TODO sin utilizar
-          labelMedium: GoogleFonts.anekDevanagari(), // TODO sin utilizar
-          labelSmall: GoogleFonts.anekDevanagari(), // TODO sin utilizar
-          displayLarge: GoogleFonts.anekDevanagari(), // TODO sin utilizar
-          displayMedium: GoogleFonts.anekDevanagari(), // TODO sin utilizar
+          bodySmall: GoogleFonts.balooPaaji2(), // TODO sin utilizar
+          // Botones
+          labelLarge: GoogleFonts.balooPaaji2(
+            fontWeight: FontWeight.w500,
+            letterSpacing: 0.5,
+          ), // TODO sin utilizar
+          labelMedium: GoogleFonts.balooPaaji2(), // TODO sin utilizar
+          labelSmall: GoogleFonts.balooPaaji2(), // TODO sin utilizar
+          displayLarge: GoogleFonts.balooPaaji2(), // TODO sin utilizar
+          displayMedium: GoogleFonts.balooPaaji2(), // TODO sin utilizar
           // Feedback de los WefoodInput
-          displaySmall: GoogleFonts.anekDevanagari(
+          displaySmall: GoogleFonts.balooPaaji2(
             color: wefoodSecondaryColor,
             fontSize: 15,
           ),

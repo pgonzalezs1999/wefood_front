@@ -69,7 +69,7 @@ class _LoginState extends State<Login> {
                   style: Theme.of(context).textTheme.titleSmall,
                 ),
                 Container(
-                  width: MediaQuery.of(context).size.width * 0.5,
+                  width: MediaQuery.of(context).size.width * 0.666,
                   margin: EdgeInsets.only(
                     top: MediaQuery.of(context).size.height * 0.01,
                   ),

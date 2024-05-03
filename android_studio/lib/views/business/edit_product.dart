@@ -48,7 +48,7 @@ class _EditProductState extends State<EditProduct> {
   DateTime? endDate;
   bool endless = false;
   List<Image?> images = [ // TODO ponerlos a null
-    Image.asset('assets/images/salmon.jpg', fit: BoxFit.cover,), null, null, null, null, null, null, null, null, null,
+    Image.asset('assets/images/logo.png', fit: BoxFit.cover,), null, null, null, null, null, null, null, null, null,
   ];
   String error = '';
 

@@ -23,7 +23,7 @@ class Api {
     required dynamic error,
     String title = '',
     String description = '',
-    String imageUrl = 'assets/images/salmon.jpg',
+    String imageUrl = 'assets/images/logo.png',
   }) {
     title = error;
     FocusScope.of(context).unfocus();
