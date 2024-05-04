@@ -159,7 +159,12 @@ class _BusinessEditDirectionsState extends State<BusinessEditDirections> {
                             error = '';
                           });
                         },
-                        errorText: (errorOnFindingLocation == true) ? 'No se ha encontrado ubicación para esas direcciones' : null,
+                        feedbackWidget: (errorOnFindingLocation == true)
+                          ? const FeedbackMessage(
+                            message: 'No se ha encontrado ubicación para esas direcciones',
+                            isError: true,
+                          )
+                          : null,
                       ),
                     ),
                   ),

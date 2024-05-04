@@ -31,16 +31,6 @@ class _RegisterUserState extends State<RegisterUser> {
   String confirmPassword = '';
   bool conditionsAccepted = false;
 
-  Widget reducedLoadingIcon(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(15),
-      child: LoadingIcon(
-        size: Theme.of(context).textTheme.displaySmall?.fontSize,
-        strokeWidth: 1.5,
-      ),
-    );
-  }
-
   void _navigateToRegisterBusiness() {
     Navigator.push(
       context,
@@ -98,45 +88,36 @@ class _RegisterUserState extends State<RegisterUser> {
   }
 
   _handleEmailChange(String value) async {
-    if(email.isEmail) {
-      setState(() {
-        auxEmail = value;
-        error = '';
-        searchingEmailAvailability = LoadingStatus.loading;
-      });
-      bool available = false;
-      Timer(
-        const Duration(seconds: 1),
-        () async {
-          if(value == auxEmail) {
-            Api.checkEmailAvailability(email: value).then((bool availability) {
-              available = availability;
+    setState(() {
+      auxEmail = value;
+      error = '';
+      searchingEmailAvailability = LoadingStatus.loading;
+    });
+    bool available = false;
+    Timer(
+      const Duration(seconds: 1),
+      () async {
+        if(value == auxEmail) {
+          Api.checkEmailAvailability(email: value).then((bool availability) {
+            available = availability;
+            setState(() {
+              email = value;
+              emailIsAvailable = available;
+              searchingEmailAvailability = LoadingStatus.successful;
+            });
+          }).onError(
+            (Object error, StackTrace stackTrace) {
+              available = false;
               setState(() {
                 email = value;
-                emailIsAvailable = available;
-                searchingEmailAvailability = LoadingStatus.successful;
+                emailIsAvailable = false;
+                searchingEmailAvailability = LoadingStatus.error;
               });
-            }).onError(
-              (Object error, StackTrace stackTrace) {
-                available = false;
-                setState(() {
-                  email = value;
-                  emailIsAvailable = false;
-                  searchingEmailAvailability = LoadingStatus.error;
-                });
-              }
-            );
-          }
+            }
+          );
         }
-      );
-    } else {
-      setState(() {
-        auxEmail = '';
-        email = value;
-        error = '';
-        searchingEmailAvailability = LoadingStatus.unset;
-      });
-    }
+      }
+    );
   }
 
   bool _setError(String reason) {
@@ -199,15 +180,13 @@ class _RegisterUserState extends State<RegisterUser> {
             child: Wrap(
               runSpacing: MediaQuery.of(context).size.height * 0.025,
               children: <Widget>[
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    WefoodInput(
-                      labelText: 'Nombre de usuario',
-                      onChanged: (value) => _handleUsernameChange(value),
-                    ),
-                    if(searchingUsernameAvailability == LoadingStatus.loading) reducedLoadingIcon(context),
-                    if(searchingUsernameAvailability != LoadingStatus.loading && username != '') (username.length >= 6)
+                WefoodInput(
+                  labelText: 'Nombre de usuario',
+                  onChanged: (value) => _handleUsernameChange(value),
+                  feedbackWidget: (searchingUsernameAvailability == LoadingStatus.loading)
+                  ? const ReducedLoadingIcon()
+                  : (searchingUsernameAvailability != LoadingStatus.loading && username != '')
+                    ? (username.length >= 6)
                       ? (username.length <= 30)
                         ? (usernameIsAvailable == false)
                           ? const FeedbackMessage(
@@ -222,21 +201,19 @@ class _RegisterUserState extends State<RegisterUser> {
                           message: 'Demasiado largo',
                           isError: true,
                         )
-                      : const FeedbackMessage(
-                        message: 'Demasiado corto',
-                        isError: true,
-                      ),
-                  ],
+                    : const FeedbackMessage(
+                      message: 'Demasiado corto',
+                      isError: true,
+                    )
+                  : null,
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    WefoodInput(
-                      labelText: 'Correo electrónico',
-                      onChanged: (value) => _handleEmailChange(value),
-                    ),
-                    if(searchingEmailAvailability == LoadingStatus.loading) reducedLoadingIcon(context),
-                    if(searchingEmailAvailability != LoadingStatus.loading && email != '') (email.isEmail)
+                WefoodInput(
+                  labelText: 'Correo electrónico',
+                  onChanged: (value) => _handleEmailChange(value),
+                  feedbackWidget: (searchingEmailAvailability == LoadingStatus.loading)
+                  ? const ReducedLoadingIcon()
+                  : (email != '')
+                    ? (email.isEmail)
                       ? (emailIsAvailable == false)
                         ? const FeedbackMessage(
                           message: 'No disponible',
@@ -249,51 +226,46 @@ class _RegisterUserState extends State<RegisterUser> {
                       : const FeedbackMessage(
                         message: 'Formato incorrecto',
                         isError: true,
-                      ),
-                  ],
+                      )
+                    : null,
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    WefoodInput(
-                      labelText: 'Contraseña',
-                      type: InputType.secret,
-                      onChanged: (value) {
-                        setState(() {
-                          error = '';
-                          password = value;
-                        });
-                      },
-                    ),
-                    if(password != '' && password.length < 6) const FeedbackMessage(
-                        message: 'Demasiado corta',
-                        isError: true
-                    ),
-                    if(password != '' && password.length > 20) const FeedbackMessage(
-                        message: 'Demasiado larga',
-                        isError: true
-                    ),
-                  ],
+                WefoodInput(
+                  labelText: 'Contraseña',
+                  type: InputType.secret,
+                  onChanged: (value) {
+                    setState(() {
+                      error = '';
+                      password = value;
+                    });
+                  },
+                  feedbackWidget: (password != '' && password.length < 6)
+                    ? const FeedbackMessage(
+                      message: 'Demasiado corta',
+                      isError: true
+                    )
+                    : (password != '' && password.length > 20)
+                      ? const FeedbackMessage(
+                          message: 'Demasiado larga',
+                          isError: true
+                      )
+                      : null,
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    WefoodInput(
-                      labelText: 'Confirmar contraseña',
-                      type: InputType.secret,
-                      onChanged: (value) {
-                        setState(() {
-                          error = '';
-                          confirmPassword = value;
-                        });
-                      },
-                    ),
-                    if(confirmPassword != '' && confirmPassword != password) const FeedbackMessage(
+                WefoodInput(
+                  labelText: 'Confirmar contraseña',
+                  type: InputType.secret,
+                  onChanged: (value) {
+                    setState(() {
+                      error = '';
+                      confirmPassword = value;
+                    });
+                  },
+                  feedbackWidget: (confirmPassword != '' && confirmPassword != password)
+                    ? const FeedbackMessage(
                       message: 'Las contraseñas no coinciden',
                       isError: true,
-                    ),
-                  ],
-                )
+                    )
+                    : null,
+                ),
               ],
             ),
           ),
@@ -312,9 +284,7 @@ class _RegisterUserState extends State<RegisterUser> {
               ),
               const Text('He leído y acepto los'),
               TextButton(
-                onPressed: () {
-                  _navigateToTermsAndConditions();
-                },
+                onPressed: () => _navigateToTermsAndConditions(),
                 style: TextButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 5,
@@ -378,9 +348,7 @@ class _RegisterUserState extends State<RegisterUser> {
             children: <Widget>[
               const Text('¿Quieres listar tu negocio?'),
               TextButton(
-                onPressed: () {
-                  _navigateToRegisterBusiness();
-                },
+                onPressed: () => _navigateToRegisterBusiness(),
                 child: const Text('Regístralo gratis'),
               ),
             ],

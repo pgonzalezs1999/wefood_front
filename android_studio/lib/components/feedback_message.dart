@@ -21,7 +21,7 @@ class FeedbackMessage extends StatelessWidget {
       : Theme.of(context).colorScheme.primary;
 
     return Container(
-      width: MediaQuery.of(context).size.width * 0.8,
+      width: double.infinity,
       alignment: (isCentered == true) ? Alignment.center : null,
       margin: const EdgeInsets.only(
         top: 15,

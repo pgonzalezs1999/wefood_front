@@ -17,8 +17,8 @@ class _WaitingVerificationState extends State<WaitingVerification> {
 
   late Timer _timer;
   bool isChecking = false;
-  static const double delaySeconds = 60;
-  double secondsToReload = 60;
+  static const double delaySeconds = 20;
+  double secondsToReload = 20;
 
   void _navigateToLogin() {
     Navigator.pushReplacement(
@@ -45,19 +45,21 @@ class _WaitingVerificationState extends State<WaitingVerification> {
         try {
           String? username = await UserSecureStorage().read(key: 'username');
           String? password = await UserSecureStorage().read(key: 'password');
-          bool validity = await Api.checkValidity(
+          Api.checkValidity(
             username: username ?? '',
-          );
-          if(validity == true) {
-            AuthModel? auth = await Api.login(
-              context: context,
-              username: username!,
-              password: password!,
-            );
-            _timer.cancel();
-          }
-          setState(() {
-            isChecking = false;
+          ).then((bool validity) {
+            if(validity == true) {
+              Api.login(
+                context: context,
+                username: username!,
+                password: password!,
+              ).then((AuthModel? authModel) {
+                _timer.cancel();
+              });
+            }
+            setState(() {
+              isChecking = false;
+            });
           });
         } catch(e) {
           isChecking = false;
@@ -80,50 +82,6 @@ class _WaitingVerificationState extends State<WaitingVerification> {
 
   @override
   Widget build(BuildContext context) {
-
-    confirmPopup() {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return StatefulBuilder(builder: (context, StateSetter setState) {
-            return AlertDialog(
-              content: Container(
-                padding: EdgeInsets.symmetric(
-                  vertical: MediaQuery.of(context).size.height * 0.01,
-                ),
-                child: const Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text('¿Seguro que quiere cancelar la solicitud?'),
-                    Text('Tendrá que volver a rellenar todos los datos'),
-                  ],
-                ),
-              ),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text('CANCELAR'),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    await Api.cancelValidation(
-                      username: (await UserSecureStorage().read(key: 'username'))!
-                    );
-                    await UserSecureStorage().delete(key: 'username');
-                    await UserSecureStorage().delete(key: 'password');
-                    _navigateToLogin();
-                  },
-                  child: const Text('CONFIRMAR'),
-                ),
-              ],
-            );
-          });
-        }
-      );
-    }
-
     return WefoodScreen(
       canPop: false,
       body: SizedBox(
@@ -155,27 +113,30 @@ class _WaitingVerificationState extends State<WaitingVerification> {
                   ),
                 ),
                 if(isChecking == true) const CircularProgressIndicator(),
-                if(isChecking == false) SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.75,
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Text('Volveremos a comprobar si ha sido validado en ${secondsToReload.round()} segundos'),
-                      ),
-                      CircularProgressIndicator(
-                        value: 1 - (secondsToReload / delaySeconds),
-                        backgroundColor: Colors.grey.withAlpha(70),
-                      ),
-                    ],
-                  ),
-                ),
               ],
             ),
             ElevatedButton(
-                onPressed: () {
-                  confirmPopup();
-                },
-                child: const Text('CANCELAR ALTA'),
+              onPressed: () {
+                WefoodPopup.show(
+                  context: context,
+                  title: '¿Seguro que quiere cancelar la solicitud?',
+                  description: 'Tendrá que volver a rellenar todos los datos',
+                  actions: <TextButton>[
+                    TextButton(
+                      onPressed: () async {
+                        await Api.cancelValidation(
+                            username: (await UserSecureStorage().read(key: 'username'))!
+                        );
+                        await UserSecureStorage().delete(key: 'username');
+                        await UserSecureStorage().delete(key: 'password');
+                        _navigateToLogin();
+                      },
+                      child: const Text('SÍ'),
+                    ),
+                  ],
+                );
+              },
+              child: const Text('CANCELAR ALTA'),
             )
           ],
         ),

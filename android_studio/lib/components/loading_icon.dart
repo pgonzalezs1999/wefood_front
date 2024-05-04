@@ -25,3 +25,17 @@ class LoadingIcon extends StatelessWidget {
     );
   }
 }
+
+class ReducedLoadingIcon extends StatelessWidget {
+  const ReducedLoadingIcon({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(15),
+      child: LoadingIcon(
+        size: Theme.of(context).textTheme.displaySmall?.fontSize,
+        strokeWidth: 1.5,
+      ),
+    );
+  }
+}

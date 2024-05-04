@@ -79,7 +79,13 @@ class MyApp extends StatelessWidget {
             fontWeight: FontWeight.w600,
             letterSpacing: -0.5,
           ),
-          titleMedium: GoogleFonts.balooPaaji2(), // TODO sin utilizar
+          // upperTitle de WefoodInput
+          // title del WefoodPopup
+          titleMedium: GoogleFonts.balooPaaji2(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
+          // "Bienvenido a" del login
           titleSmall: GoogleFonts.balooPaaji2(
             fontSize: 15,
             fontWeight: FontWeight.w500,

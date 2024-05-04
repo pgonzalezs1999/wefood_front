@@ -51,6 +51,7 @@ class _WefoodDialogState extends State<WefoodDialog> {
           ),
           Text(
             widget.title,
+            style: Theme.of(context).textTheme.titleMedium,
             textAlign: TextAlign.center,
           ),
           const SizedBox(
