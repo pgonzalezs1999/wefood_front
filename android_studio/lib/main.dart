@@ -53,6 +53,7 @@ class MyApp extends StatelessWidget {
           seedColor: wefoodPrimaryColor,
           primary: wefoodPrimaryColor,
           secondary: wefoodSecondaryColor,
+          surfaceContainer: Colors.grey.withOpacity(0.333),
           brightness: Brightness.light,
         ),
         iconTheme: IconThemeData(
@@ -81,6 +82,7 @@ class MyApp extends StatelessWidget {
           ),
           // upperTitle de WefoodInput
           // title del WefoodPopup
+          // títulos del userExplore
           titleMedium: GoogleFonts.balooPaaji2(
             fontSize: 16,
             fontWeight: FontWeight.w500,

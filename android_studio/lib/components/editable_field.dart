@@ -95,10 +95,7 @@ class _EditableFieldState extends State<EditableField> {
                   return AlertDialog(
                     content: Container(
                       padding: EdgeInsets.symmetric(
-                        vertical: MediaQuery
-                            .of(context)
-                            .size
-                            .height * 0.01,
+                        vertical: MediaQuery.of(context).size.height * 0.01,
                       ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,

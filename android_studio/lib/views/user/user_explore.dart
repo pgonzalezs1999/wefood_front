@@ -30,7 +30,10 @@ class _UserExploreState extends State<UserExplore> {
       margin: const EdgeInsets.only(
         top: 20,
       ),
-      child: Text(title),
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
     );
   }
 
@@ -245,35 +248,10 @@ class _UserExploreState extends State<UserExplore> {
               width: 10,
             ),
             GestureDetector(
-              child: Stack(
-                alignment: Alignment.topRight,
-                children: [
-                  if(
-                  context.read<SearchFiltersCubit>().state.dessert == true
-                    || context.read<SearchFiltersCubit>().state.junk == true
-                    || context.read<SearchFiltersCubit>().state.vegan == true
-                    || context.read<SearchFiltersCubit>().state.vegetarian == true
-                    || context.read<SearchFiltersCubit>().state.maximumPrice != null
-                    || context.read<SearchFiltersCubit>().state.startTime != null
-                    || context.read<SearchFiltersCubit>().state.endTime != null
-                    || context.read<SearchFiltersCubit>().state.onlyToday == true
-                    || context.read<SearchFiltersCubit>().state.onlyAvailable == true
-                  ) Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(999),
-                      color: Theme.of(context).primaryColor,
-                    ),
-                    width: 10,
-                    height: 10,
-                  ),
-                  const Icon(
-                    Icons.filter_list,
-                  ),
-                ],
+              child: const Icon(
+                Icons.filter_list,
               ),
-              onTap: () {
-                _navigateToSearchFilters();
-              },
+              onTap: () => _navigateToSearchFilters(),
             ),
           ],
         ),
@@ -293,11 +271,14 @@ class _UserExploreState extends State<UserExplore> {
           alignment: Alignment.center,
           child: Card(
             child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: MediaQuery.of(context).size.width * 0.05,
-                vertical: MediaQuery.of(context).size.width * 0.025,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 30,
+                vertical: 20,
               ),
-              child: const Text('No hemos encontrado ofertas cerca...'),
+              child: const Text(
+                '¡Añade negocios a favoritos para tener acceso a sus productos fácilmente!',
+                textAlign: TextAlign.center,
+              ),
             ),
           ),
         ),

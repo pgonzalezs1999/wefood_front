@@ -62,13 +62,6 @@ class _AdminProfileState extends State<AdminProfile> {
         Column(
           children: <Widget>[
             SettingsElement(
-              iconData: Icons.notifications,
-              title: 'Notificaciones - FALTA',
-              onTap: () {
-                // TODO falta esto
-              },
-            ),
-            SettingsElement(
               iconData: Icons.share,
               title: 'Comparte la app',
               onTap: () async {
@@ -79,20 +72,25 @@ class _AdminProfileState extends State<AdminProfile> {
               iconData: Icons.logout,
               title: 'Cerrar sesión',
               onTap: () {
-                WefoodPopup.show(
+                showDialog(
                   context: context,
-                  title: '¿Seguro que quieres cerrar sesión?',
-                  actions: <TextButton>[
-                    TextButton(
-                      onPressed: () async {
-                        await Api.logout();
-                        _deleteTokens();
-                        Navigator.pop(context);
-                        _navigateToMain();
-                      },
-                      child: const Text('SÍ'),
-                    ),
-                  ],
+                  builder: (BuildContext context) {
+                    return WefoodPopup(
+                      context: context,
+                      title: '¿Seguro que quieres cerrar sesión?',
+                      actions: <TextButton>[
+                        TextButton(
+                          onPressed: () async {
+                            await Api.logout();
+                            _deleteTokens();
+                            Navigator.pop(context);
+                            _navigateToMain();
+                          },
+                          child: const Text('SÍ'),
+                        ),
+                      ],
+                    );
+                  }
                 );
               },
             ),

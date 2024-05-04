@@ -23,7 +23,7 @@ class _BackArrowState extends State<BackArrow> {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(999),
-          color: (widget.whiteBackground == true) ? const Color.fromRGBO(255, 255, 255, 0.666) : null,
+          color: (widget.whiteBackground == true) ? const Color.fromRGBO(255, 255, 255, 0.8) : null,
         ),
         margin: widget.margin ?? EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
         padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),

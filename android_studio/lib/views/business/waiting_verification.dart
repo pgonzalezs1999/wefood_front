@@ -117,23 +117,28 @@ class _WaitingVerificationState extends State<WaitingVerification> {
             ),
             ElevatedButton(
               onPressed: () {
-                WefoodPopup.show(
+                showDialog(
                   context: context,
-                  title: '¿Seguro que quiere cancelar la solicitud?',
-                  description: 'Tendrá que volver a rellenar todos los datos',
-                  actions: <TextButton>[
-                    TextButton(
-                      onPressed: () async {
-                        await Api.cancelValidation(
-                            username: (await UserSecureStorage().read(key: 'username'))!
-                        );
-                        await UserSecureStorage().delete(key: 'username');
-                        await UserSecureStorage().delete(key: 'password');
-                        _navigateToLogin();
-                      },
-                      child: const Text('SÍ'),
-                    ),
-                  ],
+                  builder: (BuildContext context) {
+                    return WefoodPopup(
+                      context: context,
+                      title: '¿Seguro que quiere cancelar la solicitud?',
+                      description: 'Tendrá que volver a rellenar todos los datos',
+                      actions: <TextButton>[
+                        TextButton(
+                          onPressed: () async {
+                            await Api.cancelValidation(
+                              username: (await UserSecureStorage().read(key: 'username'))!
+                            );
+                            await UserSecureStorage().delete(key: 'username');
+                            await UserSecureStorage().delete(key: 'password');
+                            _navigateToLogin();
+                          },
+                          child: const Text('SÍ'),
+                        ),
+                      ],
+                    );
+                  }
                 );
               },
               child: const Text('CANCELAR ALTA'),

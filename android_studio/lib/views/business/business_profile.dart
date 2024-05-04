@@ -254,13 +254,6 @@ class _BusinessProfileState extends State<BusinessProfile> {
               },
             ),
             SettingsElement(
-              iconData: Icons.notifications,
-              title: 'Notificaciones - FALTA',
-              onTap: () {
-                // TODO falta esto
-              },
-            ),
-            SettingsElement(
               iconData: Icons.share,
               title: 'Comparte la app',
               onTap: () async {
@@ -287,20 +280,25 @@ class _BusinessProfileState extends State<BusinessProfile> {
               iconData: Icons.logout,
               title: 'Cerrar sesión',
               onTap: () {
-                WefoodPopup.show(
+                showDialog(
                   context: context,
-                  title: '¿Seguro que quieres cerrar sesión?',
-                  actions: <TextButton>[
-                    TextButton(
-                      onPressed: () async {
-                        await Api.logout();
-                        _deleteTokens();
-                        Navigator.pop(context);
-                        _navigateToMain();
-                      },
-                      child: const Text('SÍ'),
-                    )
-                  ],
+                  builder: (BuildContext context) {
+                    return WefoodPopup(
+                      context: context,
+                      title: '¿Seguro que quieres cerrar sesión?',
+                      actions: <TextButton>[
+                        TextButton(
+                          onPressed: () async {
+                            await Api.logout();
+                            _deleteTokens();
+                            Navigator.pop(context);
+                            _navigateToMain();
+                          },
+                          child: const Text('SÍ'),
+                        )
+                      ],
+                    );
+                  }
                 );
               }
             ),
@@ -315,21 +313,26 @@ class _BusinessProfileState extends State<BusinessProfile> {
               iconData: Icons.delete,
               title: 'Darme de baja',
               onTap: () {
-                WefoodPopup.show(
+                showDialog(
                   context: context,
-                  title: '¿Seguro que quieres darte de baja?',
-                  description: 'Perderás toda tu información y no podrás recuperarla más adelante.',
-                  actions: <TextButton>[
-                    TextButton(
-                      onPressed: () async {
-                        await Api.signOut();
-                        _deleteTokens();
-                        Navigator.pop(context);
-                        _navigateToMain();
-                      },
-                      child: const Text('SÍ'),
-                    )
-                  ],
+                  builder: (BuildContext context) {
+                    return WefoodPopup(
+                      context: context,
+                      title: '¿Seguro que quieres darte de baja?',
+                      description: 'Perderás toda tu información y no podrás recuperarla más adelante.',
+                      actions: <TextButton>[
+                        TextButton(
+                          onPressed: () async {
+                            await Api.signOut();
+                            _deleteTokens();
+                            Navigator.pop(context);
+                            _navigateToMain();
+                          },
+                          child: const Text('SÍ'),
+                        )
+                      ],
+                    );
+                  }
                 );
               },
             ),

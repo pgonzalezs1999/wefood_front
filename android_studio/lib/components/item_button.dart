@@ -75,14 +75,14 @@ class _ItemButtonState extends State<ItemButton> {
             borderRadius: BorderRadius.circular(10),
           ),
           child: SizedBox(
-            height: 160,
+            height: 145,
             child: Stack(
               alignment: Alignment.topCenter,
               children: <Widget>[
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: SizedBox(
-                    height: 150,
+                    height: 145,
                     child: (widget.productExpanded.image.route != null)
                     ? Image(
                       image: NetworkImage(widget.productExpanded.image.route!),
@@ -101,7 +101,6 @@ class _ItemButtonState extends State<ItemButton> {
                     Container(
                       padding: const EdgeInsets.only(
                         top: 10,
-                        bottom: 10,
                         left: 10,
                         right: 12,
                       ),
@@ -140,8 +139,8 @@ class _ItemButtonState extends State<ItemButton> {
                     ClipRect(
                       child: BackdropFilter(
                         filter: ImageFilter.blur(
-                          sigmaX: 8,
-                          sigmaY: 8,
+                          sigmaX: 3,
+                          sigmaY: 3,
                         ),
                         child: Container(
                           color: Colors.white.withOpacity(0.75),
@@ -150,9 +149,8 @@ class _ItemButtonState extends State<ItemButton> {
                             vertical: 10,
                           ),
                           width: double.infinity,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          child: Wrap(
+                            runSpacing: -3,
                             children: [
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -166,7 +164,7 @@ class _ItemButtonState extends State<ItemButton> {
                               ),
                               Text(
                                 widget.productExpanded.business.name ?? '',
-                                style: const TextStyle(fontWeight: FontWeight.w600), // TODO deshardcodear este estilo
+                                style: Theme.of(context).textTheme.titleSmall,
                               ),
                               Row(
                                 children: [

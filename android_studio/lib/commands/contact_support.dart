@@ -12,23 +12,29 @@ launchWhatsapp({
   try {
     await launchUrl(uri);
   } catch(error) {
-    WefoodPopup.show(
+    showDialog(
       context: context,
-      title: 'No se ha podido abrir WhatsApp. Esto suele deberse a problemas de conexión, o a que no tenga la aplicación de WhatsApp instalada.\n\nSi el error persiste, por favor escríbanos a',
-      content: Column(
-        children: <Widget>[
-          TextButton(
-            onPressed: () async {
-              String subject = 'Consulta sobre la aplicación WeFood';
-              await launchUrl(
-                Uri.parse('mailto:${Environment.supportEmail}?subject=$subject&body=$message'),
-              );
-            },
-            child: const Text(Environment.supportEmail),
+      builder: (BuildContext context) {
+        return WefoodPopup(
+          context: context,
+          title: 'No se ha podido abrir WhatsApp. Esto suele deberse a problemas de conexión, o a que no tenga la aplicación de WhatsApp instalada.\n\nSi el error persiste, por favor escríbanos a',
+          content: Column(
+            children: <Widget>[
+              TextButton(
+                onPressed: () async {
+                  String subject = 'Consulta sobre la aplicación WeFood';
+                  await launchUrl(
+                    Uri.parse('mailto:${Environment
+                        .supportEmail}?subject=$subject&body=$message'),
+                  );
+                },
+                child: const Text(Environment.supportEmail),
+              ),
+            ],
           ),
-        ],
-      ),
-      cancelButtonTitle: 'OK',
+          cancelButtonTitle: 'OK',
+        );
+      }
     );
   }
 }

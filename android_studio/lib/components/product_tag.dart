@@ -31,7 +31,7 @@ class _ProductTagState extends State<ProductTag> {
       break;
       case 'C. rápida': icon = Icons.fastfood;
       break;
-      case 'Postres': icon = Icons.cookie_outlined;
+      case 'Postres': icon = Icons.cookie;
       break;
     }
 
@@ -55,7 +55,10 @@ class _ProductTagState extends State<ProductTag> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Icon(icon),
+          Icon(
+            icon,
+            size: 15,
+          ),
           const SizedBox(
             width: 5,
           ),

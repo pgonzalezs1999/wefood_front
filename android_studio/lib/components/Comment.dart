@@ -35,7 +35,7 @@ class _CommentState extends State<Comment> {
             child: SizedBox.fromSize(
               size: Size.fromRadius(MediaQuery.of(context).size.width * 0.05),
               child: Container(
-                color: Colors.grey.withOpacity(0.333), // TODO deshardcodear este color
+                color: Theme.of(context).colorScheme.surfaceContainer,
                 child: const Icon(
                   Icons.person,
                 ),

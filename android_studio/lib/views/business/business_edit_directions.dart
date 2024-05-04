@@ -283,14 +283,19 @@ class _BusinessEditDirectionsState extends State<BusinessEditDirections> {
                         typedLatLng!.longitude
                       ),
                     );
-                    WefoodPopup.show(
+                    showDialog(
                       context: context,
-                      title: '¡Enhorabuena! Las direcciones hay cambiado correctamente a "$finalDirections"',
-                      cancelButtonTitle: 'OK',
-                      cancelButtonBehaviour: () {
-                        Navigator.pop(context);
-                      },
-                    ).then((onValue) {
+                      builder: (BuildContext context) {
+                        return WefoodPopup(
+                          context: context,
+                          title: '¡Enhorabuena! Las direcciones hay cambiado correctamente a "$finalDirections"',
+                          cancelButtonTitle: 'OK',
+                          cancelButtonBehaviour: () {
+                            Navigator.pop(context);
+                          },
+                        );
+                        }
+                      ).then((onValue) {
                       Navigator.pop(context);
                     });
                   } catch(e) {
