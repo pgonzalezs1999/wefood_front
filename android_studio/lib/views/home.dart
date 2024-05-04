@@ -141,7 +141,7 @@ class _HomeState extends State<Home> {
                   ),
                 ],
                 currentIndex: _selectedScreenIndex,
-                selectedItemColor: Colors.amber[800],
+                selectedItemColor: Theme.of(context).colorScheme.secondary,
                 onTap: _onScreenTapped,
               ),
             ),

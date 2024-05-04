@@ -171,11 +171,15 @@ class _UserExploreState extends State<UserExplore> {
   }
 
   _navigateToSearchedFilters({
+    required String text,
     required List<ProductExpandedModel> items
   }) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => SearchedItems(items: items)),
+      MaterialPageRoute(builder: (context) => SearchedItems(
+        text: text,
+        items: items
+      )),
     ).whenComplete(() {
       setState(() {
         context.read<SearchFiltersCubit>().state;
@@ -233,6 +237,7 @@ class _UserExploreState extends State<UserExplore> {
                               text: searchText,
                             );
                             _navigateToSearchedFilters(
+                              text: searchText,
                               items: items,
                             );
                           },
@@ -260,7 +265,12 @@ class _UserExploreState extends State<UserExplore> {
         _exploreTitle('Cerca de tí'),
         nearbyList,
         _exploreTitle('Ofertas de tus favoritos'),
-        if(_retrievingFavourites == LoadingStatus.loading) const LoadingIcon(),
+        if(_retrievingFavourites == LoadingStatus.loading) Container(
+          margin: const EdgeInsets.only(
+            left: 10,
+          ),
+          child: const LoadingIcon(),
+        ),
         if(_retrievingFavourites == LoadingStatus.error) Container(
           margin: EdgeInsets.symmetric(
             vertical: MediaQuery.of(context).size.height * 0.05,

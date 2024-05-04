@@ -17,10 +17,14 @@ class SearchFilters extends StatefulWidget {
 
 class _SearchFiltersState extends State<SearchFilters> {
 
-  void _navigateToSearchedItems(List<ProductExpandedModel> items) {
+  void _navigateToSearchedItems({
+      required List<ProductExpandedModel> items,
+  }) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => SearchedItems(items: items)),
+      MaterialPageRoute(builder: (context) => SearchedItems(
+        items: items,
+      )),
     );
   }
 
@@ -169,7 +173,9 @@ class _SearchFiltersState extends State<SearchFilters> {
                   onlyToday: context.read<SearchFiltersCubit>().state.onlyToday,
                   onlyAvailable: context.read<SearchFiltersCubit>().state.onlyAvailable,
                 );
-                _navigateToSearchedItems(items);
+                _navigateToSearchedItems(
+                  items: items,
+                );
               },
             ),
           )

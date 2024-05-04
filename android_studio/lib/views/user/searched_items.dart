@@ -5,10 +5,12 @@ import 'package:wefood/services/auth/api/api.dart';
 
 class SearchedItems extends StatefulWidget {
 
+  final String text;
   final List<ProductExpandedModel> items;
 
   const SearchedItems({
     super.key,
+    this.text = '',
     required this.items,
   });
 
@@ -44,8 +46,8 @@ class _SearchedItemsState extends State<SearchedItems> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          const BackUpBar(
-            title: 'Resultados de la búsqueda'
+          BackUpBar(
+            title: 'Resultados ${(widget.text != '') ? 'para "${widget.text}"' : 'de la búsqueda'}',
           ),
           if(widget.items.isNotEmpty) Column(
             children: widget.items.map((i) {

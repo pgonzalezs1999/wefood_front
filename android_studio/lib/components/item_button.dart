@@ -106,7 +106,7 @@ class _ItemButtonState extends State<ItemButton> {
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Row(
                             children: <Widget>[
@@ -120,8 +120,8 @@ class _ItemButtonState extends State<ItemButton> {
                           if(widget.productExpanded.isFavourite == true) ClipRect(
                             child: BackdropFilter(
                               filter: ImageFilter.blur(
-                                sigmaX: 8,
-                                sigmaY: 8,
+                                sigmaX: 2,
+                                sigmaY: 2,
                               ),
                               child: Container(
                                 decoration: BoxDecoration(
@@ -129,7 +129,10 @@ class _ItemButtonState extends State<ItemButton> {
                                   color: Colors.white.withOpacity(0.66),
                                 ),
                                 padding: const EdgeInsets.all(5),
-                                child: const Icon(Icons.favorite),
+                                child: const Icon(
+                                  Icons.favorite,
+                                  size: 20,
+                                ),
                               ),
                             ),
                           ),
