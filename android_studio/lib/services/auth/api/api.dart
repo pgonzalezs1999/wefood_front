@@ -871,7 +871,6 @@ class Api {
         file: file,
       );
       final responseBody = jsonDecode(response.body);
-      print('RESPONSE DEL API.UPLOAD_IMAGE(): $responseBody');
       ImageModel imageModel = ImageModel.fromJson(responseBody['image']);
       return imageModel;
     } catch(error) {

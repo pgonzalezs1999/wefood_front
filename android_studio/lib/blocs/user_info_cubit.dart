@@ -6,6 +6,22 @@ class UserInfoCubit extends Cubit<BusinessExpandedModel> {
 
   UserInfoCubit(): super(BusinessExpandedModel.empty());
 
+  void setRealName({
+    required String realName,
+    required String realSurname,
+  }) {
+    BusinessExpandedModel updatedState = state;
+    updatedState.user.realName = realName;
+    updatedState.user.realSurname = realSurname;
+    emit(updatedState);
+  }
+
+  void setUsername(String value) {
+    BusinessExpandedModel updatedState = state;
+    updatedState.user.username = value;
+    emit(updatedState);
+  }
+
   void setUser(UserModel value) {
     BusinessExpandedModel updatedState = state;
     updatedState.user = value;

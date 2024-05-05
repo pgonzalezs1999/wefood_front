@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/models/models.dart';
@@ -12,6 +15,14 @@ class ProfileName extends StatefulWidget {
 
 class ProfileNameState extends State<ProfileName> {
   Widget resultWidget = const LoadingIcon();
+
+
+  @override
+  void initState() {
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<UserModel>(
@@ -35,6 +46,19 @@ class ProfileNameState extends State<ProfileName> {
                   firstInitialValue: (response.data?.realName != null) ? response.data!.realName! : '',
                   firstMinimumLength: 2,
                   firstMaximumLength: 30,
+                  firstExtraRequirement: () async {
+                    bool result = false;
+                    print('ENTRANDO EN EL TIMER...');
+                    Timer(
+                      const Duration(seconds: 1),
+                      () async {
+                        Random random = Random();
+                        result = random.nextBool();
+                        print('ELIGIÓ: $result');
+                      }
+                    );
+                    return result;
+                  },
                   secondTopic: 'apellidos',
                   secondInitialValue: (response.data?.realName != null) ? response.data!.realSurname : '',
                   secondMinimumLength: 2,

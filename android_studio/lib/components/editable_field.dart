@@ -7,10 +7,14 @@ class EditableField extends StatefulWidget {
   final String firstInitialValue;
   final int? firstMinimumLength;
   final int? firstMaximumLength;
+  final Future<bool>Function()? firstExtraRequirement;
+  final String? firstRequirementFailedFeedback;
   final String? secondTopic;
   final String? secondInitialValue;
   final int? secondMinimumLength;
   final int? secondMaximumLength;
+  final  Future<bool>Function()? secondExtraRequirement;
+  final String? secondRequirementFailedFeedback;
   final Function(String, String?) onSave;
 
   const EditableField({
@@ -20,10 +24,14 @@ class EditableField extends StatefulWidget {
     required this.firstInitialValue,
     this.firstMinimumLength,
     this.firstMaximumLength,
+    this.firstExtraRequirement,
+    this.firstRequirementFailedFeedback,
     this.secondTopic,
     this.secondInitialValue,
     this.secondMinimumLength,
     this.secondMaximumLength,
+    this.secondExtraRequirement,
+    this.secondRequirementFailedFeedback,
     required this.onSave,
   });
 
@@ -46,7 +54,9 @@ class _EditableFieldState extends State<EditableField> {
 
   @override
   Widget build(BuildContext context) {
-    void setCanConfirm() {
+    errorFeedback = '';
+
+    String setCanConfirm() {
       String result = '';
       if(newFirst == widget.firstInitialValue && newSecond == widget.secondInitialValue) {
         result = 'No se han hecho cambios';
@@ -67,10 +77,20 @@ class _EditableFieldState extends State<EditableField> {
         result = 'El campo ${widget.secondTopic} debe tener más de ${widget.secondMinimumLength} caracteres';
       } else if(widget.secondMaximumLength != null && widget.secondMaximumLength! < newSecond!.length) {
         result = 'El campo ${widget.secondTopic} debe tener menos de ${widget.secondMaximumLength} caracteres';
+      } else if(widget.firstExtraRequirement != null) {
+        widget.firstExtraRequirement!().then((bool firstExtraRequirementSatisfied) {
+          if(firstExtraRequirementSatisfied == false) {
+            result = (widget.firstRequirementFailedFeedback != null) ? widget.firstRequirementFailedFeedback! : 'Requisitos del campo ${widget.firstTopic} no cumplidos';
+          } else if(widget.secondExtraRequirement != null) {
+            widget.secondExtraRequirement!().then((bool secondExtraRequirementSatisfied) {
+              if(secondExtraRequirementSatisfied == false) {
+                result = (widget.secondRequirementFailedFeedback != null) ? widget.secondRequirementFailedFeedback! : 'Requisitos del campo ${widget.secondTopic} no cumplidos';
+              }
+            });
+          }
+        });
       }
-      setState(() {
-        errorFeedback = result;
-      });
+      return result;
     }
 
     return Row(
@@ -91,7 +111,8 @@ class _EditableFieldState extends State<EditableField> {
               barrierDismissible: false,
               context: context,
               builder: (BuildContext context) {
-                return StatefulBuilder(builder: (context, StateSetter setState) {
+                return StatefulBuilder(
+                  builder: (context, StateSetter setState) {
                   return AlertDialog(
                     content: Container(
                       padding: EdgeInsets.symmetric(
@@ -102,9 +123,10 @@ class _EditableFieldState extends State<EditableField> {
                         children: [
                           WefoodInput(
                             onChanged: (value) {
+                              String newErrorFeedback = setCanConfirm();
                               setState(() {
                                 newFirst = value;
-                                setCanConfirm();
+                                errorFeedback = newErrorFeedback;
                               });
                             },
                             labelText: '${(widget.firstInitialValue == '') ? 'Añadir' : 'Cambiar'} ${widget.firstTopic}',
@@ -117,9 +139,10 @@ class _EditableFieldState extends State<EditableField> {
                               ),
                               WefoodInput(
                                 onChanged: (value) {
+                                  String newErrorFeedback = setCanConfirm();
                                   setState(() {
                                     newSecond = value;
-                                    setCanConfirm();
+                                    errorFeedback = newErrorFeedback;
                                   });
                                 },
                                 labelText: '${(widget.secondInitialValue == '') ? 'Añadir' : 'Cambiar'} ${widget.secondTopic}',
@@ -127,14 +150,9 @@ class _EditableFieldState extends State<EditableField> {
                               ),
                             ],
                           ),
-                          Container(
-                            padding: const EdgeInsets.only(
-                              top: 20,
-                            ),
-                            child: Text(
-                              errorFeedback,
-                              textAlign: TextAlign.center,
-                            ),
+                          if(errorFeedback != '') FeedbackMessage(
+                            message: errorFeedback,
+                            isError: true,
                           ),
                         ],
                       ),

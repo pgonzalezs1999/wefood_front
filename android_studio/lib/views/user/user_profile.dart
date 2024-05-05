@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,6 +11,7 @@ import 'package:wefood/main.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/services/secure_storage.dart';
+import 'package:wefood/types.dart';
 import 'package:wefood/views/views.dart';
 
 class UserProfile extends StatefulWidget {
@@ -50,17 +52,17 @@ class _UserProfileState extends State<UserProfile> {
   }
 
   void _getProfileImage() async {
-      try {
-        ImageModel? imageModel = await Api.getImage(
-          idUser: context.read<UserInfoCubit>().state.user.id!,
-          meaning: 'profile',
-        );
-        setState(() {
-          imageRoute = imageModel.route;
-        });
-      } catch(e) {
-        print('No se ha encontrado la imagen en la base de datos');
-      }
+    try {
+      ImageModel? imageModel = await Api.getImage(
+        idUser: context.read<UserInfoCubit>().state.user.id!,
+        meaning: 'profile',
+      );
+      setState(() {
+        imageRoute = imageModel.route;
+      });
+    } catch(e) {
+      print('No se ha encontrado la imagen en la base de datos');
+    }
   }
 
   Future _pickImageFromGallery() async {
@@ -114,12 +116,20 @@ class _UserProfileState extends State<UserProfile> {
 
   @override
   void initState() {
+    auxRealName = (context.read<UserInfoCubit>().state.user.realName != null) ? context.read<UserInfoCubit>().state.user.realName! : '';
+    auxRealSurname = (context.read<UserInfoCubit>().state.user.realSurname != null) ? context.read<UserInfoCubit>().state.user.realSurname! : '';
+    auxUsername = (context.read<UserInfoCubit>().state.user.username != null) ? context.read<UserInfoCubit>().state.user.username! : '';
     _getProfileImage();
     super.initState();
   }
 
   String? imageRoute;
   File? _selectedImage;
+  String auxRealName = '';
+  String auxRealSurname = '';
+  String auxUsername = '';
+  LoadingStatus usernameAvailabilityStatus = LoadingStatus.unset;
+  bool usernameAvailable = false;
 
   @override
   Widget build(BuildContext context) {
@@ -131,6 +141,7 @@ class _UserProfileState extends State<UserProfile> {
             bottom: 20,
           ),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               GestureDetector(
                 onTap: () async {
@@ -218,7 +229,242 @@ class _UserProfileState extends State<UserProfile> {
                   )
                 ),
               ),
-              const ProfileName(),
+              Expanded(
+                child: Column(
+                  children: <Widget>[
+                    GestureDetector(
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Text(
+                              '¡Hola de nuevo, ${context.read<UserInfoCubit>().state.user.realName}',
+                            ),
+                          ),
+                          const Icon(
+                            Icons.edit,
+                          ),
+                        ],
+                      ),
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return StatefulBuilder(
+                              builder: (context, setState) {
+                                return WefoodPopup(
+                                  context: context,
+                                  title: 'Cambiar nombre',
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      WefoodInput(
+                                        labelText: 'Nombre',
+                                        initialText: context.read<UserInfoCubit>().state.user.realName,
+                                        feedbackWidget: (auxRealName.length < 2)
+                                            ? const FeedbackMessage(
+                                              message: 'Debe tener 2 caracteres o más',
+                                              isError: true,
+                                            )
+                                            : (auxRealName.length > 30)
+                                              ? const FeedbackMessage(
+                                                message: 'Debe tener 2 caracteres o más',
+                                                isError: true,
+                                              )
+                                              : null,
+                                        onChanged: (String value) {
+                                          setState(() {
+                                            auxRealName = value;
+                                          });
+                                        },
+                                      ),
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                      WefoodInput(
+                                        labelText: 'Apellidos',
+                                        initialText: context.read<UserInfoCubit>().state.user.realSurname,
+                                        feedbackWidget: (auxRealSurname.length < 2)
+                                          ? const FeedbackMessage(
+                                            message: 'Debe tener 2 caracteres o más',
+                                            isError: true,
+                                          )
+                                          : (auxRealSurname.length > 30)
+                                            ? const FeedbackMessage(
+                                              message: 'Debe tener 2 caracteres o más',
+                                              isError: true,
+                                            )
+                                            : null,
+                                        onChanged: (String value) {
+                                          setState(() {
+                                            auxRealSurname = value;
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                  cancelButtonTitle: 'CANCELAR',
+                                  actions: [
+                                    if(2 <= auxRealName.length && auxRealName.length <= 30 && 2 <= auxRealSurname.length && auxRealSurname.length <= 30) TextButton(
+                                      onPressed: () {
+                                        Api.updateRealName(
+                                          name: auxRealName,
+                                          surname: auxRealSurname
+                                        ).then((_) {
+                                          Navigator.pop(context);
+                                          showDialog(
+                                            context: context,
+                                            barrierDismissible: false,
+                                            builder: (BuildContext context) {
+                                              return StatefulBuilder(builder: (context, setState) {
+                                                return WefoodPopup(
+                                                  context: context,
+                                                  title: '¡Nombre cambiado correctamente!',
+                                                  cancelButtonTitle: 'OK',
+                                                );
+                                              });
+                                            }
+                                          );
+                                        });
+                                      },
+                                      child: const Text('CONFIRMAR'),
+                                    ),
+                                  ],
+                                );
+                              }
+                            );
+                          },
+                        ).then((_) {
+                          setState(() {
+                            context.read<UserInfoCubit>().setRealName(
+                              realName: auxRealName,
+                              realSurname: auxRealSurname,
+                            );
+                          });
+                        });
+                      },
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    GestureDetector(
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Text(
+                              'Usuario: ${context.read<UserInfoCubit>().state.user.username}',
+                            ),
+                          ),
+                          const Icon(
+                            Icons.edit,
+                          ),
+                        ],
+                      ),
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return StatefulBuilder(
+                              builder: (context, setState) {
+                                return WefoodPopup(
+                                  context: context,
+                                  title: 'Cambiar nombre de usuario',
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      WefoodInput(
+                                        labelText: 'Nombre de usuario',
+                                        initialText: context.read<UserInfoCubit>().state.user.username,
+                                        feedbackWidget: (auxUsername.length < 5)
+                                          ? const FeedbackMessage(
+                                            message: 'Debe tener 5 caracteres o más',
+                                            isError: true,
+                                          )
+                                          : (auxUsername.length > 50)
+                                            ? const FeedbackMessage(
+                                              message: 'Debe tener 50 caracteres o más',
+                                              isError: true,
+                                            )
+                                            : (usernameAvailabilityStatus == LoadingStatus.loading)
+                                              ? const ReducedLoadingIcon()
+                                              : (usernameAvailable == true)
+                                                ? const FeedbackMessage(
+                                                  message: '¡Libre!',
+                                                  isError: false,
+                                                )
+                                                : const FeedbackMessage(
+                                                  message: 'No disponible',
+                                                  isError: true,
+                                                ),
+                                        onChanged: (String value) {
+                                          setState(() {
+                                            usernameAvailabilityStatus = LoadingStatus.loading;
+                                          });
+                                          Timer(
+                                            const Duration(seconds: 1),
+                                            () {
+                                              if(2 <= value.length && value.length <= 50) {
+                                                Api.checkUsernameAvailability(
+                                                  username: value,
+                                                ).then((bool availability) {
+                                                  setState(() {
+                                                    usernameAvailable = availability;
+                                                    usernameAvailabilityStatus = LoadingStatus.successful;
+                                                  });
+                                                }).onError((Object error, StackTrace stackTrace) {
+                                                  setState(() {
+                                                    usernameAvailabilityStatus = LoadingStatus.error;
+                                                  });
+                                                });
+                                              }
+                                            }
+                                          );
+                                          setState(() {
+                                            auxUsername = value;
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                  cancelButtonTitle: 'CANCELAR',
+                                  actions: [
+                                    if(5 <= auxUsername.length && auxUsername.length <= 50) TextButton(
+                                      onPressed: () {
+                                        Api.updateUsername(
+                                          username: auxUsername,
+                                        ).then((_) {
+                                          Navigator.pop(context);
+                                          showDialog(
+                                            context: context,
+                                            barrierDismissible: false,
+                                            builder: (BuildContext context) {
+                                              return StatefulBuilder(builder: (context, setState) {
+                                                return WefoodPopup(
+                                                  context: context,
+                                                  title: '¡Nombre de usuario cambiado correctamente!',
+                                                  cancelButtonTitle: 'OK',
+                                                );
+                                              });
+                                            }
+                                          );
+                                        });
+                                      },
+                                      child: const Text('CONFIRMAR'),
+                                    ),
+                                  ],
+                                );
+                              }
+                            );
+                          },
+                        ).then((_) {
+                          setState(() {
+                            context.read<UserInfoCubit>().setUsername(auxUsername);
+                          });
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -242,7 +488,7 @@ class _UserProfileState extends State<UserProfile> {
               },
             ),
             SettingsElement(
-              iconData: Icons.favorite,
+              iconData: Icons.favorite_outline,
               title: 'Productos favoritos',
               onTap: () {
                 _navigateToFavourites();
