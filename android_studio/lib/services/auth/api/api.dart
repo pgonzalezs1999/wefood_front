@@ -479,29 +479,29 @@ class Api {
     required double latitude,
   }) async {
     try {
-      dynamic response = await Middleware.endpoint(
-          name: 'createBusiness',
-          type: HttpType.post,
-          body: {
-            'email': email.toString(),
-            'password': password.toString(),
-            'phone_prefix': phonePrefix.toString(),
-            'phone': phone.toString(),
-            'name': businessName.toString(),
-            'description': businessDescription.toString(),
-            'tax_id': taxId.toString(),
-            'directions': directions.toString(),
-            'country': country.toString(),
-            'longitude': longitude.toString(),
-            'latitude': latitude.toString(),
-          }
+      await Middleware.endpoint(
+        name: 'createBusiness',
+        type: HttpType.post,
+        body: {
+          'email': email.toString(),
+          'password': password.toString(),
+          'phone_prefix': phonePrefix.toString(),
+          'phone': phone.toString(),
+          'name': businessName.toString(),
+          'description': businessDescription.toString(),
+          'tax_id': taxId.toString(),
+          'directions': directions.toString(),
+          'country': country.toString(),
+          'longitude': longitude.toString(),
+          'latitude': latitude.toString(),
+        }
       );
     } catch(error) {
       throw Exception(error);
     }
   }
 
-  static logout() async {
+  static Future logout() async {
     try {
       await Middleware.endpoint(
           name: 'logout',

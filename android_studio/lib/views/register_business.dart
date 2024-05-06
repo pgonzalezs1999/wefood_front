@@ -421,6 +421,9 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const Text('Escriba la dirección lo más exacta posible, y compruebe que es correcta en el mapa'),
+                  const SizedBox(
+                    height: 10,
+                  ),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[

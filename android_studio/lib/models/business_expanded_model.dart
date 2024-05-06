@@ -1,8 +1,10 @@
+import 'package:flutter/widgets.dart';
 import 'package:wefood/models/models.dart';
 
 class BusinessExpandedModel {
   UserModel user;
   BusinessModel business;
+  Image? image;
 
   BusinessExpandedModel.empty():
     user = UserModel.empty(),

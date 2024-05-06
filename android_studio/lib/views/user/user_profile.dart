@@ -13,6 +13,7 @@ import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/types.dart';
 import 'package:wefood/views/views.dart';
+import 'package:http/http.dart' as http;
 
 class UserProfile extends StatefulWidget {
   const UserProfile({super.key});
@@ -52,53 +53,109 @@ class _UserProfileState extends State<UserProfile> {
   }
 
   void _getProfileImage() async {
-    try {
-      ImageModel? imageModel = await Api.getImage(
-        idUser: context.read<UserInfoCubit>().state.user.id!,
-        meaning: 'profile',
-      );
-      setState(() {
-        imageRoute = imageModel.route;
-      });
-    } catch(e) {
-      print('No se ha encontrado la imagen en la base de datos');
+    if(context.read<UserInfoCubit>().state.image == null) {
+      try {
+        Api.getImage(
+          idUser: context.read<UserInfoCubit>().state.user.id!,
+          meaning: 'profile',
+        ).then((ImageModel imageModel) {
+          http.get(
+              Uri.parse(imageModel.route!)
+          ).then((response) {
+            setState(() {
+              context.read<UserInfoCubit>().setPicture(
+                Image.network(
+                  imageModel.route!,
+                  fit: BoxFit.cover,
+                )
+              );
+            });
+          });
+        });
+      } catch(e) {
+        return;
+      }
     }
   }
 
-  Future _pickImageFromGallery() async {
-    final returnedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if(returnedImage != null) {
-      setState(() {
-        _selectedImage = File(returnedImage.path);
-      });
-      ImageModel responseImage = await Api.uploadImage(
-        idUser: context.read<UserInfoCubit>().state.user.id!,
-        meaning: 'profile',
-        file: _selectedImage!,
-      );
-      setState(() {
-        imageRoute = responseImage.route;
-      });
-      Navigator.pop(context);
-    }
+  _pickImageFromGallery() {
+    ImagePicker().pickImage(source: ImageSource.gallery).then((XFile? returnedImage) {
+      if(returnedImage != null) {
+        Api.uploadImage(
+          idUser: context.read<UserInfoCubit>().state.user.id!,
+          meaning: 'profile',
+          file: File(returnedImage.path),
+        ).then((ImageModel imageModel) {
+          http.get(
+              Uri.parse(imageModel.route!)
+          ).then((response) {
+            setState(() {
+              context.read<UserInfoCubit>().setPicture(
+                Image.network(
+                  imageModel.route!,
+                  fit: BoxFit.cover,
+                )
+              );
+            });
+            Navigator.pop(context);
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) {
+                return WefoodPopup(
+                  context: context,
+                  title: '¡Foto de perfil cambiada correctamente!',
+                  cancelButtonTitle: 'OK',
+                  cancelButtonBehaviour: () {
+                    Navigator.pop(context);
+                  },
+                );
+              }
+            );
+          });
+        });
+      }
+    });
   }
 
-  Future _pickImageFromCamera() async {
-    final returnedImage = await ImagePicker().pickImage(source: ImageSource.camera);
-    if(returnedImage != null) {
-      setState(() {
-        _selectedImage = File(returnedImage.path);
-      });
-      ImageModel responseImage = await Api.uploadImage(
-        idUser: context.read<UserInfoCubit>().state.user.id!,
-        meaning: 'profile',
-        file: _selectedImage!,
-      );
-      setState(() {
-        imageRoute = responseImage.route;
-      });
-      Navigator.pop(context);
-    }
+  _pickImageFromCamera() {
+    ImagePicker().pickImage(source: ImageSource.camera).then((XFile? returnedImage) {
+      if(returnedImage != null) {
+        Api.uploadImage(
+          idUser: context.read<UserInfoCubit>().state.user.id!,
+          meaning: 'profile',
+          file: File(returnedImage.path),
+        ).then((ImageModel imageModel) {
+          http.get(
+            Uri.parse(imageModel.route!)
+          ).then((response) {
+            setState(() {
+              context.read<UserInfoCubit>().setPicture(
+                Image.network(
+                  imageModel.route!,
+                  fit: BoxFit.cover,
+                )
+              );
+            });
+            Navigator.pop(context);
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) {
+                return WefoodPopup(
+                  context: context,
+                  title: '¡Foto de perfil cambiada correctamente!',
+                  cancelButtonTitle: 'OK',
+                  cancelButtonBehaviour: () {
+                    Navigator.pop(context);
+                  },
+                );
+              }
+            );
+          });
+        });
+      }
+    });
   }
 
   void _deleteTokens() async {
@@ -123,8 +180,6 @@ class _UserProfileState extends State<UserProfile> {
     super.initState();
   }
 
-  String? imageRoute;
-  File? _selectedImage;
   String auxRealName = '';
   String auxRealSurname = '';
   String auxUsername = '';
@@ -203,24 +258,25 @@ class _UserProfileState extends State<UserProfile> {
                       ),
                       Container(
                         padding: EdgeInsets.only(
-                          right: MediaQuery.of(context).size.width * 0.025,
+                          right: MediaQuery.of(context).size.width * 0.02,
                         ),
-                        child: ClipRRect(
+                        child: Material(
+                          elevation: 2,
                           borderRadius: BorderRadius.circular(1000),
-                          child: SizedBox.fromSize(
-                            size: Size.fromRadius(MediaQuery.of(context).size.width * 0.1),
-                            child: (imageRoute != null)
-                                ? Image.network(
-                              imageRoute!,
-                              fit: BoxFit.cover,
-                            )
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(1000),
+                            child: SizedBox.fromSize(
+                              size: Size.fromRadius(MediaQuery.of(context).size.width * 0.1),
+                              child: (context.read<UserInfoCubit>().state.image != null)
+                                ? context.read<UserInfoCubit>().state.image
                                 : Container(
-                              color: Colors.grey.withOpacity(0.25),
-                              child: Icon(
-                                Icons.person,
-                                size: MediaQuery.of(context).size.width * 0.1,
-                                color: Colors.black.withOpacity(0.5),
-                              ),
+                                  color: Colors.grey.withOpacity(0.25),
+                                  child: Icon(
+                                    Icons.person,
+                                    size: MediaQuery.of(context).size.width * 0.1,
+                                    color: Colors.black.withOpacity(0.5),
+                                  ),
+                                ),
                             ),
                           ),
                         ),
@@ -237,7 +293,7 @@ class _UserProfileState extends State<UserProfile> {
                         children: <Widget>[
                           Expanded(
                             child: Text(
-                              '¡Hola de nuevo, ${context.read<UserInfoCubit>().state.user.realName}',
+                              '¡Hola de nuevo, ${context.read<UserInfoCubit>().state.user.realName}!',
                             ),
                           ),
                           const Icon(
@@ -402,19 +458,21 @@ class _UserProfileState extends State<UserProfile> {
                                           Timer(
                                             const Duration(seconds: 1),
                                             () {
-                                              if(2 <= value.length && value.length <= 50) {
-                                                Api.checkUsernameAvailability(
-                                                  username: value,
-                                                ).then((bool availability) {
-                                                  setState(() {
-                                                    usernameAvailable = availability;
-                                                    usernameAvailabilityStatus = LoadingStatus.successful;
+                                              if(value == auxUsername) {
+                                                if(2 <= value.length && value.length <= 50) {
+                                                  Api.checkUsernameAvailability(
+                                                    username: value,
+                                                  ).then((bool availability) {
+                                                    setState(() {
+                                                      usernameAvailable = availability;
+                                                      usernameAvailabilityStatus = LoadingStatus.successful;
+                                                    });
+                                                  }).onError((Object error, StackTrace stackTrace) {
+                                                    setState(() {
+                                                      usernameAvailabilityStatus = LoadingStatus.error;
+                                                    });
                                                   });
-                                                }).onError((Object error, StackTrace stackTrace) {
-                                                  setState(() {
-                                                    usernameAvailabilityStatus = LoadingStatus.error;
-                                                  });
-                                                });
+                                                }
                                               }
                                             }
                                           );
@@ -522,11 +580,16 @@ class _UserProfileState extends State<UserProfile> {
                       title: '¿Seguro que quieres cerrar sesión?',
                       actions: <TextButton>[
                         TextButton(
-                          onPressed: () async {
-                            await Api.logout();
-                            _deleteTokens();
-                            Navigator.pop(context);
-                            _navigateToMain();
+                          onPressed: () {
+                            Api.logout().then((_) {
+                              _deleteTokens();
+                              Navigator.pop(context);
+                              _navigateToMain();
+                            }).onError((Object error, StackTrace stackTrace) {
+                              _deleteTokens();
+                              Navigator.pop(context);
+                              _navigateToMain();
+                            });
                           },
                           child: const Text('SÍ'),
                         )
@@ -556,11 +619,16 @@ class _UserProfileState extends State<UserProfile> {
                       description: 'Perderás toda tu información y no podrás recuperarla más adelante.',
                       actions: <TextButton>[
                         TextButton(
-                          onPressed: () async {
-                            await Api.signOut();
-                            _deleteTokens();
-                            Navigator.pop(context);
-                            _navigateToMain();
+                          onPressed: () {
+                            Api.signOut().then(() {
+                              _deleteTokens();
+                              Navigator.pop(context);
+                              _navigateToMain();
+                            }).onError(() {
+                              _deleteTokens();
+                              Navigator.pop(context);
+                              _navigateToMain();
+                            });
                           },
                           child: const Text('SÍ'),
                         )
