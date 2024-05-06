@@ -86,8 +86,27 @@ class _UserProfileState extends State<UserProfile> {
           meaning: 'profile',
           file: File(returnedImage.path),
         ).then((ImageModel imageModel) {
+          Navigator.pop(context);
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 100,
+                      ),
+                      child: const LoadingIcon(),
+                    ),
+                  ],
+                ),
+              );
+            }
+          );
           http.get(
-              Uri.parse(imageModel.route!)
+            Uri.parse(imageModel.route!)
           ).then((response) {
             setState(() {
               context.read<UserInfoCubit>().setPicture(
@@ -126,6 +145,25 @@ class _UserProfileState extends State<UserProfile> {
           meaning: 'profile',
           file: File(returnedImage.path),
         ).then((ImageModel imageModel) {
+          Navigator.pop(context);
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 100,
+                      ),
+                      child: const LoadingIcon(),
+                    ),
+                  ],
+                ),
+              );
+            }
+          );
           http.get(
             Uri.parse(imageModel.route!)
           ).then((response) {
