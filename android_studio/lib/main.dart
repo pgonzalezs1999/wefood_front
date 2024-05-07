@@ -56,6 +56,12 @@ class MyApp extends StatelessWidget {
           surfaceContainer: Colors.grey.withOpacity(0.333),
           brightness: Brightness.light,
         ),
+        switchTheme: SwitchThemeData(
+          trackColor: WidgetStateProperty.all<Color>(wefoodPrimaryColor),
+          thumbColor: WidgetStateProperty.all<Color>(Theme.of(context).colorScheme.surface),
+          trackOutlineColor: WidgetStateProperty.all<Color>(wefoodPrimaryColor),
+          trackOutlineWidth: WidgetStateProperty.all<double>(0),
+        ),
         iconTheme: IconThemeData(
           color: Theme.of(context).primaryColor,
         ),
