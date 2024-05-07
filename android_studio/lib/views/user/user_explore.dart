@@ -23,7 +23,7 @@ class _UserExploreState extends State<UserExplore> {
   Widget recommendedList = const LoadingIcon();
   Widget nearbyList =  const LoadingIcon();
   LoadingStatus _retrievingFavourites = LoadingStatus.unset;
-  String searchText = '';
+  final TextEditingController _searchController = TextEditingController();
 
   Widget _exploreTitle(String title) {
     return Container(
@@ -142,6 +142,7 @@ class _UserExploreState extends State<UserExplore> {
     });
     try {
     List<ProductExpandedModel> items = await Api.getFavouriteItems();
+    items.sort(compareByDate);
       for(int i=0; i<items.length; i++) {
         items[i].image = await Api.getImage(
           idUser: items[i].user.id!,
@@ -157,6 +158,10 @@ class _UserExploreState extends State<UserExplore> {
         _retrievingFavourites = LoadingStatus.error;
       });
     }
+  }
+
+  int compareByDate(ProductExpandedModel a, ProductExpandedModel b) {
+    return a.item.date!.compareTo(b.item.date!);
   }
 
   _navigateToSearchFilters() {
@@ -188,6 +193,12 @@ class _UserExploreState extends State<UserExplore> {
   }
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     _retrieveRecommended();
     _retrieveNearby();
@@ -204,10 +215,11 @@ class _UserExploreState extends State<UserExplore> {
           children: [
             Expanded(
               child: TextFormField(
+                controller: _searchController,
                 keyboardType: TextInputType.visiblePassword,
                 onChanged: (String value) {
                   setState(() {
-                    searchText = value;
+                    _searchController.text;
                   });
                 },
                 decoration: InputDecoration(
@@ -221,30 +233,48 @@ class _UserExploreState extends State<UserExplore> {
                     ),
                     borderRadius: BorderRadius.circular(999),
                   ),
-                  suffixIcon: Container(
+                  suffixIcon: (_searchController.text != '') ? Container(
                     margin: const EdgeInsets.symmetric(
                       horizontal: 20,
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        GestureDetector(
-                          child: const Icon(
-                            Icons.search,
+                        SizedBox(
+                          height: 40,
+                          width: 35,
+                          child: GestureDetector(
+                            child: const Icon(
+                              Icons.search,
+                            ),
+                            onTap: () async {
+                              List<ProductExpandedModel> items = await Api.searchItemsByText(
+                                text: _searchController.text,
+                              );
+                              _navigateToSearchedFilters(
+                                text: _searchController.text,
+                                items: items,
+                              );
+                            },
                           ),
-                          onTap: () async {
-                            List<ProductExpandedModel> items = await Api.searchItemsByText(
-                              text: searchText,
-                            );
-                            _navigateToSearchedFilters(
-                              text: searchText,
-                              items: items,
-                            );
-                          },
+                        ),
+                        SizedBox(
+                          height: 40,
+                          width: 35,
+                          child: GestureDetector(
+                            child: const Icon(
+                              Icons.cancel_outlined,
+                            ),
+                            onTap: () {
+                              setState(() {
+                                _searchController.text = '';
+                              });
+                            },
+                          ),
                         ),
                       ],
                     ),
-                  ),
+                  ) : null,
                 ),
               ),
             ),

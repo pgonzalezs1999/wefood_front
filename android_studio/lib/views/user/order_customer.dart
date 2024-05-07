@@ -33,6 +33,9 @@ class _OrderCustomerState extends State<OrderCustomer> {
           const BackUpBar(
             title: 'Confirmar pedido',
           ),
+          const SizedBox(
+            height: 20,
+          ),
           FutureBuilder<ProductExpandedModel>(
             future: Api.getItem(
               id: widget.id,
@@ -51,19 +54,30 @@ class _OrderCustomerState extends State<OrderCustomer> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text('WeFood pack de'),
-                    ),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text('${info.business.name}'),
+                    Row(
+                      children: <Text>[
+                        Text(
+                          'WeFood pack de ',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        Text('${info.business.name}'),
+                      ],
                     ),
                     const SizedBox(
                       height: 20,
                     ),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        '1. Dirígete a',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[
                         Card(
                           child: Container(
@@ -82,28 +96,24 @@ class _OrderCustomerState extends State<OrderCustomer> {
                         const SizedBox(
                           width: 10,
                         ),
-                        Expanded(
-                          child: Text('${info.business.directions}'),
-                        ),
+                        Text('${info.business.directions}'),
                       ],
                     ),
                     Container(
-                      margin: const EdgeInsets.symmetric(
-                        vertical: 20,
+                      margin: const EdgeInsets.only(
+                        top: 20,
                       ),
-                      child: const Align(
+                      child: Align(
                         alignment: Alignment.centerLeft,
-                        child: Text('Enseña este QR al encargado:'),
+                        child: Text(
+                          '2. Enseña este QR al encargado:',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
                       ),
                     ),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.width * 0.75,
-                      width: MediaQuery.of(context).size.width * 0.75,
-                      child: QrImageView(
-                        data: '${widget.id}',
-                        version: QrVersions.min,
-                        size: 200.0,
-                      ),
+                    QrImageView(
+                      data: '${widget.id}',
+                      version: QrVersions.min,
                     ),
                     Container(
                       margin: const EdgeInsets.symmetric(
@@ -124,7 +134,8 @@ class _OrderCustomerState extends State<OrderCustomer> {
                           builder: (BuildContext context) {
                             return WefoodPopup(
                               context: context,
-                              title: '¿Confirmar recogida?\n\nConfirme que el encargado está de acuerdo en confirmar el pedido de esta forma, ya que no podrá deshacer esta acción.',
+                              title: '¿Confirmar recogida?',
+                              description: 'Confirme que el encargado está de acuerdo en confirmar el pedido de esta forma, ya que no podrá deshacer esta acción',
                               cancelButtonTitle: 'CANCELAR',
                               actions: <TextButton>[
                                 TextButton(
@@ -159,17 +170,14 @@ class _OrderCustomerState extends State<OrderCustomer> {
                           }
                         );
                       },
-                      child: const Text('CONFIRMAR RECOGIDA'),
+                      child: const Text('CONFIRMAR ENTREGA'),
                     ),
                     const SizedBox(
                       height: 20,
                     ),
-                    Text( // TODO deshardcodear este estilo
+                    Text(
                       'Código: ${CustomParsers.numberToHexadecimal(widget.id)}',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w900,
-                        fontSize: 20,
-                      ),
+                      style: Theme.of(context).textTheme.titleMedium,
                     )
                   ],
                 );

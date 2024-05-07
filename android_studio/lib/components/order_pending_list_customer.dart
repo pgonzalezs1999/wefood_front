@@ -34,10 +34,8 @@ class _OrderPendingListCustomerState extends State<OrderPendingListCustomer> {
                 children: <Widget>[
                   Column(
                     children: response.data!.map((ProductExpandedModel product) =>
-                      ItemButton(
-                        horizontalScroll: false,
+                      OrderButton(
                         productExpanded: product,
-                        nextScreen: NextScreen.orderCustomer,
                       )).toList(),
                   ),
                   const SizedBox(

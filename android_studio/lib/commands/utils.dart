@@ -90,4 +90,20 @@ class Utils {
     }
     return result;
   }
+
+  static int minutesFromNowToTimeOfDay(TimeOfDay deadline) {
+    int result = -1;
+    if(timesOfDayFirstIsSooner(deadline, TimeOfDay.now())) {
+      result += (deadline.hour - TimeOfDay.now().hour) * 60;
+      result += (deadline.minute - TimeOfDay.now().minute);
+      if(TimeOfDay.now().minute > deadline.minute) {
+        result -= 60;
+      }
+    }
+    return result;
+  }
+
+  static int minutesFromNowToDateTime(DateTime deadline) {
+    return deadline.difference(DateTime.now()).inMinutes;
+  }
 }
