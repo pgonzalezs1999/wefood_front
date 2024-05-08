@@ -41,6 +41,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Color wefoodPrimaryColor = const Color(0xFF392FAA);
+    Color wefoodPrimaryAccent = const Color(0xFFCCDDFF);
     Color wefoodSecondaryColor = const Color(0xFFF96478);
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -53,7 +54,10 @@ class MyApp extends StatelessWidget {
           seedColor: wefoodPrimaryColor,
           primary: wefoodPrimaryColor,
           secondary: wefoodSecondaryColor,
+          // Placeholders
           surfaceContainer: Colors.grey.withOpacity(0.333),
+          // BgColor de orderButton
+          primaryContainer: wefoodPrimaryAccent,
           brightness: Brightness.light,
         ),
         switchTheme: SwitchThemeData(

@@ -59,6 +59,7 @@ class _EditProductButtonState extends State<EditProductButton> {
           );
         },
         child: Card(
+          elevation: 3,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
@@ -96,22 +97,24 @@ class _EditProductButtonState extends State<EditProductButton> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          if(widget.productType == ProductType.breakfast) const Expanded(
-                            child: Text('Edite sus desayunos'),
-                          ),
-                          if(widget.productType == ProductType.lunch) const Expanded(
-                            child: Text('Edite sus almuerzos'),
-                          ),
-                          if(widget.productType == ProductType.dinner) const Expanded(
-                            child: Text('Edite sus cenas'),
-                          ),
-                          const SizedBox(
-                            width: 35,
+                          Expanded(
+                            child: Text(
+                              'Edite sus ${
+                                (widget.productType == ProductType.breakfast) ? 'desayuno'
+                                  : (widget.productType == ProductType.lunch) ? 'almuerzo'
+                                  : 'cena'
+                              }s',
+                              style: Theme.of(context).textTheme.titleSmall,
+                            ),
                           ),
                           Container(
                             decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Theme.of(context).colorScheme.primary,
+                                width: 0.5,
+                              ),
                               borderRadius: BorderRadius.circular(9999999),
-                              color: Colors.grey.withOpacity(0.5),
+                              color: Theme.of(context).colorScheme.surface.withOpacity(0.75),
                             ),
                             height: 80,
                             width: 80,

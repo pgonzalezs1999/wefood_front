@@ -128,6 +128,7 @@ class _OrderCustomerState extends State<OrderCustomer> {
                       ),
                     ),
                     ElevatedButton(
+                      child: const Text('CONFIRMAR ENTREGA'),
                       onPressed: () async {
                         showDialog(
                           context: context,
@@ -135,16 +136,16 @@ class _OrderCustomerState extends State<OrderCustomer> {
                             return WefoodPopup(
                               context: context,
                               title: '¿Confirmar recogida?',
-                              description: 'Confirme que el encargado está de acuerdo en confirmar el pedido de esta forma, ya que no podrá deshacer esta acción',
+                              description: 'Asegúrese de que el encargado está de acuerdo en confirmar el pedido de esta forma, ya que no se podrá deshacer esta acción',
                               cancelButtonTitle: 'CANCELAR',
                               actions: <TextButton>[
                                 TextButton(
                                   child: const Text('CONFIRMAR'),
-                                  onPressed: () async {
-                                    Navigator.pop(context);
-                                    await Api.completeOrderCustomer(
+                                  onPressed: () {
+                                    Api.completeOrderCustomer(
                                       idOrder: widget.id,
                                     ).then((_) {
+                                      Navigator.pop(context);
                                       showDialog(
                                         context: context,
                                         builder: (BuildContext context) {
@@ -160,7 +161,7 @@ class _OrderCustomerState extends State<OrderCustomer> {
                                               });
                                             },
                                           );
-                                      }
+                                        }
                                       );
                                     });
                                   },
@@ -170,7 +171,6 @@ class _OrderCustomerState extends State<OrderCustomer> {
                           }
                         );
                       },
-                      child: const Text('CONFIRMAR ENTREGA'),
                     ),
                     const SizedBox(
                       height: 20,

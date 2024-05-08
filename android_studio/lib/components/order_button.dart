@@ -57,6 +57,7 @@ class _OrderButtonState extends State<OrderButton> with SingleTickerProviderStat
           });
         },
         child: Card(
+          color: Theme.of(context).colorScheme.primaryContainer,
           elevation: 2,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),

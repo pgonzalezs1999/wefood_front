@@ -25,7 +25,12 @@ class Item extends StatefulWidget {
 }
 class _ItemState extends State<Item> {
 
-  Widget resultWidget = const LoadingScreen();
+  Widget resultWidget = const SizedBox(
+    height: 500,
+    child: Center(
+      child: LoadingIcon()
+    ),
+  );
   Widget favouriteIcon = const Icon(Icons.favorite_outline);
   late ProductExpandedModel info;
   int selectedAmount = 1;
@@ -110,24 +115,24 @@ class _ItemState extends State<Item> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<ProductExpandedModel>(
-      future: Api.getItem(
-        id: widget.productExpanded.item.id!,
-      ),
-      builder: (BuildContext context, AsyncSnapshot<ProductExpandedModel> response) {
-        if(response.hasError) {
-          resultWidget = Container(
-            margin: EdgeInsets.symmetric(
-              vertical: MediaQuery.of(context).size.height * 0.05,
-            ),
-            child: Text('Error: ${response.error}'),
-          );
-        } else if(response.hasData) {
-          info = response.data!;
-          resultWidget = WefoodScreen(
-            ignoreHorizontalPadding: true,
-            ignoreVerticalPadding: true,
-            body: Column(
+    return WefoodScreen(
+      ignoreHorizontalPadding: true,
+      ignoreVerticalPadding: true,
+      body: FutureBuilder<ProductExpandedModel>(
+        future: Api.getItem(
+          id: widget.productExpanded.item.id!,
+        ),
+        builder: (BuildContext context, AsyncSnapshot<ProductExpandedModel> response) {
+          if(response.hasError) {
+            resultWidget = Container(
+              margin: EdgeInsets.symmetric(
+                vertical: MediaQuery.of(context).size.height * 0.05,
+              ),
+              child: Text('Error: ${response.error}. ${response.data}'),
+            );
+          } else if(response.hasData) {
+            info = response.data!;
+            resultWidget = Column(
               children: [
                 Stack(
                   children: <Widget>[
@@ -166,8 +171,8 @@ class _ItemState extends State<Item> {
                                   margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
                                   padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
                                   child: (info.isFavourite == true)
-                                    ? const Icon(Icons.favorite)
-                                    : const Icon(Icons.favorite_outline),
+                                      ? const Icon(Icons.favorite)
+                                      : const Icon(Icons.favorite_outline),
                                 ),
                                 onTap: () async {
                                   setState(() {
@@ -182,14 +187,14 @@ class _ItemState extends State<Item> {
                                       await Api.addFavourite(idBusiness: info.business.id!);
                                     }
                                     showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return WefoodPopup(
-                                          context: context,
-                                          title: '¡Cambios guardados!',
-                                          cancelButtonTitle: 'OK',
-                                        );
-                                      }
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return WefoodPopup(
+                                            context: context,
+                                            title: '¡Cambios guardados!',
+                                            cancelButtonTitle: 'OK',
+                                          );
+                                        }
                                     );
                                   } catch(e) {
                                     _chooseFavouriteIcon(info.isFavourite!);
@@ -246,8 +251,8 @@ class _ItemState extends State<Item> {
                                     Text(
                                       info.business.name ?? '',
                                       style: const TextStyle( // TODO deshardcodear estilo
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold
                                       ),
                                     ),
                                   ],
@@ -419,8 +424,7 @@ class _ItemState extends State<Item> {
                                               ),
                                               if(info.product.price != null) Align(
                                                 alignment: Alignment.centerLeft,
-                                                child: Text(
-                                                  'Precio total:  ${(info.product.price! * selectedAmount).toStringAsFixed(2)} Sol/.'),
+                                                child: Text('Precio total:  ${(info.product.price! * selectedAmount).toStringAsFixed(2)} Sol/.'),
                                               ),
                                             ],
                                           ),
@@ -435,21 +439,20 @@ class _ItemState extends State<Item> {
                                                   Navigator.pop(context);
                                                   showDialog(
                                                     context: context,
-                                                    builder: (
-                                                      BuildContext context) {
-                                                        return WefoodPopup(
-                                                          context: context,
-                                                          title: '¡Producto comprado!',
-                                                          description: 'Esto es todavía un entorno de pruebas. Más adelante, aquí aparecerá la pasarela de pago',
-                                                          cancelButtonTitle: 'OK',
-                                                          cancelButtonBehaviour: () {
-                                                            Navigator.pop(
-                                                                context);
-                                                            Navigator.pop(
-                                                                context);
-                                                          },
-                                                        );
-                                                      }
+                                                    builder: (BuildContext context) {
+                                                      return WefoodPopup(
+                                                        context: context,
+                                                        title: '¡Producto comprado!',
+                                                        description: 'Esto es todavía un entorno de pruebas. Más adelante, aquí aparecerá la pasarela de pago',
+                                                        cancelButtonTitle: 'OK',
+                                                        cancelButtonBehaviour: () {
+                                                          Navigator.pop(
+                                                              context);
+                                                          Navigator.pop(
+                                                              context);
+                                                        },
+                                                      );
+                                                    }
                                                   );
                                                 });
                                               },
@@ -480,11 +483,11 @@ class _ItemState extends State<Item> {
                   ),
                 ),
               ],
-            ),
-          );
+            );
+          }
+          return resultWidget;
         }
-        return resultWidget;
-      }
+      )
     );
   }
 

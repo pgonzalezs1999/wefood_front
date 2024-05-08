@@ -49,7 +49,10 @@ class _PendingOrdersBusinessState extends State<PendingOrdersBusiness> {
                   horizontal: MediaQuery.of(context).size.width * 0.05,
                   vertical: MediaQuery.of(context).size.width * 0.025,
                 ),
-                child: const Text('¡Estás al día! Aquí aparecerán los productos que compres mientras aún puedas recogerlos'),
+                child: const Text(
+                  'Cuando alguien compre alguno de sus productos, aparecerán aquí',
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
           );

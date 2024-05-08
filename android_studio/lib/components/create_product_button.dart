@@ -37,6 +37,7 @@ class _CreateProductButtonState extends State<CreateProductButton> {
           );
         },
         child: Card(
+          elevation: 2,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
@@ -49,22 +50,27 @@ class _CreateProductButtonState extends State<CreateProductButton> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  if(widget.productType == ProductType.breakfast) const Expanded(
-                    child: Text('Vende un producto en el horario de desayunos'),
-                  ),
-                  if(widget.productType == ProductType.lunch) const Expanded(
-                    child: Text('Vende un producto en el horario de almuerzos'),
-                  ),
-                  if(widget.productType == ProductType.dinner) const Expanded(
-                    child: Text('Vende un producto en el horario de cenas'),
+                  Expanded(
+                    child: Text(
+                      'Venda un producto en el horario de ${
+                        (widget.productType == ProductType.breakfast) ? 'desayuno'
+                        : (widget.productType == ProductType.lunch) ? 'almuerzo'
+                        : 'cena'
+                      }s',
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
                   ),
                   const SizedBox(
                     width: 35,
                   ),
                   Container(
                     decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Theme.of(context).colorScheme.primary,
+                        width: 0.5,
+                      ),
                       borderRadius: BorderRadius.circular(9999999),
-                      color: Colors.grey.withOpacity(0.25),
+                      color: Theme.of(context).colorScheme.surface.withOpacity(0.75),
                     ),
                     height: 80,
                     width: 80,

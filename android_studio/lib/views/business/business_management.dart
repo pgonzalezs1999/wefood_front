@@ -67,12 +67,19 @@ class _BusinessManagementState extends State<BusinessManagement> {
         if(retrievingResumeError == false && isRetrieving == false) Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text(
+              'Gestionar productos',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             Container(
               margin: EdgeInsets.only(
-                top: MediaQuery.of(context).size.height * 0.025,
+                top: 20,
                 bottom: MediaQuery.of(context).size.height * 0.01,
               ),
-              child: const Text('Desayunos:'),
+              child: Text(
+                'Desayunos:',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
             ),
             if(businessBreakfastCubit.state != null) EditProductButton(
               product: businessBreakfastCubit.state!,
@@ -86,7 +93,10 @@ class _BusinessManagementState extends State<BusinessManagement> {
                 top: MediaQuery.of(context).size.height * 0.025,
                 bottom: MediaQuery.of(context).size.height * 0.01,
               ),
-              child: const Text('Almuerzos:'),
+              child: Text(
+                'Almuerzos:',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
             ),
             if(businessLunchCubit.state != null) EditProductButton(
               product: businessLunchCubit.state!,
@@ -100,7 +110,10 @@ class _BusinessManagementState extends State<BusinessManagement> {
                 top: MediaQuery.of(context).size.height * 0.025,
                 bottom: MediaQuery.of(context).size.height * 0.01,
               ),
-              child: const Text('Cenas:'),
+              child: Text(
+                'Cenas:',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
             ),
             if(businessDinnerCubit.state != null) EditProductButton(
               product: businessDinnerCubit.state!,
@@ -114,7 +127,7 @@ class _BusinessManagementState extends State<BusinessManagement> {
         const SizedBox(
           height: 50,
         ),
-        Align(
+        if(businessBreakfastCubit.state != null || businessLunchCubit.state != null || businessDinnerCubit.state != null) Align(
           child: ElevatedButton(
             onPressed: () {
               _navigateToPendingOrdersBusiness();
