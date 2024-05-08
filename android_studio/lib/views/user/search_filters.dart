@@ -6,6 +6,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/commands/utils.dart';
 import 'package:wefood/components/components.dart';
+import 'package:wefood/environment.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/types.dart';
@@ -95,13 +96,13 @@ class _SearchFiltersState extends State<SearchFilters> {
                   labelText: 'Hasta',
                   type: InputType.decimal,
                   feedbackWidget: (context.read<SearchFiltersCubit>().state.maximumPrice != null)
-                      ? (context.read<SearchFiltersCubit>().state.maximumPrice! < 5)
+                    ? (context.read<SearchFiltersCubit>().state.maximumPrice! < Environment.minimumPrice)
                       ? const FeedbackMessage(
-                    message: 'No tenemos productos a ese precio',
-                    isError: true,
-                  )
+                        message: 'No tenemos productos a ese precio',
+                        isError: true,
+                      )
                       : null
-                      : null,
+                    : null,
                 ),
               ],
             ),
@@ -274,15 +275,15 @@ class _SearchFiltersState extends State<SearchFilters> {
                                       });
                                     } else {
                                       showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            return WefoodPopup(
-                                              context: context,
-                                              title: 'Dato incorrecto',
-                                              description: 'La hora "desde las" tiene que ser más temprano que la hora "hasta las"',
-                                              cancelButtonTitle: 'OK',
-                                            );
-                                          }
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return WefoodPopup(
+                                            context: context,
+                                            title: 'Dato incorrecto',
+                                            description: 'La hora "desde las" tiene que ser más temprano que la hora "hasta las"',
+                                            cancelButtonTitle: 'OK',
+                                          );
+                                        }
                                       );
                                     }
                                   }
