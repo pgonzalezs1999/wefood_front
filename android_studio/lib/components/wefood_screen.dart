@@ -1,25 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
 
 class WefoodScreen extends StatefulWidget {
-  final AppBar? appBar;
-  final Widget body;
+  final String? title;
+  final List<Widget> body;
   final Widget? bottomNavigationBar;
   final bool? canPop;
   final Function(bool)? onPopInvoked;
   final bool ignoreHorizontalPadding;
   final bool ignoreVerticalPadding;
+  final MainAxisAlignment bodyMainAxisAlignment;
+  final CrossAxisAlignment bodyCrossAxisAlignment;
 
   const WefoodScreen({
     super.key,
-    this.appBar,
+    this.title,
     required this.body,
     this.bottomNavigationBar,
     this.canPop,
     this.onPopInvoked,
     this.ignoreHorizontalPadding = false,
-    this.ignoreVerticalPadding = false
+    this.ignoreVerticalPadding = false,
+    this.bodyMainAxisAlignment = MainAxisAlignment.start,
+    this.bodyCrossAxisAlignment = CrossAxisAlignment.start,
   });
 
   @override
@@ -61,7 +66,6 @@ class _WefoodScreenState extends State<WefoodScreen> {
       onPopInvoked: _onPopInvoked,
       canPop: widget.canPop ?? true,
       child: Scaffold(
-        appBar: widget.appBar,
         body: Container(
           constraints: BoxConstraints(
             minHeight: MediaQuery.of(context).size.height,
@@ -73,7 +77,22 @@ class _WefoodScreenState extends State<WefoodScreen> {
           ),
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
-            child: widget.body,
+            child: Column(
+              mainAxisAlignment: widget.bodyMainAxisAlignment,
+              crossAxisAlignment: widget.bodyCrossAxisAlignment,
+              children: <Widget>[
+                if(widget.title != null) BackUpBar(
+                  title: widget.title!,
+                ),
+                if(widget.title != null) const SizedBox(
+                  height: 20,
+                ),
+              ]+ widget.body +[
+                const SizedBox(
+                  height: 25,
+                ),
+              ],
+            ),
           ),
         ),
         bottomNavigationBar: widget.bottomNavigationBar,

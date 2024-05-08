@@ -56,53 +56,47 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
   @override
   Widget build(BuildContext context) {
     return WefoodScreen(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const BackUpBar(
-            title: 'Productos de mis favoritos',
+      title: 'Productos de mis favoritos',
+      body: [
+        if(_retrievingFavourites == LoadingStatus.loading) Container(
+          margin: const EdgeInsets.only(
+            left: 10,
           ),
-          if(_retrievingFavourites == LoadingStatus.loading) Container(
-            margin: const EdgeInsets.only(
-              left: 10,
-            ),
-            child: const LoadingIcon(),
+          child: const LoadingIcon(),
+        ),
+        if(_retrievingFavourites == LoadingStatus.error) Container(
+          margin: EdgeInsets.symmetric(
+            vertical: MediaQuery.of(context).size.height * 0.05,
           ),
-          if(_retrievingFavourites == LoadingStatus.error) Container(
-            margin: EdgeInsets.symmetric(
-              vertical: MediaQuery.of(context).size.height * 0.05,
-            ),
-            child: const Text('Error'),
-          ),
-          if(_retrievingFavourites == LoadingStatus.successful && context.read<FavouriteItemsCubit>().state.isEmpty) Align(
-            alignment: Alignment.center,
-            child: Card(
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 30,
-                  vertical: 20,
-                ),
-                child: const Text(
-                  '¡Añade negocios a favoritos para tener acceso a sus productos fácilmente!',
-                  textAlign: TextAlign.center,
-                ),
+          child: const Text('Error'),
+        ),
+        if(_retrievingFavourites == LoadingStatus.successful && context.read<FavouriteItemsCubit>().state.isEmpty) Align(
+          alignment: Alignment.center,
+          child: Card(
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 30,
+                vertical: 20,
+              ),
+              child: const Text(
+                '¡Añade negocios a favoritos para tener acceso a sus productos fácilmente!',
+                textAlign: TextAlign.center,
               ),
             ),
           ),
-          if((_retrievingFavourites == LoadingStatus.unset || _retrievingFavourites == LoadingStatus.successful) && context.read<FavouriteItemsCubit>().state.isNotEmpty) Column(
-            children: context.read<FavouriteItemsCubit>().state.map((ProductExpandedModel i) => ItemButton(
-              productExpanded: i,
-              comebackBehaviour: () async {
-                await _retrieveFavourites();
-              },
-            )).toList(),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-        ],
-      ),
+        ),
+        if((_retrievingFavourites == LoadingStatus.unset || _retrievingFavourites == LoadingStatus.successful) && context.read<FavouriteItemsCubit>().state.isNotEmpty) Column(
+          children: context.read<FavouriteItemsCubit>().state.map((ProductExpandedModel i) => ItemButton(
+            productExpanded: i,
+            comebackBehaviour: () async {
+              await _retrieveFavourites();
+            },
+          )).toList(),
+        ),
+        const SizedBox(
+          height: 20,
+        ),
+      ],
     );
   }
 }

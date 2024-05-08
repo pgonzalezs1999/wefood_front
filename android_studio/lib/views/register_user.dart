@@ -158,63 +158,32 @@ class _RegisterUserState extends State<RegisterUser> {
   @override
   Widget build(BuildContext context) {
     return WefoodScreen(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          const BackUpBar(
-            title: 'Regístrate en'
+      title: 'Regístrate en',
+      bodyCrossAxisAlignment: CrossAxisAlignment.center,
+      body: [
+        Container(
+          margin: const EdgeInsets.only(
+            bottom: 50,
           ),
-          Container(
-            margin: const EdgeInsets.only(
-              top: 20,
-              bottom: 50,
-            ),
-            width: MediaQuery.of(context).size.width * 0.666,
-            child: Image.asset('assets/images/logo.png'),
+          width: MediaQuery.of(context).size.width * 0.666,
+          child: Image.asset('assets/images/logo.png'),
+        ),
+        Container(
+          margin: EdgeInsets.symmetric(
+            vertical: MediaQuery.of(context).size.height * 0.025,
           ),
-          Container(
-            margin: EdgeInsets.symmetric(
-              vertical: MediaQuery.of(context).size.height * 0.025,
-            ),
-            child: Wrap(
-              runSpacing: MediaQuery.of(context).size.height * 0.025,
-              children: <Widget>[
-                WefoodInput(
-                  labelText: 'Nombre de usuario',
-                  onChanged: (value) => _handleUsernameChange(value),
-                  feedbackWidget: (searchingUsernameAvailability == LoadingStatus.loading)
-                  ? const ReducedLoadingIcon()
-                  : (searchingUsernameAvailability != LoadingStatus.loading && username != '')
-                    ? (username.length >= 6)
-                      ? (username.length <= 30)
-                        ? (usernameIsAvailable == false)
-                          ? const FeedbackMessage(
-                            message: 'No disponible',
-                            isError: true,
-                          )
-                          : const FeedbackMessage(
-                            message: '¡Libre!',
-                            isError: false,
-                          )
-                        : const FeedbackMessage(
-                          message: 'Demasiado largo',
-                          isError: true,
-                        )
-                    : const FeedbackMessage(
-                      message: 'Demasiado corto',
-                      isError: true,
-                    )
-                  : null,
-                ),
-                WefoodInput(
-                  labelText: 'Correo electrónico',
-                  onChanged: (value) => _handleEmailChange(value),
-                  feedbackWidget: (searchingEmailAvailability == LoadingStatus.loading)
-                  ? const ReducedLoadingIcon()
-                  : (email != '')
-                    ? (email.isEmail)
-                      ? (emailIsAvailable == false)
+          child: Wrap(
+            runSpacing: MediaQuery.of(context).size.height * 0.025,
+            children: <Widget>[
+              WefoodInput(
+                labelText: 'Nombre de usuario',
+                onChanged: (value) => _handleUsernameChange(value),
+                feedbackWidget: (searchingUsernameAvailability == LoadingStatus.loading)
+                ? const ReducedLoadingIcon()
+                : (searchingUsernameAvailability != LoadingStatus.loading && username != '')
+                  ? (username.length >= 6)
+                    ? (username.length <= 30)
+                      ? (usernameIsAvailable == false)
                         ? const FeedbackMessage(
                           message: 'No disponible',
                           isError: true,
@@ -224,137 +193,162 @@ class _RegisterUserState extends State<RegisterUser> {
                           isError: false,
                         )
                       : const FeedbackMessage(
-                        message: 'Formato incorrecto',
+                        message: 'Demasiado largo',
                         isError: true,
                       )
-                    : null,
-                ),
-                WefoodInput(
-                  labelText: 'Contraseña',
-                  type: InputType.secret,
-                  onChanged: (value) {
-                    setState(() {
-                      error = '';
-                      password = value;
-                    });
-                  },
-                  feedbackWidget: (password != '' && password.length < 6)
-                    ? const FeedbackMessage(
-                      message: 'Demasiado corta',
-                      isError: true
-                    )
-                    : (password != '' && password.length > 20)
+                  : const FeedbackMessage(
+                    message: 'Demasiado corto',
+                    isError: true,
+                  )
+                : null,
+              ),
+              WefoodInput(
+                labelText: 'Correo electrónico',
+                onChanged: (value) => _handleEmailChange(value),
+                feedbackWidget: (searchingEmailAvailability == LoadingStatus.loading)
+                ? const ReducedLoadingIcon()
+                : (email != '')
+                  ? (email.isEmail)
+                    ? (emailIsAvailable == false)
                       ? const FeedbackMessage(
-                          message: 'Demasiado larga',
-                          isError: true
+                        message: 'No disponible',
+                        isError: true,
                       )
-                      : null,
-                ),
-                WefoodInput(
-                  labelText: 'Confirmar contraseña',
-                  type: InputType.secret,
-                  onChanged: (value) {
-                    setState(() {
-                      error = '';
-                      confirmPassword = value;
-                    });
-                  },
-                  feedbackWidget: (confirmPassword != '' && confirmPassword != password)
-                    ? const FeedbackMessage(
-                      message: 'Las contraseñas no coinciden',
+                      : const FeedbackMessage(
+                        message: '¡Libre!',
+                        isError: false,
+                      )
+                    : const FeedbackMessage(
+                      message: 'Formato incorrecto',
                       isError: true,
                     )
-                    : null,
-                ),
-              ],
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Checkbox(
-                value: conditionsAccepted,
+                  : null,
+              ),
+              WefoodInput(
+                labelText: 'Contraseña',
+                type: InputType.secret,
                 onChanged: (value) {
-                  FocusManager.instance.primaryFocus?.unfocus();
                   setState(() {
                     error = '';
-                    conditionsAccepted = !conditionsAccepted;
+                    password = value;
                   });
                 },
+                feedbackWidget: (password != '' && password.length < 6)
+                  ? const FeedbackMessage(
+                    message: 'Demasiado corta',
+                    isError: true
+                  )
+                  : (password != '' && password.length > 20)
+                    ? const FeedbackMessage(
+                        message: 'Demasiado larga',
+                        isError: true
+                    )
+                    : null,
               ),
-              const Text('He leído y acepto los'),
-              TextButton(
-                onPressed: () => _navigateToTermsAndConditions(),
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 5,
-                  ),
-                ),
-                child: const Text('términos y condiciones')
-              ),
-            ],
-          ),
-          if(authenticating == LoadingStatus.loading) const LoadingIcon(),
-          if(authenticating != LoadingStatus.loading) Container(
-            margin: const EdgeInsets.symmetric(
-              vertical: 10,
-            ),
-            child: ElevatedButton(
-              onPressed: () async {
-                if(_readyToRegister() == true) {
+              WefoodInput(
+                labelText: 'Confirmar contraseña',
+                type: InputType.secret,
+                onChanged: (value) {
                   setState(() {
-                    authenticating = LoadingStatus.loading;
+                    error = '';
+                    confirmPassword = value;
                   });
-                  try {
-                    Api.signIn(
-                      username: username,
-                      email: email,
-                      password: password,
-                    ).then((UserModel userModel) async {
-                      UserSecureStorage().write(key: 'username', value: username);
-                      UserSecureStorage().write(key: 'password', value: password);
-                      Api.login(
-                        context: context,
-                        username: username,
-                        password: password
-                      ).then((AuthModel? authModel) {
-                        authenticating = LoadingStatus.successful;
-                      });
-                    });
-                  }
-                  catch(e) {
-                    setState(() {
-                      UserSecureStorage().delete(key: 'username');
-                      UserSecureStorage().delete(key: 'password');
-                      error = 'Ha ocurrido un error. Por favor, inténtalo de nuevo más tarde.';
-                      authenticating = LoadingStatus.error;
-                    });
-                  }
-                }
-              },
-              child: const Text('REGISTRARME'),
-            ),
-          ),
-          if(error != '') FeedbackMessage(
-            message: error,
-            isError: true,
-            isCentered: true,
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              const Text('¿Quieres listar tu negocio?'),
-              TextButton(
-                onPressed: () => _navigateToRegisterBusiness(),
-                child: const Text('Regístralo gratis'),
+                },
+                feedbackWidget: (confirmPassword != '' && confirmPassword != password)
+                  ? const FeedbackMessage(
+                    message: 'Las contraseñas no coinciden',
+                    isError: true,
+                  )
+                  : null,
               ),
             ],
           ),
-        ],
-      ),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Checkbox(
+              value: conditionsAccepted,
+              onChanged: (value) {
+                FocusManager.instance.primaryFocus?.unfocus();
+                setState(() {
+                  error = '';
+                  conditionsAccepted = !conditionsAccepted;
+                });
+              },
+            ),
+            const Text('He leído y acepto los'),
+            TextButton(
+              onPressed: () => _navigateToTermsAndConditions(),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 5,
+                ),
+              ),
+              child: const Text('términos y condiciones')
+            ),
+          ],
+        ),
+        if(authenticating == LoadingStatus.loading) const LoadingIcon(),
+        if(authenticating != LoadingStatus.loading) Container(
+          margin: const EdgeInsets.symmetric(
+            vertical: 10,
+          ),
+          child: ElevatedButton(
+            onPressed: () async {
+              if(_readyToRegister() == true) {
+                setState(() {
+                  authenticating = LoadingStatus.loading;
+                });
+                try {
+                  Api.signIn(
+                    username: username,
+                    email: email,
+                    password: password,
+                  ).then((UserModel userModel) async {
+                    UserSecureStorage().write(key: 'username', value: username);
+                    UserSecureStorage().write(key: 'password', value: password);
+                    Api.login(
+                      context: context,
+                      username: username,
+                      password: password
+                    ).then((AuthModel? authModel) {
+                      authenticating = LoadingStatus.successful;
+                    });
+                  });
+                }
+                catch(e) {
+                  setState(() {
+                    UserSecureStorage().delete(key: 'username');
+                    UserSecureStorage().delete(key: 'password');
+                    error = 'Ha ocurrido un error. Por favor, inténtalo de nuevo más tarde.';
+                    authenticating = LoadingStatus.error;
+                  });
+                }
+              }
+            },
+            child: const Text('REGISTRARME'),
+          ),
+        ),
+        if(error != '') FeedbackMessage(
+          message: error,
+          isError: true,
+          isCentered: true,
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Text('¿Quieres listar tu negocio?'),
+            TextButton(
+              onPressed: () => _navigateToRegisterBusiness(),
+              child: const Text('Regístralo gratis'),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

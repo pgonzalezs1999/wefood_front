@@ -3,14 +3,12 @@ import 'package:flutter/services.dart';
 
 class ChoosableNumericInput extends StatefulWidget {
 
-  final String? title;
   final Function(String) onChanged;
   final double initialValue;
   final double? interval;
   final bool allowsDecimals;
 
   const ChoosableNumericInput({
-    this.title,
     required this.onChanged,
     required this.initialValue,
     this.interval,
@@ -41,14 +39,6 @@ class _ChoosableNumericInputState extends State<ChoosableNumericInput> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if(widget.title != null) Column(
-          children: <Widget>[
-            Text(widget.title!),
-            const SizedBox(
-              height: 10,
-            ),
-          ],
-        ),
         Container(
           width: 150,
           foregroundDecoration: BoxDecoration(

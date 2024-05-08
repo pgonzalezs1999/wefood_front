@@ -32,159 +32,152 @@ class _ValidatableBusinessesState extends State<ValidatableBusinesses> {
   @override
   Widget build(BuildContext context) {
     return WefoodScreen(
-      body: Column(
-        children: <Widget>[
-          const BackUpBar(
-            title: 'Validar establecimientos',
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          if(isRetrievingData == true) const LoadingIcon(),
-          if(isRetrievingData == false) Column(
-            children: businesses!.map(
-              (item) => Container(
-                width: double.infinity,
-                margin: const EdgeInsets.only(
-                  bottom: 20,
-                ),
-                child: Card(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 20,
-                    ),
-                    child: Column(
-                      children: <Widget>[
-                        const Text(
-                          'Establecimiento solicitado:',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w900, // TODO deshardcodear estilo
+      title: 'Validar establecimientos',
+      body: [
+        if(isRetrievingData == true) const LoadingIcon(),
+        if(isRetrievingData == false) Column(
+          children: businesses!.map(
+            (item) => Container(
+              width: double.infinity,
+              margin: const EdgeInsets.only(
+                bottom: 20,
+              ),
+              child: Card(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 20,
+                  ),
+                  child: Column(
+                    children: <Widget>[
+                      const Text(
+                        'Establecimiento solicitado:',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w900, // TODO deshardcodear estilo
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      _ValidatableRow(
+                        title: 'Nombre',
+                        value: item.business.name,
+                      ),
+                      _ValidatableRow(
+                        title: 'Descripción',
+                        value: item.business.description,
+                      ),
+                      _ValidatableRow(
+                        title: 'RUC',
+                        value: item.business.taxId,
+                      ),
+                      _ValidatableRow(
+                        title: 'Dirección',
+                        value: '${item.business.directions} - (long: ${item.business.longitude}, lat: ${item.business.latitude})',
+                      ),
+                      const Divider(
+                        height: 30,
+                      ),
+                      const Text(
+                        'Usuario solicitante:',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w900, // TODO deshardcodear estilo
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      _ValidatableRow(
+                        title: 'Username',
+                        value: item.user.username,
+                      ),
+                      _ValidatableRow(
+                        title: 'Correo',
+                        value: item.user.email,
+                      ),
+                      _ValidatableRow(
+                        title: 'Teléfono',
+                        value: '(+${item.user.phone}) ${item.user.phone}',
+                      ),
+                      _ValidatableRow(
+                        title: 'Solicitado a fecha',
+                        value: CustomParsers.dateTimeToString(item.business.createdAt),
+                      ),
+                      const Divider(
+                        height: 30,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <ElevatedButton>[
+                          ElevatedButton(
+                            onPressed: () async {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return WefoodPopup(
+                                    context: context,
+                                    title: '¿Rechazar establecimiento?',
+                                    actions: <TextButton>[
+                                      TextButton(
+                                        onPressed: () async {
+                                          await Api.refuseBusiness(
+                                            id: item.business.id!,
+                                          ).then((value) async {
+                                            _retrieveData();
+                                          }).then((value) {
+                                            Navigator.pop(context);
+                                          });
+                                        },
+                                        child: const Text('SÍ'),
+                                      ),
+                                    ],
+                                  );
+                                }
+                              );
+                            },
+                            child: const Text('RECHAZAR'),
                           ),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        _ValidatableRow(
-                          title: 'Nombre',
-                          value: item.business.name,
-                        ),
-                        _ValidatableRow(
-                          title: 'Descripción',
-                          value: item.business.description,
-                        ),
-                        _ValidatableRow(
-                          title: 'RUC',
-                          value: item.business.taxId,
-                        ),
-                        _ValidatableRow(
-                          title: 'Dirección',
-                          value: '${item.business.directions} - (long: ${item.business.longitude}, lat: ${item.business.latitude})',
-                        ),
-                        const Divider(
-                          height: 30,
-                        ),
-                        const Text(
-                          'Usuario solicitante:',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w900, // TODO deshardcodear estilo
+                          ElevatedButton(
+                            onPressed: () async {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return WefoodPopup(
+                                    context: context,
+                                    title: '¿Aceptar establecimiento?',
+                                    actions: <TextButton>[
+                                      TextButton(
+                                        onPressed: () async {
+                                          await Api.validateBusiness(
+                                            id: item.business.id!,
+                                          ).then((value) async {
+                                            _retrieveData();
+                                          }).then((value) {
+                                            Navigator.pop(context);
+                                          });
+                                        },
+                                        child: const Text('SÍ'),
+                                      ),
+                                    ],
+                                  );
+                                }
+                              );
+                            },
+                            child: const Text('ACEPTAR'),
                           ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        _ValidatableRow(
-                          title: 'Username',
-                          value: item.user.username,
-                        ),
-                        _ValidatableRow(
-                          title: 'Correo',
-                          value: item.user.email,
-                        ),
-                        _ValidatableRow(
-                          title: 'Teléfono',
-                          value: '(+${item.user.phone}) ${item.user.phone}',
-                        ),
-                        _ValidatableRow(
-                          title: 'Solicitado a fecha',
-                          value: CustomParsers.dateTimeToString(item.business.createdAt),
-                        ),
-                        const Divider(
-                          height: 30,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <ElevatedButton>[
-                            ElevatedButton(
-                              onPressed: () async {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return WefoodPopup(
-                                      context: context,
-                                      title: '¿Rechazar establecimiento?',
-                                      actions: <TextButton>[
-                                        TextButton(
-                                          onPressed: () async {
-                                            await Api.refuseBusiness(
-                                              id: item.business.id!,
-                                            ).then((value) async {
-                                              _retrieveData();
-                                            }).then((value) {
-                                              Navigator.pop(context);
-                                            });
-                                          },
-                                          child: const Text('SÍ'),
-                                        ),
-                                      ],
-                                    );
-                                  }
-                                );
-                              },
-                              child: const Text('RECHAZAR'),
-                            ),
-                            ElevatedButton(
-                              onPressed: () async {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return WefoodPopup(
-                                      context: context,
-                                      title: '¿Aceptar establecimiento?',
-                                      actions: <TextButton>[
-                                        TextButton(
-                                          onPressed: () async {
-                                            await Api.validateBusiness(
-                                              id: item.business.id!,
-                                            ).then((value) async {
-                                              _retrieveData();
-                                            }).then((value) {
-                                              Navigator.pop(context);
-                                            });
-                                          },
-                                          child: const Text('SÍ'),
-                                        ),
-                                      ],
-                                    );
-                                  }
-                                );
-                              },
-                              child: const Text('ACEPTAR'),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
+                        ],
+                      )
+                    ],
                   ),
                 ),
               ),
-            ).toList(),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-        ],
-      ),
+            ),
+          ).toList(),
+        ),
+        const SizedBox(
+          height: 20,
+        ),
+      ],
     );
   }
 }

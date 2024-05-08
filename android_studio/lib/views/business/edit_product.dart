@@ -123,515 +123,481 @@ class _EditProductState extends State<EditProduct> {
   @override
   Widget build(BuildContext context) {
     return WefoodScreen(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          BackUpBar(
-            title: 'Editar $_productTypeString',
-          ),
-          if(price == null) const LoadingIcon(),
-          if(price != null) Column(
-            children: <Widget>[
-              ChoosableNumericInput(
-                title: 'Precio',
-                initialValue: price!,
-                interval: 0.1,
-                allowsDecimals: true,
-                onChanged: (String value) {
-                  setState(() {
-                    error = '';
-                    price = double.tryParse(value);
-                  });
-                },
-              ),
-              Text((price == null || price == 0) ? 'Número incorrecto' : '', style: const TextStyle(color: Colors.red),), // TODO deshardcodear estilo
-            ],
-          ),
-          const Text('Horario de recogida:'),
-          Row(
-            children: <Widget>[
-              const Text('Desde las'),
-              TextButton(
-                onPressed: () async {
-                  final selectedTime = await showTimePicker(
-                    context: context,
-                    initialTime: TimeOfDay.now(),
-                  );
-                  setState(() {
-                    startTime = selectedTime;
-                  });
-                },
-                child: Text('${startTime?.format(context)} h'),
-              ),
-              const Text('hasta las'),
-              TextButton(
-                onPressed: () async {
-                  final selectedTime = await showTimePicker(
-                    context: context,
-                    initialTime: TimeOfDay.now(),
-                  );
-                  setState(() {
-                    endTime = selectedTime;
-                  });
-                },
-                child: Text('${endTime?.format(context)} h'),
-              ),
-            ],
-          ),
-          if(amount == null) const LoadingIcon(),
-          if(amount != null) Column(
-            children: <Widget>[
-              ChoosableNumericInput(
-                title: 'Número de packs por día',
-                initialValue: amount!.toDouble(),
-                interval: 1,
-                onChanged: (String value) {
-                  setState(() {
-                    error = '';
-                    amount = int.parse(value);
-                  });
-                },
-              ),
-              Text((amount == null || amount == 0 || int.tryParse('$amount') == null) ? 'Número incorrecto' : '', style: const TextStyle(color: Colors.red),), // TODO deshardcodear estilo
-            ],
-          ),
-          const Text('Categorías'),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <CheckBoxRow>[
-                  CheckBoxRow(
-                      title: 'Comida rápida',
-                      value: junk,
-                      onChanged: () {
-                        setState(() {
-                          junk = !junk;
-                        });
-                      }
-                  ),
-                  CheckBoxRow(
-                      title: 'Postres',
-                      value: dessert,
-                      onChanged: () {
-                        setState(() {
-                          dessert = !dessert;
-                        });
-                      }
-                  ),
-                ],
-              ),
-              const SizedBox(
-                width: 20,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <CheckBoxRow>[
-                  CheckBoxRow(
-                      title: 'Vegetariano',
-                      value: vegetarian,
-                      onChanged: () {
-                        setState(() {
-                          vegetarian = !vegetarian;
-                        });
-                      }
-                  ),
-                  CheckBoxRow(
-                      title: 'Vegano',
-                      value: vegan,
-                      onChanged: () {
-                        setState(() {
-                          vegan = !vegan;
-                        });
-                      }
-                  ),
-                ],
-              )
-            ],
-          ),
-          const Text('Días en que se ofrecen packs'),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <CheckBoxRow>[
-                  CheckBoxRow(
-                      title: 'Lunes',
-                      value: mondays,
-                      onChanged: () {
-                        setState(() {
-                          mondays = !mondays;
-                        });
-                      }
-                  ),
-                  CheckBoxRow(
-                      title: 'Martes',
-                      value: tuesdays,
-                      onChanged: () {
-                        setState(() {
-                          tuesdays = !tuesdays;
-                        });
-                      }
-                  ),
-                  CheckBoxRow(
-                      title: 'Miércoles',
-                      value: wednesdays,
-                      onChanged: () {
-                        setState(() {
-                          wednesdays = !wednesdays;
-                        });
-                      }
-                  ),
-                  CheckBoxRow(
-                      title: 'Jueves',
-                      value: thursdays,
-                      onChanged: () {
-                        setState(() {
-                          thursdays = !thursdays;
-                        });
-                      }
-                  ),
-                ],
-              ),
-              const SizedBox(
-                width: 20,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <CheckBoxRow>[
-                  CheckBoxRow(
-                      title: 'Viernes',
-                      value: fridays,
-                      onChanged: () {
-                        setState(() {
-                          fridays = !fridays;
-                        });
-                      }
-                  ),
-                  CheckBoxRow(
-                      title: 'Sábados',
-                      value: saturdays,
-                      onChanged: () {
-                        setState(() {
-                          saturdays = !saturdays;
-                        });
-                      }
-                  ),
-                  CheckBoxRow(
-                      title: 'Domingos',
-                      value: sundays,
-                      onChanged: () {
-                        setState(() {
-                          sundays = !sundays;
-                        });
-                      }
-                  ),
-                ],
-              )
-            ],
-          ),
-          const Text('Ofrecer packs hasta'),
-          Row(
-            children: <Widget>[
-              TextButton(
-                onPressed: () async {
-                  DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2101)
-                  ) ?? endDate;
-                  setState(() {
-                    error = '';
-                    endless = false;
-                    endDate = pickedDate;
-                  });
-                },
-                child: Text((endDate != null && endless == false) ? (Utils.displayDateTime(endDate!)) : 'Elegir fecha'),
-              ),
-              Container(
-                margin: const EdgeInsets.only(
-                  left: 25,
+      title: 'Editar $_productTypeString',
+      body: [
+        Wrap(
+          runSpacing: 25,
+          children: <Widget>[
+            if(price == null) const LoadingIcon(),
+            if(price != null) Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  'Precio',
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
-                child: CheckBoxRow(
-                  title: 'Indefinido',
-                  value: endless,
-                  onChanged: () {
+                ChoosableNumericInput(
+                  initialValue: price!,
+                  interval: 0.1,
+                  allowsDecimals: true,
+                  onChanged: (String value) {
                     setState(() {
-                      endless = !endless;
+                      error = '';
+                      price = double.tryParse(value);
                     });
                   },
                 ),
-              ),
-            ],
-          ),
-          const Text('Añadir imágenes'),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Container(
-                margin: EdgeInsets.only(
-                  right: MediaQuery.of(context).size.width * 0.05,
+                Text((price == null || price == 0) ? 'Número incorrecto' : '', style: const TextStyle(color: Colors.red),), // TODO deshardcodear estilo
+              ],
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  'Horario de recogida:',
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
-                child: Column(
+                Row(
                   children: <Widget>[
-                    _ImageSlot(
-                      image: images[0],
-                      isMain: true,
+                    const Text('Desde las'),
+                    TextButton(
+                      onPressed: () async {
+                        final selectedTime = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.now(),
+                        );
+                        setState(() {
+                          startTime = selectedTime;
+                        });
+                      },
+                      child: Text('${startTime?.format(context)} h'),
                     ),
-                    const Text('Imagen principal'),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Column(
-                  children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: <_ImageSlot>[
-                        _ImageSlot(
-                          image: images[0],
-                        ),
-                        _ImageSlot(
-                          image: images[1],
-                        ),
-                        _ImageSlot(
-                          image: images[2],
-                        ),
-                        _ImageSlot(
-                          image: images[3],
-                        ),
-                        _ImageSlot(
-                          image: images[4],
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.width * 0.025,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: <_ImageSlot>[
-                        _ImageSlot(
-                          image: images[5],
-                        ),
-                        _ImageSlot(
-                          image: images[6],
-                        ),
-                        _ImageSlot(
-                          image: images[7],
-                        ),
-                        _ImageSlot(
-                          image: images[8],
-                        ),
-                        _ImageSlot(
-                          image: images[9],
-                        ),
-                      ],
+                    const Text('hasta las'),
+                    TextButton(
+                      onPressed: () async {
+                        final selectedTime = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.now(),
+                        );
+                        setState(() {
+                          endTime = selectedTime;
+                        });
+                      },
+                      child: Text('${endTime?.format(context)} h'),
                     ),
                   ],
                 ),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              ElevatedButton(
-                onPressed: () async {
-                  Navigator.pop(context);
-                },
-                child: const Text('CANCELAR'),
-              ),
-              if(isSubmitting == true) const LoadingIcon(),
-              if(isSubmitting == false && isRetrievingData == false) ElevatedButton(
-                onPressed: () async {
-                  if(_readyToRegister() == true) {
+              ],
+            ),
+            if(amount == null) const LoadingIcon(),
+            if(amount != null) Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  'Número de packs por día:',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                ChoosableNumericInput(
+                  initialValue: amount!.toDouble(),
+                  interval: 1,
+                  onChanged: (String value) {
                     setState(() {
-                      isSubmitting = true;
+                      error = '';
+                      amount = int.parse(value);
                     });
-                    try {
-                      ProductModel product = await Api.updateProduct(
-                        id: widget.productId,
-                        price: price!,
-                        amount: amount!,
-                        endingDate: CustomParsers.dateTimeToSqlDateTimeString(endDate),
-                        startHour: CustomParsers.timeOfDayToSqlTimeString(startTime!),
-                        endHour: CustomParsers.timeOfDayToSqlTimeString(endTime!),
-                        vegetarian: CustomParsers.boolToSqlString(vegetarian),
-                        vegan: CustomParsers.boolToSqlString(vegan),
-                        junk: CustomParsers.boolToSqlString(junk),
-                        dessert: CustomParsers.boolToSqlString(dessert),
-                        workingOnMonday: CustomParsers.boolToSqlString(mondays),
-                        workingOnTuesday: CustomParsers.boolToSqlString(tuesdays),
-                        workingOnWednesday: CustomParsers.boolToSqlString(wednesdays),
-                        workingOnThursday: CustomParsers.boolToSqlString(thursdays),
-                        workingOnFriday: CustomParsers.boolToSqlString(fridays),
-                        workingOnSaturday: CustomParsers.boolToSqlString(saturdays),
-                        workingOnSunday: CustomParsers.boolToSqlString(sundays),
-                      );
-                      setState(() {
-                        isSubmitting = false;
-                      });
-                      Navigator.pop(context);
-                    } catch(e) {
-                      print('ERROR: $e');
-                      setState(() {
-                        isSubmitting = false;
-                        error = 'Ha ocurrido un error'; // TODO hacer algo más currado
-                      });
-                    }
-                  }
-                },
-                child: const Text('GUARDAR'),
-              ),
-            ],
-          ),
-          Align(
-            child: ElevatedButton(
-              onPressed: () async {
-                showDialog(
-                    context: context,
-                    useRootNavigator: false,
-                    builder: (_) => AlertDialog(
-                      title: const Text('¿Eliminar producto?'),
-                      content: const Text('No podrás deshacer esta acción'),
-                      actions: <TextButton>[
-                        TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: const Text('CANCELAR'),
+                  },
+                ),
+                Text((amount == null || amount == 0 || int.tryParse('$amount') == null) ? 'Número incorrecto' : '', style: const TextStyle(color: Colors.red),), // TODO deshardcodear estilo
+              ],
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  'Categorías',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <CheckBoxRow>[
+                        CheckBoxRow(
+                          title: 'Comida rápida',
+                          value: junk,
+                          onChanged: () {
+                            setState(() {
+                              junk = !junk;
+                            });
+                          }
                         ),
-                        TextButton(
-                          onPressed: () async {
-                            try {
-                              await Api.deleteProduct(
-                                type: (widget.productType == ProductType.breakfast) ? 'B'
-                                  : (widget.productType == ProductType.lunch) ? 'L'
-                                  : (widget.productType == ProductType.dinner) ? 'D' : '',
-                              );
-                              if(widget.productType == ProductType.breakfast) {
-                                context.read<BusinessBreakfastCubit>().set(null);
-                              } else if(widget.productType == ProductType.lunch) {
-                                context.read<BusinessLunchCubit>().set(null);
-                              } else {
-                                context.read<BusinessDinnerCubit>().set(null);
-                              }
-                              Navigator.pop(context);
-                              Navigator.pop(context);
-                            } catch(e) {
-                              setState(() {
-                                error = 'Ha ocurrido un error eliminar el producto. Por favor, inténtelo de nuevo más tarde';
-                              });
-                            }
-                          },
-                          child: const Text('CONFIRMAR'),
+                        CheckBoxRow(
+                          title: 'Postres',
+                          value: dessert,
+                          onChanged: () {
+                            setState(() {
+                              dessert = !dessert;
+                            });
+                          }
+                        ),
+                      ],
+                    ),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <CheckBoxRow>[
+                        CheckBoxRow(
+                          title: 'Vegetariano',
+                          value: vegetarian,
+                          onChanged: () {
+                            setState(() {
+                              vegetarian = !vegetarian;
+                            });
+                          }
+                        ),
+                        CheckBoxRow(
+                          title: 'Vegano',
+                          value: vegan,
+                          onChanged: () {
+                            setState(() {
+                              vegan = !vegan;
+                            });
+                          }
                         ),
                       ],
                     )
-                );
-              },
-              child: const Text('ELIMINAR PRODUCTO'),
+                  ],
+                ),
+              ],
             ),
-          ),
-          if(error != '') Align(
-            child: Text(
-              error,
-              textAlign: TextAlign.center,
-              style: const TextStyle( // TODO deshardcodear estilo
-                color: Colors.red,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 0.25,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  'Días en que se ofrecen packs',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <CheckBoxRow>[
+                        CheckBoxRow(
+                          title: 'Lunes',
+                          value: mondays,
+                          onChanged: () {
+                            setState(() {
+                              mondays = !mondays;
+                            });
+                          }
+                        ),
+                        CheckBoxRow(
+                          title: 'Martes',
+                          value: tuesdays,
+                          onChanged: () {
+                            setState(() {
+                              tuesdays = !tuesdays;
+                            });
+                          }
+                        ),
+                        CheckBoxRow(
+                          title: 'Miércoles',
+                          value: wednesdays,
+                          onChanged: () {
+                            setState(() {
+                              wednesdays = !wednesdays;
+                            });
+                          }
+                        ),
+                        CheckBoxRow(
+                          title: 'Jueves',
+                          value: thursdays,
+                          onChanged: () {
+                            setState(() {
+                              thursdays = !thursdays;
+                            });
+                          }
+                        ),
+                      ],
+                    ),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <CheckBoxRow>[
+                        CheckBoxRow(
+                          title: 'Viernes',
+                          value: fridays,
+                          onChanged: () {
+                            setState(() {
+                              fridays = !fridays;
+                            });
+                          }
+                        ),
+                        CheckBoxRow(
+                          title: 'Sábados',
+                          value: saturdays,
+                          onChanged: () {
+                            setState(() {
+                              saturdays = !saturdays;
+                            });
+                          }
+                        ),
+                        CheckBoxRow(
+                          title: 'Domingos',
+                          value: sundays,
+                          onChanged: () {
+                            setState(() {
+                              sundays = !sundays;
+                            });
+                          }
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ],
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  'Ofrecer packs hasta',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                Row(
+                  children: <Widget>[
+                    TextButton(
+                      onPressed: () async {
+                        DateTime? pickedDate = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(2101)
+                        ) ?? endDate;
+                        setState(() {
+                          error = '';
+                          endless = false;
+                          endDate = pickedDate;
+                        });
+                      },
+                      child: Text((endDate != null && endless == false) ? (Utils.displayDateTime(endDate!)) : 'Elegir fecha'),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(
+                        left: 25,
+                      ),
+                      child: CheckBoxRow(
+                        title: 'Indefinido',
+                        value: endless,
+                        onChanged: () {
+                          setState(() {
+                            endless = !endless;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Text(
+              'Añadir imágenes',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  margin: EdgeInsets.only(
+                    right: MediaQuery.of(context).size.width * 0.05,
+                  ),
+                  child: Column(
+                    children: <Widget>[
+                      ImageSlot(
+                        image: images[0],
+                        isMain: true,
+                      ),
+                      const Text('Imagen principal'),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    children: <Widget>[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: <ImageSlot>[
+                          ImageSlot(
+                            image: images[0],
+                          ),
+                          ImageSlot(
+                            image: images[1],
+                          ),
+                          ImageSlot(
+                            image: images[2],
+                          ),
+                          ImageSlot(
+                            image: images[3],
+                          ),
+                          ImageSlot(
+                            image: images[4],
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.width * 0.025,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: <ImageSlot>[
+                          ImageSlot(
+                            image: images[5],
+                          ),
+                          ImageSlot(
+                            image: images[6],
+                          ),
+                          ImageSlot(
+                            image: images[7],
+                          ),
+                          ImageSlot(
+                            image: images[8],
+                          ),
+                          ImageSlot(
+                            image: images[9],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                ElevatedButton(
+                  onPressed: () async {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('CANCELAR'),
+                ),
+                if(isSubmitting == true) const LoadingIcon(),
+                if(isSubmitting == false && isRetrievingData == false) ElevatedButton(
+                  onPressed: () {
+                    if(_readyToRegister() == true) {
+                      setState(() {
+                        isSubmitting = true;
+                      });
+                      try {
+                        Api.updateProduct(
+                          id: widget.productId,
+                          price: price!,
+                          amount: amount!,
+                          endingDate: CustomParsers.dateTimeToSqlDateTimeString(endDate),
+                          startHour: CustomParsers.timeOfDayToSqlTimeString(startTime!),
+                          endHour: CustomParsers.timeOfDayToSqlTimeString(endTime!),
+                          vegetarian: CustomParsers.boolToSqlString(vegetarian),
+                          vegan: CustomParsers.boolToSqlString(vegan),
+                          junk: CustomParsers.boolToSqlString(junk),
+                          dessert: CustomParsers.boolToSqlString(dessert),
+                          workingOnMonday: CustomParsers.boolToSqlString(mondays),
+                          workingOnTuesday: CustomParsers.boolToSqlString(tuesdays),
+                          workingOnWednesday: CustomParsers.boolToSqlString(wednesdays),
+                          workingOnThursday: CustomParsers.boolToSqlString(thursdays),
+                          workingOnFriday: CustomParsers.boolToSqlString(fridays),
+                          workingOnSaturday: CustomParsers.boolToSqlString(saturdays),
+                          workingOnSunday: CustomParsers.boolToSqlString(sundays),
+                        ).then((ProductModel product) {
+                          setState(() {
+                            isSubmitting = false;
+                          });
+                          Navigator.pop(context);
+                        });
+                      } catch(e) {
+                        setState(() {
+                          isSubmitting = false;
+                          error = 'Ha ocurrido un error'; // TODO hacer algo más currado
+                        });
+                      }
+                    }
+                  },
+                  child: const Text('GUARDAR'),
+                ),
+              ],
+            ),
+            Align(
+              child: ElevatedButton(
+                onPressed: () async {
+                  showDialog(
+                    context: context,
+                    useRootNavigator: false,
+                    builder: ((BuildContext context) {
+                      return WefoodPopup(
+                        context: context,
+                        title: '¿Eliminar producto?',
+                        description: 'No podrás deshacer esta acción',
+                        cancelButtonTitle: 'CANCELAR',
+                        actions: <TextButton>[
+                          TextButton(
+                            child: const Text('OK'),
+                            onPressed: () {
+                              try {
+                                Api.deleteProduct(
+                                  type: (widget.productType == ProductType.breakfast) ? 'B'
+                                      : (widget.productType == ProductType.lunch) ? 'L'
+                                      : (widget.productType == ProductType.dinner) ? 'D' : '',
+                                ).then((_) {
+                                  if(widget.productType == ProductType.breakfast) {
+                                    context.read<BusinessBreakfastCubit>().set(null);
+                                  } else if(widget.productType == ProductType.lunch) {
+                                    context.read<BusinessLunchCubit>().set(null);
+                                  } else {
+                                    context.read<BusinessDinnerCubit>().set(null);
+                                  }
+                                  Navigator.pop(context);
+                                  Navigator.pop(context);
+                                });
+                              } catch(e) {
+                                setState(() {
+                                  error = 'Ha ocurrido un error eliminar el producto. Por favor, inténtelo de nuevo más tarde';
+                                });
+                              }
+                            },
+                          ),
+                        ],
+                      );
+                    }),
+                  );
+                },
+                child: const Text('ELIMINAR PRODUCTO'),
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class CheckBoxRow extends StatefulWidget {
-
-  final String title;
-  final bool value;
-  final Function() onChanged;
-
-  const CheckBoxRow({
-    required this.title,
-    required this.value,
-    required this.onChanged,
-  });
-
-  @override
-  State<CheckBoxRow> createState() => _CheckBoxState();
-}
-
-class _CheckBoxState extends State<CheckBoxRow> {
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        Container(
-          width: 30,
-          height: 30,
-          margin: const EdgeInsets.only(
-            right: 10,
-          ),
-          child: Checkbox(
-            value: widget.value,
-            onChanged: (value) => widget.onChanged(),
-          ),
+            if(error != '') Align(
+              child: Text(
+                error,
+                textAlign: TextAlign.center,
+                style: const TextStyle( // TODO deshardcodear estilo
+                  color: Colors.red,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0.25,
+                ),
+              ),
+            ),
+          ],
         ),
-        Text(widget.title),
       ],
     );
-  }
-}
-
-class _ImageSlot extends StatefulWidget {
-
-  final bool isMain;
-  final Image? image;
-
-  const _ImageSlot({
-    this.isMain = false,
-    this.image,
-  });
-
-  @override
-  State<_ImageSlot> createState() => _ImageSlotState();
-}
-
-class _ImageSlotState extends State<_ImageSlot> {
-  @override
-  Widget build(BuildContext context) {
-    final double size = MediaQuery.of(context).size.width * (widget.isMain ? 0.25 : 0.1);
-
-    return (widget.image == null)
-      ? Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          color: Colors.grey.withOpacity(0.66),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Icon(
-          Icons.add,
-          color: Colors.white,
-          size: size * 0.75,
-        ),
-      )
-      : SizedBox(
-        width: size,
-        height: size,
-        child: ClipRRect(
-          borderRadius: (widget.isMain) ? BorderRadius.circular(15) : BorderRadius.circular(10),
-          child: widget.image!,
-        ),
-      );
   }
 }

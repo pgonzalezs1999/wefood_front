@@ -110,7 +110,7 @@ class _HomeState extends State<Home> {
             businessVerified: response.data!.businessVerified
           ) == false) ? WefoodScreen(
             canPop: false,
-            body: screens[_selectedScreenIndex],
+            body: [ screens[_selectedScreenIndex] ],
             bottomNavigationBar: SizedBox(
               height: (MediaQuery.of(context).size.height - MediaQuery.of(context).viewPadding.top) * 0.075,
               child: BottomNavigationBar(

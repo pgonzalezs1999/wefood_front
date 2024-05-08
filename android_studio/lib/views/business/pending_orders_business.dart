@@ -184,109 +184,103 @@ class _PendingOrdersBusinessState extends State<PendingOrdersBusiness> {
     }
 
     return WefoodScreen(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const BackUpBar(
-            title: 'Pedidos pendientes',
+      title: 'Pedidos pendientes',
+      body: [
+        Container(
+          margin: const EdgeInsets.only(
+            top: 20,
+            bottom: 50,
           ),
-          Container(
-            margin: const EdgeInsets.only(
-              top: 20,
-              bottom: 50,
-            ),
-            child: resultWidgetPendingList,
-          ),
-          if(_openCamera == false) Center(
-            child: Column(
-              children: <Widget>[
-                const Text('Escanear QR de un cliente:'),
-                const SizedBox(
-                  height: 20,
-                ),
-                GestureDetector(
-                  onTap: () async {
-                    _toggleCamera(true);
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey.withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                    padding: EdgeInsets.all(
-                      MediaQuery.of(context).size.width * 0.15,
-                    ),
-                    child: Icon(
-                      Icons.camera_alt_outlined,
-                      size: MediaQuery.of(context).size.width * 0.15,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-              ],
-            )
-          ),
-          Visibility(
-            visible: _openCamera,
-            child: Column(
-              children: <Widget>[
-                const Text('Escanee QRs para confirmar recogidas:'),
-                Container(
+          child: resultWidgetPendingList,
+        ),
+        if(_openCamera == false) Center(
+          child: Column(
+            children: <Widget>[
+              const Text('Escanear QR de un cliente:'),
+              const SizedBox(
+                height: 20,
+              ),
+              GestureDetector(
+                onTap: () async {
+                  _toggleCamera(true);
+                },
+                child: Container(
                   decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.grey.withOpacity(0.5),
-                    ),
-                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.grey.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(999),
                   ),
-                  height: MediaQuery.of(context).size.width - (Environment.defaultHorizontalMargin * 2),
-                  margin: const EdgeInsets.symmetric(
-                    vertical: 20,
+                  padding: EdgeInsets.all(
+                    MediaQuery.of(context).size.width * 0.15,
                   ),
-                  child: Stack(
-                    alignment: Alignment.bottomRight,
-                    children: <Widget>[
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: MobileScanner(
-                          controller: cameraController,
-                          onDetect: foundQR,
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(
-                          bottom: MediaQuery.of(context).size.width * 0.025,
-                          right: MediaQuery.of(context).size.width * 0.025,
-                        ),
-                        child: GestureDetector(
-                          child: Container( // TODO deshardcodear este estilo
-                            padding: EdgeInsets.all(
-                              MediaQuery.of(context).size.width * 0.02,
-                            ),
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.grey.withOpacity(0.5),
-                              ),
-                              borderRadius: BorderRadius.circular(999),
-                              color: Theme.of(context).primaryColor,
-                            ),
-                            child: const Icon(
-                              Icons.close,
-                            ),
-                          ),
-                          onTap: () {
-                            _toggleCamera(false);
-                          },
-                        ),
-                      ),
-                    ],
-                  )
+                  child: Icon(
+                    Icons.camera_alt_outlined,
+                    size: MediaQuery.of(context).size.width * 0.15,
+                    color: Colors.black,
+                  ),
                 ),
-              ],
-            )
-          ),
-        ],
-      ),
+              ),
+            ],
+          )
+        ),
+        Visibility(
+          visible: _openCamera,
+          child: Column(
+            children: <Widget>[
+              const Text('Escanee QRs para confirmar recogidas:'),
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.grey.withOpacity(0.5),
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                height: MediaQuery.of(context).size.width - (Environment.defaultHorizontalMargin * 2),
+                margin: const EdgeInsets.symmetric(
+                  vertical: 20,
+                ),
+                child: Stack(
+                  alignment: Alignment.bottomRight,
+                  children: <Widget>[
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: MobileScanner(
+                        controller: cameraController,
+                        onDetect: foundQR,
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(
+                        bottom: MediaQuery.of(context).size.width * 0.025,
+                        right: MediaQuery.of(context).size.width * 0.025,
+                      ),
+                      child: GestureDetector(
+                        child: Container( // TODO deshardcodear este estilo
+                          padding: EdgeInsets.all(
+                            MediaQuery.of(context).size.width * 0.02,
+                          ),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.grey.withOpacity(0.5),
+                            ),
+                            borderRadius: BorderRadius.circular(999),
+                            color: Theme.of(context).primaryColor,
+                          ),
+                          child: const Icon(
+                            Icons.close,
+                          ),
+                        ),
+                        onTap: () {
+                          _toggleCamera(false);
+                        },
+                      ),
+                    ),
+                  ],
+                )
+              ),
+            ],
+          )
+        ),
+      ],
     );
   }
 }

@@ -19,3 +19,5 @@ export 'package:wefood/components/profile_name.dart';
 export 'package:wefood/components/wefood_input.dart';
 export 'package:wefood/components/back_up_bar.dart';
 export 'package:wefood/components/feedback_message.dart';
+export 'package:wefood/components/checkbox_row.dart';
+export 'package:wefood/components/image_slot.dart';

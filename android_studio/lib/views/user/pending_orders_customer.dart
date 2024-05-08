@@ -13,16 +13,10 @@ class _PendingOrdersCustomerState extends State<PendingOrdersCustomer> {
   @override
   Widget build(BuildContext context) {
     return const WefoodScreen(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          BackUpBar(
-            title: 'Pedidos pendientes',
-          ),
-          OrderPendingListCustomer(),
-        ],
-      ),
+      title: 'Pedidos pendientes',
+      body: [
+        OrderPendingListCustomer(),
+      ],
     );
   }
 }

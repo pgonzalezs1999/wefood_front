@@ -19,16 +19,6 @@ class _LoginState extends State<Login> {
   String username = '';
   String password = '';
 
-  void _showButtonPressDialog(BuildContext context, String provider) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('$provider Button Pressed!'),
-        backgroundColor: Colors.black26,
-        duration: const Duration(milliseconds: 1000),
-      ),
-    );
-  }
-
   void _navigateToRegisterUser() {
     Navigator.push(
       context,
@@ -54,119 +44,104 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return WefoodScreen(
       canPop: false,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          SizedBox(
-            height: MediaQuery.of(context).size.height * 0.333,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  'Bienvenido a',
-                  style: Theme.of(context).textTheme.titleSmall,
+      bodyCrossAxisAlignment: CrossAxisAlignment.center,
+      body: [
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.333,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                'Bienvenido a',
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+              Container(
+                width: MediaQuery.of(context).size.width * 0.666,
+                margin: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height * 0.01,
                 ),
-                Container(
-                  width: MediaQuery.of(context).size.width * 0.666,
-                  margin: EdgeInsets.only(
-                    top: MediaQuery.of(context).size.height * 0.01,
-                  ),
-                  child: Image.asset('assets/images/logo.png'),
-                ),
-              ],
-            ),
-          ) ,
-          Container(
-            margin: EdgeInsets.symmetric(
-              vertical: MediaQuery.of(context).size.height * 0.025,
-            ),
-            child: Wrap(
-              runSpacing: MediaQuery.of(context).size.height * 0.025,
-              children: <WefoodInput>[
-                WefoodInput(
-                  labelText: 'Nombre de usuario o email',
-                  onChanged: (value) {
-                    username = value;
-                  },
-                ),
-                WefoodInput(
-                  labelText: 'Contraseña',
-                  type: InputType.secret,
-                  onChanged: (value) {
-                    password = value;
-                  },
-                ),
-              ],
-            ),
+                child: Image.asset('assets/images/logo.png'),
+              ),
+            ],
           ),
-          if(authenticating != LoadingStatus.loading) ElevatedButton(
-            onPressed: () async {
-              setState(() {
-                authenticating = LoadingStatus.loading;
-              });
-              AuthModel? auth = await Api.login(
-                context: context,
-                username: username,
-                password: password,
-                onError: () {
-                  setState(() {
-                    authenticating = LoadingStatus.error;
-                  });
-                }
-              );
-            },
-            child: const Text('INICIAR SESIÓN'),
+        ) ,
+        Container(
+          margin: EdgeInsets.symmetric(
+            vertical: MediaQuery.of(context).size.height * 0.025,
           ),
-          const SizedBox(
-            height: 20,
+          child: Wrap(
+            runSpacing: MediaQuery.of(context).size.height * 0.025,
+            children: <WefoodInput>[
+              WefoodInput(
+                labelText: 'Nombre de usuario o email',
+                onChanged: (value) {
+                  username = value;
+                },
+              ),
+              WefoodInput(
+                labelText: 'Contraseña',
+                type: InputType.secret,
+                onChanged: (value) {
+                  password = value;
+                },
+              ),
+            ],
           ),
-          if(authenticating == LoadingStatus.loading) const CircularProgressIndicator(),
-          /*Container(
-            padding: EdgeInsets.symmetric(
-              vertical: MediaQuery.of(context).size.height * 0.025,
-            ),
-            child: SignInButton(
-              Buttons.google,
+        ),
+        if(authenticating != LoadingStatus.loading) ElevatedButton(
+          onPressed: () {
+            setState(() {
+              authenticating = LoadingStatus.loading;
+            });
+            Api.login(
+              context: context,
+              username: username,
+              password: password,
+              onError: () {
+                setState(() {
+                  authenticating = LoadingStatus.error;
+                });
+              }
+            );
+          },
+          child: const Text('INICIAR SESIÓN'),
+        ),
+        const SizedBox(
+          height: 20,
+        ),
+        if(authenticating == LoadingStatus.loading) const CircularProgressIndicator(),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Text('¿No tienes cuenta?'),
+            TextButton(
               onPressed: () {
-              // TODO faltar hacer autenticación por Google y otros
-                _showButtonPressDialog(context, 'Google');
+                _navigateToRegisterUser();
               },
+              child: const Text('Regístrate gratis'),
             ),
-          ),*/
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              const Text('¿No tienes cuenta?'),
-              TextButton(
-                onPressed: () {
-                  _navigateToRegisterUser();
-                },
-                child: const Text('Regístrate gratis'),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              const Text('¿Quieres listar tu negocio?'),
-              TextButton(
-                onPressed: () {
-                  _navigateToRegisterBusiness();
-                },
-                child: const Text('Regístralo gratis'),
-              ),
-            ],
-          ),
-          TextButton(
-            onPressed: () {
-              _navigateToTermsAndConditions();
-            },
-            child: const Text('Términos y condiciones legales'),
-          ),
-        ],
-      ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Text('¿Quieres listar tu negocio?'),
+            TextButton(
+              onPressed: () {
+                _navigateToRegisterBusiness();
+              },
+              child: const Text('Regístralo gratis'),
+            ),
+          ],
+        ),
+        TextButton(
+          onPressed: () {
+            _navigateToTermsAndConditions();
+          },
+          child: const Text('Términos y condiciones legales'),
+        ),
+      ],
     );
   }
 }
