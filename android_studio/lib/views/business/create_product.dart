@@ -398,9 +398,7 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
             if(isSubmitting == true) const LoadingIcon(),
             if(isSubmitting == false) ElevatedButton(
               onPressed: () async {
-                print('He pulsado GUARDAR');
                 if(_readyToRegister() == true) {
-                  print('Esta ready to register');
                   setState(() {
                     isSubmitting = true;
                   });
@@ -436,7 +434,6 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
                     });
                     Navigator.pop(context);
                   } catch(e) {
-                    print('ERROR: $e');
                     setState(() {
                       isSubmitting = false;
                       error = 'Ha ocurrido un error'; // TODO hacer algo más currado

@@ -6,7 +6,7 @@ class WefoodPopup extends StatefulWidget {
 
   final BuildContext context;
   final File? image;
-  final String title;
+  final String? title;
   final String? description;
   final Widget? content;
   final String? cancelButtonTitle;
@@ -17,7 +17,7 @@ class WefoodPopup extends StatefulWidget {
     super.key,
     required this.context,
     this.image,
-    required this.title,
+    this.title,
     this.description,
     this.content,
     this.cancelButtonTitle,
@@ -49,12 +49,12 @@ class _WefoodPopupState extends State<WefoodPopup> {
                   : const AssetImage('assets/images/logo.png'),
               ),
             ),
-            Text(
-              widget.title,
+            if(widget.title != null) Text(
+              widget.title!,
               style: Theme.of(context).textTheme.titleMedium,
               textAlign: TextAlign.center,
             ),
-            const SizedBox(
+            if(widget.title != null) const SizedBox(
               height: 20,
             ),
             if(widget.description != null) Text(

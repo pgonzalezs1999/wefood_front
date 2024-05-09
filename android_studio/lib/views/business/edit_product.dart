@@ -1,7 +1,8 @@
 import 'dart:async';
-
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/commands/custom_parsers.dart';
@@ -95,6 +96,104 @@ class _EditProductState extends State<EditProduct> {
     );
   }
 
+  _pickImageFromGallery(int position) {
+    ImagePicker().pickImage(source: ImageSource.gallery).then((XFile? returnedImage) {
+      Image image;
+      if(returnedImage != null) {
+        File imageFile = File(returnedImage.path);
+        image = Image.file(
+          imageFile,
+          fit: BoxFit.cover,
+        );
+        Navigator.pop(context);
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 100,
+                    ),
+                    child: const LoadingIcon(),
+                  ),
+                ],
+              ),
+            );
+          }
+        );
+        Api.uploadImage(
+          idUser: context.read<UserInfoCubit>().state.user.id!,
+          meaning: '${Utils.productTypeToChar(widget.productType).toLowerCase()}$position',
+          file: imageFile,
+        ).then((ImageModel imageModel) {
+          setState(() {
+            images[position-1] = image;
+          });
+          Navigator.pop(context);
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (BuildContext context) {
+              return WefoodPopup(
+                context: context,
+                title: '¡Foto actualizada correctamente!',
+                cancelButtonTitle: 'OK',
+                cancelButtonBehaviour: () {
+                  Navigator.pop(context);
+                },
+              );
+            }
+          );
+        });
+      }
+    });
+  }
+
+  _manageImageSlot(int current) async {
+    int lastFilled = 0;
+    for(int i = 0; i < images.length; i++) {
+      if(images[i] != null) {
+        lastFilled = i+1;
+      }
+    }
+    print('CLICADO: $current, LAST_FILLED:  $lastFilled');
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return WefoodPopup(
+          context: context,
+          content: Column(
+            children: <TextButton>[
+              TextButton(
+                child: Text('${(current <= lastFilled) ? 'CAMBIAR' : 'AÑADIR'} IMAGEN DESDE LA CÁMARA'),
+                onPressed: () async {
+
+                },
+              ),
+              TextButton(
+                child: Text('${(current <= lastFilled) ? 'CAMBIAR' : 'AÑADIR'} IMAGEN DE LA GALERÍA'),
+                onPressed: () async {
+                  _pickImageFromGallery((current <= lastFilled) ? current+1 : lastFilled+1);
+                },
+              ),
+              if(current <= lastFilled) TextButton(
+                child: const Text('ELIMINAR IMAGEN'),
+                onPressed: () async {
+
+                },
+              ),
+            ],
+          ),
+          cancelButtonTitle: 'CANCELAR',
+        );
+      }
+    );
+  }
+
   void _retrieveData() async {
     ProductExpandedModel response = await Api.getProduct(
       id: widget.productId,
@@ -131,7 +230,7 @@ class _EditProductState extends State<EditProduct> {
     for(int i = 0; i < images.length; i++) {
       try {
         await Api.getImage(
-          idUser: 26, // TODO deshardcodear id_user
+          idUser: context.read<UserInfoCubit>().state.user.id!,
           meaning: '${Utils.productTypeToChar(widget.productType).toLowerCase()}${i+1}',
         ).then((ImageModel imageModel) {
           setState(() {
@@ -598,63 +697,69 @@ class _EditProductState extends State<EditProduct> {
                 ),
               ],
             ),
-            Text(
-              'Añadir imágenes',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            Row(
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Container(
-                  margin: EdgeInsets.only(
-                    right: MediaQuery.of(context).size.width * 0.05,
-                  ),
-                  child: Column(
-                    children: <Widget>[
-                      ImageSlot(
-                        image: images[0],
-                        isMain: true,
-                      ),
-                      const Text('Imagen principal'),
-                    ],
-                  ),
+                Text(
+                  'Añadir imágenes',
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
-                Expanded(
-                  child: Column(
-                    children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: <int>[0, 1, 2, 3, 4].map((i) {
-                          return ImageSlot(
-                            image: images[i],
-                          );
-                        }).toList(),
+                const SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Container(
+                      margin: EdgeInsets.only(
+                        right: MediaQuery.of(context).size.width * 0.05,
                       ),
-                      SizedBox(
-                        height: MediaQuery.of(context).size.width * 0.025,
+                      child: Column(
+                        children: <Widget>[
+                          ImageSlot(
+                            image: images[0],
+                            isMain: true,
+                            onTap: () async {
+                              _manageImageSlot(0);
+                            },
+                          ),
+                          const Text('Imagen principal'),
+                        ],
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: <ImageSlot>[
-                          ImageSlot(
-                            image: images[5],
+                    ),
+                    Expanded(
+                      child: Column(
+                        children: <Widget>[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: <int>[0, 1, 2, 3, 4].map((i) {
+                              return ImageSlot(
+                                image: images[i],
+                                onTap: () async {
+                                  _manageImageSlot(i);
+                                },
+                              );
+                            }).toList(),
                           ),
-                          ImageSlot(
-                            image: images[6],
+                          SizedBox(
+                            height: MediaQuery.of(context).size.width * 0.025,
                           ),
-                          ImageSlot(
-                            image: images[7],
-                          ),
-                          ImageSlot(
-                            image: images[8],
-                          ),
-                          ImageSlot(
-                            image: images[9],
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: <int>[5, 6, 7, 8, 9].map((i) {
+                              return ImageSlot(
+                                image: images[i],
+                                onTap: () async {
+                                  print('-');
+                                  _manageImageSlot(i);
+                                },
+                              );
+                            }).toList(),
                           ),
                         ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ],
             ),
