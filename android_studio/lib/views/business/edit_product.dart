@@ -16,7 +16,7 @@ import 'package:wefood/views/user/search_filters.dart';
 
 class EditProduct extends StatefulWidget {
 
-  final int productId;
+  final int? productId;
   final ProductType productType;
 
   const EditProduct({
@@ -31,29 +31,35 @@ class EditProduct extends StatefulWidget {
 
 class _EditProductState extends State<EditProduct> {
 
-  String _productTypeString = '';
+  final ScrollController scrollController = ScrollController();
 
+  String _productTypeString = '';
   bool isRetrievingData = true;
   bool isSubmitting = false;
-
   double? price;
-  TimeOfDay? startTime;
-  TimeOfDay? endTime;
+  TimeOfDay startTime = const TimeOfDay(
+    hour: 0,
+    minute: 1
+  );
+  TimeOfDay endTime = const TimeOfDay(
+    hour: 23,
+    minute: 59,
+  );
   int? amount;
   bool dessert = false;
   bool junk = false;
   bool vegetarian = false;
   bool vegan = false;
-  bool mondays = false;
-  bool tuesdays = false;
-  bool wednesdays = false;
-  bool thursdays = false;
-  bool fridays = false;
-  bool saturdays = false;
-  bool sundays = false;
+  bool mondays = true;
+  bool tuesdays = true;
+  bool wednesdays = true;
+  bool thursdays = true;
+  bool fridays = true;
+  bool saturdays = true;
+  bool sundays = true;
   DateTime? endDate;
   bool endless = false;
-  List<Image?> images = [ null, null, null, null, null, null, null, null, null, null, ];
+  List<Image?> images = List.generate(10, (_) => null);
   String error = '';
 
   bool _setError(String reason) {
@@ -69,12 +75,16 @@ class _EditProductState extends State<EditProduct> {
       result = _setError('El campo precio es obligatorio');
     } else if(price! < Environment.minimumPrice) {
       result = _setError('El precio debe ser de al menos ${Environment.minimumPrice} S/.');
-    } else if(Utils.timesOfDayFirstIsSooner(startTime!, endTime!) == false) {
+    } else if(Utils.timesOfDayFirstIsSooner(startTime, endTime) == false) {
       result = _setError('Horario de recogida incorrecto: ¡la fecha de apertura debe ser antes que la fecha de cierre!');
     } else if(amount == null) {
       result = _setError('El campo cantidad es obligatorio');
     } else if(amount! < 1) {
-      result = _setError('La cantidad debe ser de al menos 1');
+      result = _setError('Cantidad mínima: 1 pack');
+    } else if(Utils.sumTrueBooleans([junk, dessert, vegetarian, vegan]) > 2) {
+      result = _setError('Se tiene que seleccionar como máximo 2 categorías');
+    } else if(Utils.sumTrueBooleans([mondays, tuesdays, wednesdays, thursdays, fridays, saturdays, sundays]) == 0) {
+      result = _setError('Se tiene que seleccionar al menos 1 día de la semana');
     } else if(endless == false && endDate == null) {
       result = _setError('El campo fecha límite es obligatorio. Si no tiene fecha de fin, marque "Indefinido"');
     } else {
@@ -96,15 +106,14 @@ class _EditProductState extends State<EditProduct> {
     );
   }
 
-  _pickImageFromGallery(int position) {
-    ImagePicker().pickImage(source: ImageSource.gallery).then((XFile? returnedImage) {
-      Image image;
+  _pickImageFrom({
+    required ImageSource source,
+    required int position,
+  }) {
+    ImagePicker().pickImage(source: source).then((XFile? returnedImage) {
+      File imageFile;
       if(returnedImage != null) {
-        File imageFile = File(returnedImage.path);
-        image = Image.file(
-          imageFile,
-          fit: BoxFit.cover,
-        );
+        imageFile = File(returnedImage.path);
         Navigator.pop(context);
         showDialog(
           context: context,
@@ -130,7 +139,10 @@ class _EditProductState extends State<EditProduct> {
           file: imageFile,
         ).then((ImageModel imageModel) {
           setState(() {
-            images[position-1] = image;
+            images[position-1] = Image.file(
+              imageFile,
+              fit: BoxFit.cover,
+            );
           });
           Navigator.pop(context);
           showDialog(
@@ -152,6 +164,97 @@ class _EditProductState extends State<EditProduct> {
     });
   }
 
+  void _safeEditProduct() async {
+    Api.updateProduct(
+      id: widget.productId!,
+      price: price!,
+      amount: amount!,
+      endingDate: CustomParsers.dateTimeToSqlDateTimeString(endDate),
+      startHour: CustomParsers.timeOfDayToSqlTimeString(startTime),
+      endHour: CustomParsers.timeOfDayToSqlTimeString(endTime),
+      vegetarian: CustomParsers.boolToSqlString(vegetarian),
+      vegan: CustomParsers.boolToSqlString(vegan),
+      junk: CustomParsers.boolToSqlString(junk),
+      dessert: CustomParsers.boolToSqlString(dessert),
+      workingOnMonday: CustomParsers.boolToSqlString(mondays),
+      workingOnTuesday: CustomParsers.boolToSqlString(tuesdays),
+      workingOnWednesday: CustomParsers.boolToSqlString(wednesdays),
+      workingOnThursday: CustomParsers.boolToSqlString(thursdays),
+      workingOnFriday: CustomParsers.boolToSqlString(fridays),
+      workingOnSaturday: CustomParsers.boolToSqlString(saturdays),
+      workingOnSunday: CustomParsers.boolToSqlString(sundays),
+    ).then((ProductModel product) {
+      setState(() {
+        isSubmitting = false;
+      });
+      Navigator.pop(context);
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        useRootNavigator: false,
+        builder: ((BuildContext context) {
+          return WefoodPopup(
+            context: context,
+            title: '¡Producto modificado correctamente!',
+            cancelButtonTitle: 'OK',
+          );
+        }),
+      );
+    });
+  }
+
+  void _safeCreateProduct() async {
+    Api.createProduct(
+      price: price!,
+      amount: amount!,
+      endingDate: CustomParsers.dateTimeToSqlDateTimeString(endDate),
+      startHour: CustomParsers.timeOfDayToSqlTimeString(startTime),
+      endHour: CustomParsers.timeOfDayToSqlTimeString(endTime),
+      vegetarian: CustomParsers.boolToSqlString(vegetarian),
+      vegan: CustomParsers.boolToSqlString(vegan),
+      junk: CustomParsers.boolToSqlString(junk),
+      dessert: CustomParsers.boolToSqlString(dessert),
+      workingOnMonday: CustomParsers.boolToSqlString(mondays),
+      workingOnTuesday: CustomParsers.boolToSqlString(tuesdays),
+      workingOnWednesday: CustomParsers.boolToSqlString(wednesdays),
+      workingOnThursday: CustomParsers.boolToSqlString(thursdays),
+      workingOnFriday: CustomParsers.boolToSqlString(fridays),
+      workingOnSaturday: CustomParsers.boolToSqlString(saturdays),
+      workingOnSunday: CustomParsers.boolToSqlString(sundays),
+      type: Utils.productTypeToChar(widget.productType),
+    ).then((ProductModel product) {
+      setState(() {
+        isSubmitting = false;
+      });
+      if(widget.productType == ProductType.breakfast) {
+        setState(() {
+          context.read<BusinessBreakfastCubit>().set(product);
+        });
+      } else if(widget.productType == ProductType.breakfast) {
+        setState(() {
+          context.read<BusinessBreakfastCubit>().set(product);
+        });
+      } else {
+        setState(() {
+          context.read<BusinessBreakfastCubit>().set(product);
+        });
+      }
+      Navigator.pop(context);
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        useRootNavigator: false,
+        builder: ((BuildContext context) {
+          return WefoodPopup(
+            context: context,
+            title: '¡Producto creado correctamente!',
+            cancelButtonTitle: 'OK',
+          );
+        }),
+      );
+    });
+  }
+
   _manageImageSlot(int current) async {
     int lastFilled = 0;
     for(int i = 0; i < images.length; i++) {
@@ -166,24 +269,73 @@ class _EditProductState extends State<EditProduct> {
       builder: (BuildContext context) {
         return WefoodPopup(
           context: context,
+          image: images[current],
           content: Column(
             children: <TextButton>[
               TextButton(
-                child: Text('${(current <= lastFilled) ? 'CAMBIAR' : 'AÑADIR'} IMAGEN DESDE LA CÁMARA'),
+                child: Text('${(current < lastFilled) ? 'CAMBIAR' : 'AÑADIR'} IMAGEN DESDE LA CÁMARA'),
                 onPressed: () async {
-
+                  _pickImageFrom(
+                    source: ImageSource.camera,
+                    position: (current <= lastFilled) ? current+1 : lastFilled+1,
+                  );
                 },
               ),
               TextButton(
-                child: Text('${(current <= lastFilled) ? 'CAMBIAR' : 'AÑADIR'} IMAGEN DE LA GALERÍA'),
+                child: Text('${(current < lastFilled) ? 'CAMBIAR' : 'AÑADIR'} IMAGEN DE LA GALERÍA'),
                 onPressed: () async {
-                  _pickImageFromGallery((current <= lastFilled) ? current+1 : lastFilled+1);
+                  _pickImageFrom(
+                    source: ImageSource.gallery,
+                    position: (current <= lastFilled) ? current+1 : lastFilled+1,
+                  );
                 },
               ),
-              if(current <= lastFilled) TextButton(
+              if(current < lastFilled) TextButton(
                 child: const Text('ELIMINAR IMAGEN'),
-                onPressed: () async {
-
+                onPressed: () {
+                  Navigator.pop(context);
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return WefoodPopup(
+                        image: images[current],
+                        context: context,
+                        title: '¿Eliminar imagen?',
+                        actions: <TextButton>[
+                          TextButton(
+                            child: const Text('SÍ'),
+                            onPressed: () {
+                              Api.removeImage(
+                                idUser: context.read<UserInfoCubit>().state.user.id!,
+                                meaning: '${Utils.productTypeToChar(widget.productType).toLowerCase()}${current+1}',
+                              ).then((_) {
+                                for(int i = current; i < images.length - 1; i++) {
+                                  setState(() {
+                                    images[i] = images[i+1];
+                                  });
+                                }
+                                setState(() {
+                                  images[images.length-1] = null;
+                                  lastFilled = lastFilled - 1;
+                                });
+                                Navigator.pop(context);
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return WefoodPopup(
+                                      context: context,
+                                      title: '¡Imagen eliminada correctamente!',
+                                      cancelButtonTitle: 'OK',
+                                    );
+                                  }
+                                );
+                              });
+                            },
+                          ),
+                        ],
+                      );
+                    }
+                  );
                 },
               ),
             ],
@@ -196,7 +348,7 @@ class _EditProductState extends State<EditProduct> {
 
   void _retrieveData() async {
     ProductExpandedModel response = await Api.getProduct(
-      id: widget.productId,
+      id: widget.productId!,
     );
     price = response.product.price;
     startTime = TimeOfDay(
@@ -229,21 +381,33 @@ class _EditProductState extends State<EditProduct> {
   void _retrieveImages() async {
     for(int i = 0; i < images.length; i++) {
       try {
-        await Api.getImage(
+        Api.getImage(
           idUser: context.read<UserInfoCubit>().state.user.id!,
           meaning: '${Utils.productTypeToChar(widget.productType).toLowerCase()}${i+1}',
-        ).then((ImageModel imageModel) {
-          setState(() {
-            images[i] = Image.network(
-              imageModel.route!,
-              fit: BoxFit.cover,
-            );
-          });
+        ).then((ImageModel imageModel) async {
+          if(imageModel.route != null) {
+            setState(() {
+              images[i] = ImageWithLoader.network(
+                  route: imageModel.route!
+              );
+            });
+          }
         });
-      } catch(error) {
-        return;
-      }
+      } catch(error) { /*if (kDebugMode) print('ERROR AL CARGAR LA FOTO [$i]: $error');*/ }
     }
+  }
+
+  void _scrollToBottom() {
+    Timer(
+      const Duration(milliseconds: 100),
+      () {
+        scrollController.animateTo(
+        scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeInOut,
+        );
+      },
+    );
   }
 
   @override
@@ -251,8 +415,14 @@ class _EditProductState extends State<EditProduct> {
     _productTypeString = Utils.productTypeToString(
       type: widget.productType,
     ) ?? '';
-    _retrieveData();
-    _retrieveImages();
+    if(widget.productId != null) { // Is editing an existing product
+      _retrieveData();
+      _retrieveImages();
+    } else { // Is creating a new product
+      setState(() {
+        isRetrievingData = false;
+      });
+    }
     super.initState();
   }
 
@@ -263,7 +433,8 @@ class _EditProductState extends State<EditProduct> {
   Widget build(BuildContext context) {
     setScheduleBorderColor();
     return WefoodScreen(
-      title: 'Editar $_productTypeString',
+      controller: scrollController,
+      title: '${(widget.productId != null) ? 'Editar' : 'Crear'} $_productTypeString',
       body: [
         Wrap(
           runSpacing: 25,
@@ -282,14 +453,12 @@ class _EditProductState extends State<EditProduct> {
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.5,
                   child: WefoodInput(
-                    initialText: price.toString(),
+                    initialText: (widget.productId != null) ? price.toString() : '',
                     onChanged: (String value) {
                       double? parsedValue = double.tryParse(value);
                       setState(() {
-                        if(parsedValue == null) {
-                          _setError('El campo precio es obligatorio');
-                        } else if(parsedValue < Environment.minimumPrice) {
-                          _setError('El precio debe ser de al menos ${Environment.minimumPrice}');
+                        if(parsedValue != null && parsedValue < Environment.minimumPrice) {
+                          _setError('El precio debe ser de al menos ${Environment.minimumPrice} S/.');
                         } else {
                           _setError('');
                         }
@@ -300,17 +469,14 @@ class _EditProductState extends State<EditProduct> {
                     labelText: 'Hasta',
                     type: InputType.decimal,
                     feedbackWidget: (price != null)
-                        ? (price! < Environment.minimumPrice)
+                      ? (price! < Environment.minimumPrice)
                         ? const FeedbackMessage(
-                      message: 'Precio mínimo: ${Environment.minimumPrice} S/.',
-                      isError: true,
-                    ) : null
-                        : const FeedbackMessage(
-                      message: 'Campo obligatorio',
-                      isError: true,
-                    ),
+                          message: 'Precio mínimo: ${Environment.minimumPrice} S/.',
+                          isError: true,
+                        ) : null
+                      : null,
                   ),
-                )
+                ),
               ],
             ),
             Column(
@@ -320,7 +486,7 @@ class _EditProductState extends State<EditProduct> {
                   'Horario de recogida:',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
-                if(startTime != null && endTime != null) Row(
+                (widget.productId == null || (widget.productId != null && isRetrievingData == false)) ? Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
                     Stack(
@@ -338,15 +504,15 @@ class _EditProductState extends State<EditProduct> {
                                   radius: '130%',
                                   dataSource: <PieData>[
                                     PieData( // Before range
-                                      value: ((startTime!.hour * 60) + startTime!.minute).toDouble(),
+                                      value: ((startTime.hour * 60) + startTime.minute).toDouble(),
                                       color: Theme.of(context).colorScheme.surface,
                                     ),
                                     PieData( // Actual range
-                                      value: (((endTime!.hour - startTime!.hour) * 60) + (endTime!.minute - startTime!.minute)).toDouble(),
+                                      value: (((endTime.hour - startTime.hour) * 60) + (endTime.minute - startTime.minute)).toDouble(),
                                       color: Theme.of(context).colorScheme.secondary,
                                     ),
                                     PieData( // After range
-                                      value: (((23 - endTime!.hour) * 60) + (60 - endTime!.minute)).toDouble(),
+                                      value: (((23 - endTime.hour) * 60) + (60 - endTime.minute)).toDouble(),
                                       color: Theme.of(context).colorScheme.surface,
                                     ),
                                   ],
@@ -380,7 +546,7 @@ class _EditProductState extends State<EditProduct> {
                           children: <Widget>[
                             const Text('Desde las'),
                             TextButton(
-                              child: Text('${startTime!.format(context)} h'),
+                              child: Text('${startTime.format(context)} h'),
                               onPressed: () {
                                 showTimePicker(
                                   barrierDismissible: false,
@@ -390,7 +556,7 @@ class _EditProductState extends State<EditProduct> {
                                   if(selectedTime != null) {
                                     if(Utils.timesOfDayFirstIsSooner(
                                       selectedTime,
-                                      endTime!,
+                                      endTime,
                                     )) {
                                       setState(() {
                                         startTime = selectedTime;
@@ -418,7 +584,7 @@ class _EditProductState extends State<EditProduct> {
                           children: <Widget>[
                             const Text('Hasta las'),
                             TextButton(
-                              child: Text('${endTime!.format(context)} h'),
+                              child: Text('${endTime.format(context)} h'),
                               onPressed: () {
                                 showTimePicker(
                                   barrierDismissible: false,
@@ -427,7 +593,7 @@ class _EditProductState extends State<EditProduct> {
                                 ).then((TimeOfDay? selectedTime) {
                                   if(selectedTime != null) {
                                     if(Utils.timesOfDayFirstIsSooner(
-                                      startTime!,
+                                      startTime,
                                       selectedTime,
                                     )) {
                                       setState(() {
@@ -455,7 +621,7 @@ class _EditProductState extends State<EditProduct> {
                       ],
                     ),
                   ],
-                ),
+                ) : const LoadingIcon(),
               ],
             ),
             if(isRetrievingData == true) const LoadingIcon(),
@@ -472,7 +638,7 @@ class _EditProductState extends State<EditProduct> {
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.5,
                   child: WefoodInput(
-                    initialText: amount.toString(),
+                    initialText: (widget.productId != null) ? amount.toString() : null,
                     onChanged: (String value) {
                       setState(() {
                         error = '';
@@ -481,16 +647,6 @@ class _EditProductState extends State<EditProduct> {
                     },
                     labelText: 'Hasta',
                     type: InputType.integer,
-                    feedbackWidget: (amount != null)
-                        ? (amount! < 1)
-                        ? const FeedbackMessage(
-                      message: 'Cantidad mínima: 1 pack',
-                      isError: true,
-                    ) : null
-                        : const FeedbackMessage(
-                      message: 'Campo obligatorio',
-                      isError: true,
-                    ),
                   ),
                 ),
               ],
@@ -558,6 +714,10 @@ class _EditProductState extends State<EditProduct> {
                       ],
                     )
                   ],
+                ),
+                if(Utils.sumTrueBooleans([junk, dessert, vegetarian, vegan]) > 2) const FeedbackMessage(
+                  message: 'Máximo 2 categorías',
+                  isError: true
                 ),
               ],
             ),
@@ -652,6 +812,10 @@ class _EditProductState extends State<EditProduct> {
                     )
                   ],
                 ),
+                if(Utils.sumTrueBooleans([mondays, tuesdays, wednesdays, thursdays, fridays, saturdays, sundays]) == 0) const FeedbackMessage(
+                    message: 'Mínimo 1 día de la semana',
+                    isError: true
+                ),
               ],
             ),
             Column(
@@ -717,7 +881,7 @@ class _EditProductState extends State<EditProduct> {
                       child: Column(
                         children: <Widget>[
                           ImageSlot(
-                            image: images[0],
+                            image: (images[0] != null) ? images[0] : null,
                             isMain: true,
                             onTap: () async {
                               _manageImageSlot(0);
@@ -734,7 +898,7 @@ class _EditProductState extends State<EditProduct> {
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: <int>[0, 1, 2, 3, 4].map((i) {
                               return ImageSlot(
-                                image: images[i],
+                                image: (images[i] != null) ? images[i] : null,
                                 onTap: () async {
                                   _manageImageSlot(i);
                                 },
@@ -748,7 +912,7 @@ class _EditProductState extends State<EditProduct> {
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: <int>[5, 6, 7, 8, 9].map((i) {
                               return ImageSlot(
-                                image: images[i],
+                                image: (images[i] != null) ? images[i] : null,
                                 onTap: () async {
                                   print('-');
                                   _manageImageSlot(i);
@@ -784,48 +948,20 @@ class _EditProductState extends State<EditProduct> {
                         isSubmitting = true;
                       });
                       try {
-                        Api.updateProduct(
-                          id: widget.productId,
-                          price: price!,
-                          amount: amount!,
-                          endingDate: CustomParsers.dateTimeToSqlDateTimeString(endDate),
-                          startHour: CustomParsers.timeOfDayToSqlTimeString(startTime!),
-                          endHour: CustomParsers.timeOfDayToSqlTimeString(endTime!),
-                          vegetarian: CustomParsers.boolToSqlString(vegetarian),
-                          vegan: CustomParsers.boolToSqlString(vegan),
-                          junk: CustomParsers.boolToSqlString(junk),
-                          dessert: CustomParsers.boolToSqlString(dessert),
-                          workingOnMonday: CustomParsers.boolToSqlString(mondays),
-                          workingOnTuesday: CustomParsers.boolToSqlString(tuesdays),
-                          workingOnWednesday: CustomParsers.boolToSqlString(wednesdays),
-                          workingOnThursday: CustomParsers.boolToSqlString(thursdays),
-                          workingOnFriday: CustomParsers.boolToSqlString(fridays),
-                          workingOnSaturday: CustomParsers.boolToSqlString(saturdays),
-                          workingOnSunday: CustomParsers.boolToSqlString(sundays),
-                        ).then((ProductModel product) {
-                          setState(() {
-                            isSubmitting = false;
-                          });
-                          Navigator.pop(context);
-                          showDialog(
-                            context: context,
-                            barrierDismissible: false,
-                            useRootNavigator: false,
-                            builder: ((BuildContext context) {
-                              return WefoodPopup(
-                                context: context,
-                                title: '¡Producto modificado correctamente!',
-                                cancelButtonTitle: 'OK',
-                              );
-                            }),
-                          );
-                        });
+                        if(widget.productId != null) {
+                          _safeEditProduct();
+                        } else {
+                          _safeCreateProduct();
+                        }
                       } catch(e) {
                         setState(() {
                           isSubmitting = false;
-                          error = 'Ha ocurrido un error'; // TODO hacer algo más currado
+                          error = 'Ha ocurrido un error: $e'; // TODO hacer algo más currado
                         });
+                        _scrollToBottom();
                       }
+                    } else {
+                      _scrollToBottom();
                     }
                   },
                 ),
@@ -836,7 +972,7 @@ class _EditProductState extends State<EditProduct> {
               isError: true,
               isCentered: true,
             ),
-            Align(
+            if(widget.productId != null) Align(
               child: ElevatedButton(
                 child: const Text('ELIMINAR PRODUCTO'),
                 onPressed: () async {
@@ -873,6 +1009,7 @@ class _EditProductState extends State<EditProduct> {
                                 setState(() {
                                   error = 'Ha ocurrido un error eliminar el producto. Por favor, inténtelo de nuevo más tarde';
                                 });
+                                _scrollToBottom();
                               }
                             },
                           ),

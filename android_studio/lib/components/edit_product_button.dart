@@ -10,7 +10,7 @@ import 'package:wefood/views/views.dart';
 
 class EditProductButton extends StatefulWidget {
 
-  final ProductModel product;
+  final ProductModel? product;
   final ProductType productType;
 
   const EditProductButton({
@@ -53,10 +53,19 @@ class _EditProductButtonState extends State<EditProductButton> {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => EditProduct(
-              productId: widget.product.id!,
+              productId: widget.product?.id,
               productType: widget.productType,
             )),
-          );
+          ).whenComplete(() async {
+            Api.getImage(
+              idUser: context.read<UserInfoCubit>().state.user.id!,
+              meaning: '${Utils.productTypeToChar(widget.productType).toLowerCase()}1',
+            ).then((ImageModel imageModel) {
+              setState(() {
+                imageRoute = imageModel.route;
+              });
+            });
+          });
         },
         child: Card(
           elevation: 3,

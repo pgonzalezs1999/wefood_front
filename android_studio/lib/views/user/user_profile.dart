@@ -64,8 +64,8 @@ class _UserProfileState extends State<UserProfile> {
           ).then((response) {
             setState(() {
               context.read<UserInfoCubit>().setPicture(
-                Image.network(
-                  imageModel.route!,
+                ImageWithLoader.network(
+                  route: imageModel.route!,
                   fit: BoxFit.cover,
                 )
               );

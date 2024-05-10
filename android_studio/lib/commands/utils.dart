@@ -106,4 +106,14 @@ class Utils {
   static int minutesFromNowToDateTime(DateTime deadline) {
     return deadline.difference(DateTime.now()).inMinutes;
   }
+
+  static int sumTrueBooleans(List<bool> list) {
+    int result = 0;
+    for(int i = 0; i < list.length; i++) {
+      if(list[i] == true) {
+        result++;
+      }
+    }
+    return result;
+  }
 }

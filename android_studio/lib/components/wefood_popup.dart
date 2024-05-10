@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class WefoodPopup extends StatefulWidget {
 
   final BuildContext context;
-  final File? image;
+  final Image? image;
   final String? title;
   final String? description;
   final Widget? content;
@@ -39,15 +39,15 @@ class _WefoodPopupState extends State<WefoodPopup> {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Container(
-              margin: EdgeInsets.symmetric(
+                margin: EdgeInsets.symmetric(
                 horizontal: MediaQuery.of(context).size.width * 0.1,
                 vertical: MediaQuery.of(context).size.height * 0.05,
               ),
-              child: Image(
-                image: (widget.image != null)
-                  ? FileImage(widget.image!)
-                  : const AssetImage('assets/images/logo.png'),
-              ),
+              child: (widget.image != null)
+                ? widget.image!
+                : const Image(
+                  image: AssetImage('assets/images/logo.png'),
+                ),
             ),
             if(widget.title != null) Text(
               widget.title!,

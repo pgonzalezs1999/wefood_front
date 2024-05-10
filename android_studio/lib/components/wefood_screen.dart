@@ -13,6 +13,7 @@ class WefoodScreen extends StatefulWidget {
   final bool ignoreVerticalPadding;
   final MainAxisAlignment bodyMainAxisAlignment;
   final CrossAxisAlignment bodyCrossAxisAlignment;
+  final ScrollController? controller;
 
   const WefoodScreen({
     super.key,
@@ -25,6 +26,7 @@ class WefoodScreen extends StatefulWidget {
     this.ignoreVerticalPadding = false,
     this.bodyMainAxisAlignment = MainAxisAlignment.start,
     this.bodyCrossAxisAlignment = CrossAxisAlignment.start,
+    this.controller,
   });
 
   @override
@@ -76,6 +78,7 @@ class _WefoodScreenState extends State<WefoodScreen> {
             right: widget.ignoreHorizontalPadding ? 0 : MediaQuery.of(context).size.width * Environment.defaultHorizontalMargin,
           ),
           child: SingleChildScrollView(
+            controller: widget.controller,
             physics: const AlwaysScrollableScrollPhysics(),
             child: Column(
               mainAxisAlignment: widget.bodyMainAxisAlignment,

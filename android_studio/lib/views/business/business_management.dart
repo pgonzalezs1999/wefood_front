@@ -81,11 +81,8 @@ class _BusinessManagementState extends State<BusinessManagement> {
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ),
-            if(businessBreakfastCubit.state != null) EditProductButton(
-              product: businessBreakfastCubit.state!,
-              productType: ProductType.breakfast,
-            ),
-            if(businessBreakfastCubit.state == null) const CreateProductButton(
+            EditProductButton(
+              product: businessBreakfastCubit.state,
               productType: ProductType.breakfast,
             ),
             Container(
@@ -98,11 +95,8 @@ class _BusinessManagementState extends State<BusinessManagement> {
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ),
-            if(businessLunchCubit.state != null) EditProductButton(
-              product: businessLunchCubit.state!,
-              productType: ProductType.lunch,
-            ),
-            if(businessLunchCubit.state == null) const CreateProductButton(
+            EditProductButton(
+              product: businessLunchCubit.state,
               productType: ProductType.lunch,
             ),
             Container(
@@ -115,11 +109,8 @@ class _BusinessManagementState extends State<BusinessManagement> {
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ),
-            if(businessDinnerCubit.state != null) EditProductButton(
-              product: businessDinnerCubit.state!,
-              productType: ProductType.dinner,
-            ),
-            if(businessDinnerCubit.state == null) const CreateProductButton(
+            EditProductButton(
+              product: businessDinnerCubit.state,
               productType: ProductType.dinner,
             ),
           ],

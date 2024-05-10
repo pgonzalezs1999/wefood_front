@@ -650,8 +650,8 @@ class Api {
     required String endHour,
     required String vegetarian,
     required String vegan,
-    required String bakery,
-    required String fresh,
+    required String dessert,
+    required String junk,
     required String workingOnMonday,
     required String workingOnTuesday,
     required String workingOnWednesday,
@@ -673,8 +673,8 @@ class Api {
           'ending_hour': endHour.toString(),
           'vegetarian': vegetarian.toString(),
           'vegan': vegan.toString(),
-          'bakery': bakery.toString(),
-          'fresh': fresh.toString(),
+          'dessert': dessert.toString(),
+          'junk': junk.toString(),
           'working_on_monday': workingOnMonday.toString(),
           'working_on_tuesday': workingOnTuesday.toString(),
           'working_on_wednesday': workingOnWednesday.toString(),
@@ -841,17 +841,17 @@ class Api {
   }) async {
     try {
       final response = await Middleware.endpoint(
-          name: 'getImage',
-          type: HttpType.post,
-          body: {
-            'id_user': idUser.toString(),
-            'meaning': meaning.toString(),
-          }
+        name: 'getImage',
+        type: HttpType.post,
+        body: {
+          'id_user': idUser.toString(),
+          'meaning': meaning.toString(),
+        }
       );
       ImageModel imageModel = ImageModel.fromJson(response['image']);
       return imageModel;
     } catch(error) {
-      throw Exception(error);
+      return ImageModel.empty();
     }
   }
 
@@ -931,6 +931,24 @@ class Api {
       );
       List<ProductExpandedModel> products = (response['items'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();
       return products;
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static removeImage({
+    required int idUser,
+    required String meaning,
+  }) async {
+    try {
+      await Middleware.endpoint(
+        name: 'removeImage',
+        type: HttpType.post,
+        body: {
+          'id_user': idUser.toString(),
+          'meaning': meaning.toString(),
+        },
+      );
     } catch(error) {
       throw Exception(error);
     }
