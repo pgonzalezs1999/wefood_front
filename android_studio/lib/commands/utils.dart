@@ -116,4 +116,10 @@ class Utils {
     }
     return result;
   }
+
+  static int timesOfDayDifferenceInMinutes(TimeOfDay startTime, TimeOfDay endTime) {
+    int result = 0;
+    result = ((endTime.hour - startTime.hour - ((startTime.minute > endTime.minute) ? 1 : 0)) * 60) + (endTime.minute - startTime.minute);
+    return result;
+  }
 }

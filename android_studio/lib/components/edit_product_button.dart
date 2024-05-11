@@ -27,8 +27,8 @@ class _EditProductButtonState extends State<EditProductButton> {
 
   void _retrieveData() async {
     ImageModel? imageModel = await Api.getImage(
-        idUser: context.read<UserInfoCubit>().state.user.id!,
-        meaning: '${Utils.productTypeToChar(widget.productType)}1',
+      idUser: context.read<UserInfoCubit>().state.user.id!,
+      meaning: '${Utils.productTypeToChar(widget.productType)}1',
     );
     setState(() {
       imageRoute = imageModel.route;
@@ -57,6 +57,17 @@ class _EditProductButtonState extends State<EditProductButton> {
               productType: widget.productType,
             )),
           ).whenComplete(() async {
+            Api.businessProductsResume().then((BusinessProductsResumeModel products) {
+              setState(() {
+                if(Utils.productTypeToChar(widget.productType).toLowerCase() == 'b') {
+                  context.read<BusinessBreakfastCubit>().set(products.breakfast);
+                } else if(Utils.productTypeToChar(widget.productType).toLowerCase() == 'l') {
+                  context.read<BusinessBreakfastCubit>().set(products.lunch);
+                } else if(Utils.productTypeToChar(widget.productType).toLowerCase() == 'd') {
+                  context.read<BusinessBreakfastCubit>().set(products.dinner);
+                }
+              });
+            });
             Api.getImage(
               idUser: context.read<UserInfoCubit>().state.user.id!,
               meaning: '${Utils.productTypeToChar(widget.productType).toLowerCase()}1',
@@ -88,15 +99,15 @@ class _EditProductButtonState extends State<EditProductButton> {
                   width: MediaQuery.of(context).size.width * 0.5,
                 ),
                 Container(
-                  color: Colors.white.withOpacity(0.66),
+                  color: Colors.white.withOpacity(0.85),
                   width: double.infinity,
                   height: double.infinity,
                 ),
                 ClipRect(
                   child: BackdropFilter(
                     filter: ImageFilter.blur(
-                      sigmaX: 6,
-                      sigmaY: 6,
+                      sigmaX: 4,
+                      sigmaY: 4,
                     ),
                     child: Container(
                       height: double.infinity,
@@ -108,13 +119,16 @@ class _EditProductButtonState extends State<EditProductButton> {
                         children: <Widget>[
                           Expanded(
                             child: Text(
-                              'Edite sus ${
+                              '${(widget.product?.id != null) ? 'Edite sus' : 'Cree productos para el horario de '} ${
                                 (widget.productType == ProductType.breakfast) ? 'desayuno'
                                   : (widget.productType == ProductType.lunch) ? 'almuerzo'
                                   : 'cena'
                               }s',
                               style: Theme.of(context).textTheme.titleSmall,
                             ),
+                          ),
+                          const SizedBox(
+                            width: 50,
                           ),
                           Container(
                             decoration: BoxDecoration(

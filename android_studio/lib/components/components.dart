@@ -21,3 +21,5 @@ export 'package:wefood/components/feedback_message.dart';
 export 'package:wefood/components/checkbox_row.dart';
 export 'package:wefood/components/image_slot.dart';
 export 'package:wefood/components/image_with_loader.dart';
+export 'package:wefood/components/clock_graphic.dart';
+export 'package:wefood/components/schedule_setter.dart';

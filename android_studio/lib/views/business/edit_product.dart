@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/commands/custom_parsers.dart';
 import 'package:wefood/components/components.dart';
@@ -12,7 +11,6 @@ import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/types.dart';
 import 'package:wefood/commands/utils.dart';
-import 'package:wefood/views/user/search_filters.dart';
 
 class EditProduct extends StatefulWidget {
 
@@ -93,17 +91,6 @@ class _EditProductState extends State<EditProduct> {
       });
     }
     return result;
-  }
-
-  setScheduleBorderColor() {
-    Timer(
-      const Duration(milliseconds: 1),
-          () {
-        setState(() {
-          scheduleBorderColor = Theme.of(context).colorScheme.primary;
-        });
-      },
-    );
   }
 
   _pickImageFrom({
@@ -262,7 +249,6 @@ class _EditProductState extends State<EditProduct> {
         lastFilled = i+1;
       }
     }
-    print('CLICADO: $current, LAST_FILLED:  $lastFilled');
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -426,12 +412,10 @@ class _EditProductState extends State<EditProduct> {
     super.initState();
   }
 
-  Color? scheduleBorderColor = Colors.white;
   Widget resultWidget = const LoadingIcon();
 
   @override
   Widget build(BuildContext context) {
-    setScheduleBorderColor();
     return WefoodScreen(
       controller: scrollController,
       title: '${(widget.productId != null) ? 'Editar' : 'Crear'} $_productTypeString',
@@ -486,142 +470,22 @@ class _EditProductState extends State<EditProduct> {
                   'Horario de recogida:',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
-                (widget.productId == null || (widget.productId != null && isRetrievingData == false)) ? Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    Stack(
-                      alignment: Alignment.center,
-                      children: <Widget>[
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(9999),
-                          child: Container(
-                            color: scheduleBorderColor,
-                            height: 80,
-                            width: 80,
-                            child: SfCircularChart(
-                              series: <CircularSeries>[
-                                PieSeries<PieData, String>(
-                                  radius: '130%',
-                                  dataSource: <PieData>[
-                                    PieData( // Before range
-                                      value: ((startTime.hour * 60) + startTime.minute).toDouble(),
-                                      color: Theme.of(context).colorScheme.surface,
-                                    ),
-                                    PieData( // Actual range
-                                      value: (((endTime.hour - startTime.hour) * 60) + (endTime.minute - startTime.minute)).toDouble(),
-                                      color: Theme.of(context).colorScheme.secondary,
-                                    ),
-                                    PieData( // After range
-                                      value: (((23 - endTime.hour) * 60) + (60 - endTime.minute)).toDouble(),
-                                      color: Theme.of(context).colorScheme.surface,
-                                    ),
-                                  ],
-                                  pointColorMapper: (PieData data, _) => data.color,
-                                  xValueMapper: (PieData data, _) => 'Section',
-                                  yValueMapper: (PieData data, _) => data.value,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(1000),
-                          child: Container(
-                            padding: const EdgeInsets.all(3),
-                            color: Theme.of(context).colorScheme.surface,
-                            child: Icon(
-                              Icons.timer_outlined,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      width: 20,
-                    ),
-                    Column(
-                      children: <Widget>[
-                        Row(
-                          children: <Widget>[
-                            const Text('Desde las'),
-                            TextButton(
-                              child: Text('${startTime.format(context)} h'),
-                              onPressed: () {
-                                showTimePicker(
-                                  barrierDismissible: false,
-                                  context: context,
-                                  initialTime: TimeOfDay.now(),
-                                ).then((TimeOfDay? selectedTime) {
-                                  if(selectedTime != null) {
-                                    if(Utils.timesOfDayFirstIsSooner(
-                                      selectedTime,
-                                      endTime,
-                                    )) {
-                                      setState(() {
-                                        startTime = selectedTime;
-                                      });
-                                    } else {
-                                      showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return WefoodPopup(
-                                            context: context,
-                                            title: 'Dato incorrecto',
-                                            description: 'La hora "desde las" tiene que ser más temprano que la hora "hasta las"',
-                                            cancelButtonTitle: 'OK',
-                                          );
-                                        }
-                                      );
-                                    }
-                                  }
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: <Widget>[
-                            const Text('Hasta las'),
-                            TextButton(
-                              child: Text('${endTime.format(context)} h'),
-                              onPressed: () {
-                                showTimePicker(
-                                  barrierDismissible: false,
-                                  context: context,
-                                  initialTime: TimeOfDay.now(),
-                                ).then((TimeOfDay? selectedTime) {
-                                  if(selectedTime != null) {
-                                    if(Utils.timesOfDayFirstIsSooner(
-                                      startTime,
-                                      selectedTime,
-                                    )) {
-                                      setState(() {
-                                        endTime = selectedTime;
-                                      });
-                                    } else {
-                                      showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return WefoodPopup(
-                                            context: context,
-                                            title: 'Datos incorrecto',
-                                            description: 'La hora "desde las" tiene que ser más temprano que la hora "hasta las"',
-                                            cancelButtonTitle: 'OK',
-                                          );
-                                        }
-                                      );
-                                    }
-                                  }
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ) : const LoadingIcon(),
+                (widget.productId == null || (widget.productId != null && isRetrievingData == false))
+                  ? ScheduleSetter(
+                    startTime: startTime,
+                    endTime: endTime,
+                    onChangeStartTime: (TimeOfDay selectedTime) {
+                      setState(() {
+                        startTime = selectedTime;
+                      });
+                    },
+                    onChangeEndTime: (TimeOfDay selectedTime) {
+                      setState(() {
+                        endTime = selectedTime;
+                      });
+                    },
+                  )
+                  : const LoadingIcon(),
               ],
             ),
             if(isRetrievingData == true) const LoadingIcon(),
@@ -914,7 +778,6 @@ class _EditProductState extends State<EditProduct> {
                               return ImageSlot(
                                 image: (images[i] != null) ? images[i] : null,
                                 onTap: () async {
-                                  print('-');
                                   _manageImageSlot(i);
                                 },
                               );
