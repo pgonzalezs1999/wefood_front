@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wefood/blocs/blocs.dart';
 import 'package:get/get.dart';
 import 'package:maps_launcher/maps_launcher.dart';
-import 'package:wefood/commands/custom_parsers.dart';
+import 'package:wefood/commands/utils.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
 import 'package:wefood/models/models.dart';
@@ -239,7 +239,7 @@ class _ItemState extends State<Item> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: <Widget>[
                                       Text(
-                                        '${CustomParsers.productTypeInitialToName(
+                                        '${Utils.productTypeInitialToName(
                                           string: widget.productExpanded.product.type!,
                                           isCapitalized: true,
                                           isPlural: true,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:wefood/commands/custom_parsers.dart';
+import 'package:wefood/commands/utils.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
 import 'package:wefood/models/models.dart';
@@ -67,7 +67,7 @@ class _PendingOrdersBusinessState extends State<PendingOrdersBusiness> {
                 i = i + 1;
                 return PendingOrderBusiness(
                   id: order.id!,
-                  receptionMethod: CustomParsers.stringToOrderReceptionMethod(order.receptionMethod),
+                  receptionMethod: Utils.stringToOrderReceptionMethod(order.receptionMethod),
                   isFirst: (i != 1),
                 );
               }).toList(),
@@ -119,7 +119,7 @@ class _PendingOrdersBusinessState extends State<PendingOrdersBusiness> {
                       content: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
-                          Text('¿Confirmar el pedido ${CustomParsers.numberToHexadecimal(qrOrderId)}'),
+                          Text('¿Confirmar el pedido ${Utils.numberToHexadecimal(qrOrderId)}'),
                         ],
                       ),
                       actions: [

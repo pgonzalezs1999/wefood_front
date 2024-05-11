@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wefood/commands/custom_parsers.dart';
+import 'package:wefood/commands/utils.dart';
 import 'package:wefood/types.dart';
 
 class PendingOrderBusiness extends StatefulWidget {
@@ -41,7 +41,7 @@ class _PendingOrderBusinessState extends State<PendingOrderBusiness> {
             children: <Text>[
               const Text('Pedido '),
               Text(
-                CustomParsers.numberToHexadecimal(widget.id),
+                Utils.numberToHexadecimal(widget.id),
                 style: const TextStyle(
                   fontWeight: FontWeight.w900, // TODO deshardcodear estilo
                 ),

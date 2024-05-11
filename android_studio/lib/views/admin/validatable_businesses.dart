@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wefood/commands/custom_parsers.dart';
+import 'package:wefood/commands/utils.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/components/components.dart';
@@ -101,7 +101,7 @@ class _ValidatableBusinessesState extends State<ValidatableBusinesses> {
                       ),
                       _ValidatableRow(
                         title: 'Solicitado a fecha',
-                        value: CustomParsers.dateTimeToString(item.business.createdAt),
+                        value: Utils.dateTimeToString(item.business.createdAt),
                       ),
                       const Divider(
                         height: 30,

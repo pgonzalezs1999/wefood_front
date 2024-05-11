@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:wefood/commands/custom_parsers.dart';
+import 'package:wefood/commands/utils.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/middleware.dart';
 import 'package:wefood/services/secure_storage.dart';
@@ -905,8 +905,8 @@ class Api {
           'dessert': dessert ? "1" : "0",
           'junk': junk ? "1" : "0",
           'price': price.toString(),
-          'starting_hour': CustomParsers.timeOfDayToSqlTimeString(startingHour),
-          'ending_hour': CustomParsers.timeOfDayToSqlTimeString(endingHour),
+          'starting_hour': Utils.timeOfDayToSqlTimeString(startingHour),
+          'ending_hour': Utils.timeOfDayToSqlTimeString(endingHour),
           'only_today': onlyToday ? "1" : "0",
           'only_available': onlyAvailable ? "1" : "0",
         },

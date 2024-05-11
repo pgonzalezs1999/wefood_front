@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:wefood/commands/custom_parsers.dart';
+import 'package:wefood/commands/utils.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api/api.dart';
@@ -170,7 +170,7 @@ class _OrderCustomerState extends State<OrderCustomer> {
                     height: 20,
                   ),
                   Text(
-                    'Código: ${CustomParsers.numberToHexadecimal(widget.id)}',
+                    'Código: ${Utils.numberToHexadecimal(widget.id)}',
                     style: Theme.of(context).textTheme.titleMedium,
                   )
                 ],

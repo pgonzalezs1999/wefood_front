@@ -104,15 +104,15 @@ class _ScheduleSetterState extends State<ScheduleSetter> {
                         )) {
                           if(Utils.timesOfDayDifferenceInMinutes(widget.startTime, selectedTime) >= (12 * 60)) {
                             showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return WefoodPopup(
-                                    context: context,
-                                    title: 'Datos incorrectos',
-                                    description: 'Por motivos de higiene, no permitimos que el periodo de recogida supere las 12h',
-                                    cancelButtonTitle: 'OK',
-                                  );
-                                }
+                              context: context,
+                              builder: (BuildContext context) {
+                                return WefoodPopup(
+                                  context: context,
+                                  title: 'Datos incorrectos',
+                                  description: 'Por motivos de higiene, no permitimos que el periodo de recogida supere las 12h',
+                                  cancelButtonTitle: 'OK',
+                                );
+                              }
                             );
                           } else {
                             widget.onChangeEndTime(selectedTime);

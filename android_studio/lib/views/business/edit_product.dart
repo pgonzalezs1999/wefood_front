@@ -1,16 +1,15 @@
-import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:wefood/blocs/blocs.dart';
-import 'package:wefood/commands/custom_parsers.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/types.dart';
 import 'package:wefood/commands/utils.dart';
+import 'package:wefood/commands/scroll_to_bottom.dart';
 
 class EditProduct extends StatefulWidget {
 
@@ -156,20 +155,20 @@ class _EditProductState extends State<EditProduct> {
       id: widget.productId!,
       price: price!,
       amount: amount!,
-      endingDate: CustomParsers.dateTimeToSqlDateTimeString(endDate),
-      startHour: CustomParsers.timeOfDayToSqlTimeString(startTime),
-      endHour: CustomParsers.timeOfDayToSqlTimeString(endTime),
-      vegetarian: CustomParsers.boolToSqlString(vegetarian),
-      vegan: CustomParsers.boolToSqlString(vegan),
-      junk: CustomParsers.boolToSqlString(junk),
-      dessert: CustomParsers.boolToSqlString(dessert),
-      workingOnMonday: CustomParsers.boolToSqlString(mondays),
-      workingOnTuesday: CustomParsers.boolToSqlString(tuesdays),
-      workingOnWednesday: CustomParsers.boolToSqlString(wednesdays),
-      workingOnThursday: CustomParsers.boolToSqlString(thursdays),
-      workingOnFriday: CustomParsers.boolToSqlString(fridays),
-      workingOnSaturday: CustomParsers.boolToSqlString(saturdays),
-      workingOnSunday: CustomParsers.boolToSqlString(sundays),
+      endingDate: Utils.dateTimeToSqlDateTimeString(endDate),
+      startHour: Utils.timeOfDayToSqlTimeString(startTime),
+      endHour: Utils.timeOfDayToSqlTimeString(endTime),
+      vegetarian: Utils.boolToSqlString(vegetarian),
+      vegan: Utils.boolToSqlString(vegan),
+      junk: Utils.boolToSqlString(junk),
+      dessert: Utils.boolToSqlString(dessert),
+      workingOnMonday: Utils.boolToSqlString(mondays),
+      workingOnTuesday: Utils.boolToSqlString(tuesdays),
+      workingOnWednesday: Utils.boolToSqlString(wednesdays),
+      workingOnThursday: Utils.boolToSqlString(thursdays),
+      workingOnFriday: Utils.boolToSqlString(fridays),
+      workingOnSaturday: Utils.boolToSqlString(saturdays),
+      workingOnSunday: Utils.boolToSqlString(sundays),
     ).then((ProductModel product) {
       setState(() {
         isSubmitting = false;
@@ -194,20 +193,20 @@ class _EditProductState extends State<EditProduct> {
     Api.createProduct(
       price: price!,
       amount: amount!,
-      endingDate: CustomParsers.dateTimeToSqlDateTimeString(endDate),
-      startHour: CustomParsers.timeOfDayToSqlTimeString(startTime),
-      endHour: CustomParsers.timeOfDayToSqlTimeString(endTime),
-      vegetarian: CustomParsers.boolToSqlString(vegetarian),
-      vegan: CustomParsers.boolToSqlString(vegan),
-      junk: CustomParsers.boolToSqlString(junk),
-      dessert: CustomParsers.boolToSqlString(dessert),
-      workingOnMonday: CustomParsers.boolToSqlString(mondays),
-      workingOnTuesday: CustomParsers.boolToSqlString(tuesdays),
-      workingOnWednesday: CustomParsers.boolToSqlString(wednesdays),
-      workingOnThursday: CustomParsers.boolToSqlString(thursdays),
-      workingOnFriday: CustomParsers.boolToSqlString(fridays),
-      workingOnSaturday: CustomParsers.boolToSqlString(saturdays),
-      workingOnSunday: CustomParsers.boolToSqlString(sundays),
+      endingDate: Utils.dateTimeToSqlDateTimeString(endDate),
+      startHour: Utils.timeOfDayToSqlTimeString(startTime),
+      endHour: Utils.timeOfDayToSqlTimeString(endTime),
+      vegetarian: Utils.boolToSqlString(vegetarian),
+      vegan: Utils.boolToSqlString(vegan),
+      junk: Utils.boolToSqlString(junk),
+      dessert: Utils.boolToSqlString(dessert),
+      workingOnMonday: Utils.boolToSqlString(mondays),
+      workingOnTuesday: Utils.boolToSqlString(tuesdays),
+      workingOnWednesday: Utils.boolToSqlString(wednesdays),
+      workingOnThursday: Utils.boolToSqlString(thursdays),
+      workingOnFriday: Utils.boolToSqlString(fridays),
+      workingOnSaturday: Utils.boolToSqlString(saturdays),
+      workingOnSunday: Utils.boolToSqlString(sundays),
       type: Utils.productTypeToChar(widget.productType),
     ).then((ProductModel product) {
       setState(() {
@@ -381,19 +380,6 @@ class _EditProductState extends State<EditProduct> {
         });
       } catch(error) { /*if (kDebugMode) print('ERROR AL CARGAR LA FOTO [$i]: $error');*/ }
     }
-  }
-
-  void _scrollToBottom() {
-    Timer(
-      const Duration(milliseconds: 100),
-      () {
-        scrollController.animateTo(
-        scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.easeInOut,
-        );
-      },
-    );
   }
 
   @override
@@ -821,10 +807,14 @@ class _EditProductState extends State<EditProduct> {
                           isSubmitting = false;
                           error = 'Ha ocurrido un error: $e'; // TODO hacer algo más currado
                         });
-                        _scrollToBottom();
+                        scrollToBottom(
+                          scrollController: scrollController,
+                        );
                       }
                     } else {
-                      _scrollToBottom();
+                      scrollToBottom(
+                        scrollController: scrollController,
+                      );
                     }
                   },
                 ),
@@ -872,7 +862,9 @@ class _EditProductState extends State<EditProduct> {
                                 setState(() {
                                   error = 'Ha ocurrido un error eliminar el producto. Por favor, inténtelo de nuevo más tarde';
                                 });
-                                _scrollToBottom();
+                                scrollToBottom(
+                                  scrollController: scrollController,
+                                );
                               }
                             },
                           ),

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
@@ -6,11 +7,13 @@ class ClockGraphic extends StatefulWidget {
 
   final TimeOfDay startTime;
   final TimeOfDay endTime;
+  final double size;
 
   const ClockGraphic({
     super.key,
     required this.startTime,
     required this.endTime,
+    this.size = 80,
   });
 
   @override
@@ -24,7 +27,7 @@ class _ClockGraphicState extends State<ClockGraphic> {
   _setScheduleBorderColor() {
     Timer(
       const Duration(milliseconds: 1),
-          () {
+        () {
         setState(() {
           _scheduleBorderColor = Theme.of(context).colorScheme.primary;
         });
@@ -46,12 +49,12 @@ class _ClockGraphicState extends State<ClockGraphic> {
             borderRadius: BorderRadius.circular(9999),
             child: Container(
               color: _scheduleBorderColor,
-              height: 80,
-              width: 80,
+              height: widget.size,
+              width: widget.size,
               child: SfCircularChart(
                 series: <CircularSeries>[
                   PieSeries<PieData, String>(
-                    radius: '130%',
+                    radius: '${(220 * pow(e, -0.03 * widget.size)) + 110}%', // Looks good on a size between 50 - 200
                     dataSource: (endMinutes > startMinutes)
                       ? <PieData>[
                         PieData( // Before range
@@ -101,6 +104,42 @@ class _ClockGraphicState extends State<ClockGraphic> {
                   color: Theme.of(context).colorScheme.primary,
                 ),
               ),
+            ),
+          ),
+          SizedBox(
+            width: widget.size * 0.8,
+            height: widget.size * 0.9,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [9, 3].map((i) {
+                return Text(
+                  '$i',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: widget.size * 0.1,
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.w900,
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          SizedBox(
+            width: widget.size * 0.8,
+            height: widget.size * 0.9,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [12, 6].map((i) {
+                return Text(
+                  '$i',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: widget.size * 0.1,
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.w900,
+                  ),
+                );
+              }).toList(),
             ),
           ),
         ],
