@@ -59,6 +59,8 @@ class _EditProductState extends State<EditProduct> {
   List<Image?> images = List.generate(10, (_) => null);
   String error = '';
 
+  List<bool> initialWeekDays = List.generate(7, (_) => false);
+
   bool _setError(String reason) {
     setState(() {
       error = reason;
@@ -174,6 +176,35 @@ class _EditProductState extends State<EditProduct> {
         isSubmitting = false;
       });
       Navigator.pop(context);
+      String title = '¡Producto modificado correctamente!';
+      String? description;
+      int dayOfWeekToday = DateTime.now().weekday - 1;
+      int dayOfWeekTomorrow = DateTime.now().weekday;
+      if(dayOfWeekTomorrow == 7) {
+        dayOfWeekTomorrow = 0;
+      }
+      List<bool> workingOns = [mondays, tuesdays, wednesdays, thursdays, fridays, saturdays, sundays];
+      if((initialWeekDays[dayOfWeekToday] == true && workingOns[dayOfWeekToday] == false) || (initialWeekDays[dayOfWeekTomorrow] == true && workingOns[dayOfWeekTomorrow] == false)) {
+        setState(() {
+          description = 'Se han deslistado productos activos. Si alguien ya ha reservado un pack, tendrá que ofrecérselo igualmente. Revise sus reservas clicando en "RECOGIDAS"';
+        });
+      }
+      if((initialWeekDays[dayOfWeekToday] == false && workingOns[dayOfWeekToday] == true) && (initialWeekDays[dayOfWeekTomorrow] == false && workingOns[dayOfWeekTomorrow] == true)) {
+        setState(() {
+          description = 'También se ha activado el producto para hoy y para mañana';
+        });
+      } else {
+        if(initialWeekDays[dayOfWeekToday] == false && workingOns[dayOfWeekToday] == true) {
+          setState(() {
+            description = 'También se ha activado el producto para hoy';
+          });
+        }
+        if(initialWeekDays[dayOfWeekTomorrow] == false && workingOns[dayOfWeekTomorrow] == true) {
+          setState(() {
+            description = 'También se ha activado el producto para mañana';
+          });
+        }
+      }
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -181,7 +212,8 @@ class _EditProductState extends State<EditProduct> {
         builder: ((BuildContext context) {
           return WefoodPopup(
             context: context,
-            title: '¡Producto modificado correctamente!',
+            title: title,
+            description: description,
             cancelButtonTitle: 'OK',
           );
         }),
@@ -395,6 +427,13 @@ class _EditProductState extends State<EditProduct> {
         isRetrievingData = false;
       });
     }
+    initialWeekDays[0] = mondays;
+    initialWeekDays[1] = tuesdays;
+    initialWeekDays[2] = wednesdays;
+    initialWeekDays[3] = thursdays;
+    initialWeekDays[4] = fridays;
+    initialWeekDays[5] = saturdays;
+    initialWeekDays[6] = sundays;
     super.initState();
   }
 
@@ -825,7 +864,7 @@ class _EditProductState extends State<EditProduct> {
               isError: true,
               isCentered: true,
             ),
-            if(widget.productId != null) Align(
+            if(widget.productId != null && isSubmitting == false && isRetrievingData == false) Align(
               child: ElevatedButton(
                 child: const Text('ELIMINAR PRODUCTO'),
                 onPressed: () async {

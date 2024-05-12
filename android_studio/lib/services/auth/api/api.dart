@@ -560,7 +560,7 @@ class Api {
     }
   }
 
-  static Future<BusinessProductsResumeModel> businessProductsResume() async {
+  static Future<BusinessProductsResumeModel> getBusinessProductsResume() async {
     try {
       final response = await Middleware.endpoint(
         name: 'businessProductsResume',

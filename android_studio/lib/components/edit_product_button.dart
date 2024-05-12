@@ -25,7 +25,7 @@ class EditProductButton extends StatefulWidget {
 
 class _EditProductButtonState extends State<EditProductButton> {
 
-  void _retrieveData() async {
+  void _retrieveImage() async {
     ImageModel? imageModel = await Api.getImage(
       idUser: context.read<UserInfoCubit>().state.user.id!,
       meaning: '${Utils.productTypeToChar(widget.productType)}1',
@@ -37,11 +37,15 @@ class _EditProductButtonState extends State<EditProductButton> {
 
   @override
   void initState() {
-    _retrieveData();
+    setState(() {
+      _product = widget.product;
+    });
+    _retrieveImage();
     super.initState();
   }
 
   String? imageRoute;
+  ProductModel? _product;
 
   @override
   Widget build(BuildContext context) {
@@ -53,20 +57,28 @@ class _EditProductButtonState extends State<EditProductButton> {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => EditProduct(
-              productId: widget.product?.id,
+              productId: _product?.id,
               productType: widget.productType,
             )),
           ).whenComplete(() async {
-            Api.businessProductsResume().then((BusinessProductsResumeModel products) {
-              setState(() {
-                if(Utils.productTypeToChar(widget.productType).toLowerCase() == 'b') {
+            Api.getBusinessProductsResume().then((BusinessProductsResumeModel products) {
+              _retrieveImage();
+              if(widget.productType == ProductType.breakfast) {
+                setState(() {
+                  _product = products.breakfast;
                   context.read<BusinessBreakfastCubit>().set(products.breakfast);
-                } else if(Utils.productTypeToChar(widget.productType).toLowerCase() == 'l') {
+                });
+              } else if(widget.productType == ProductType.lunch) {
+                setState(() {
+                  _product = products.lunch;
                   context.read<BusinessBreakfastCubit>().set(products.lunch);
-                } else if(Utils.productTypeToChar(widget.productType).toLowerCase() == 'd') {
+                });
+              } else if(widget.productType == ProductType.dinner) {
+                setState(() {
+                  _product = products.dinner;
                   context.read<BusinessBreakfastCubit>().set(products.dinner);
-                }
-              });
+                });
+              }
             });
             Api.getImage(
               idUser: context.read<UserInfoCubit>().state.user.id!,
@@ -119,7 +131,7 @@ class _EditProductButtonState extends State<EditProductButton> {
                         children: <Widget>[
                           Expanded(
                             child: Text(
-                              '${(widget.product?.id != null) ? 'Edite sus' : 'Cree productos para el horario de '} ${
+                              '${(_product?.id != null) ? 'Edite sus' : 'Cree productos para el horario de '} ${
                                 (widget.productType == ProductType.breakfast) ? 'desayuno'
                                   : (widget.productType == ProductType.lunch) ? 'almuerzo'
                                   : 'cena'

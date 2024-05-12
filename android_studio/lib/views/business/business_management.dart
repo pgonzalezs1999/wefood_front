@@ -28,7 +28,7 @@ class _BusinessManagementState extends State<BusinessManagement> {
   }
 
   void _retrieveData() async {
-    await Api.businessProductsResume().then((BusinessProductsResumeModel value) {
+    await Api.getBusinessProductsResume().then((BusinessProductsResumeModel value) {
       context.read<BusinessBreakfastCubit>().set(value.breakfast);
       context.read<BusinessLunchCubit>().set(value.lunch);
       context.read<BusinessDinnerCubit>().set(value.dinner);
