@@ -254,39 +254,42 @@ class _BusinessEditDirectionsState extends State<BusinessEditDirections> {
         Align(
           alignment: Alignment.center,
           child: ElevatedButton(
+            child: const Text('GUARDAR'),
             onPressed: () async {
               setState(() {
                 error = '';
               });
               if(finalDirections != '' && finalBusinessCountry != '' && typedLatLng != null) {
                 try {
-                  await Api.updateBusinessDirections(
+                  Api.updateBusinessDirections(
                     directions: finalDirections,
                     country: finalBusinessCountry,
                     longitude: typedLatLng!.longitude,
                     latitude: typedLatLng!.latitude,
-                  );
-                  context.read<UserInfoCubit>().setBusinessDirections(finalDirections);
-                  context.read<UserInfoCubit>().setBusinessLatLng(
-                    LatLng(
-                      typedLatLng!.latitude,
-                      typedLatLng!.longitude
-                    ),
-                  );
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return WefoodPopup(
-                        context: context,
-                        title: '¡Enhorabuena! Las direcciones hay cambiado correctamente a "$finalDirections"',
-                        cancelButtonTitle: 'OK',
-                        cancelButtonBehaviour: () {
-                          Navigator.pop(context);
-                        },
-                      );
+                  ).then((_) {
+                    context.read<UserInfoCubit>().setBusinessDirections(finalDirections);
+                    context.read<UserInfoCubit>().setBusinessLatLng(
+                      LatLng(
+                        typedLatLng!.latitude,
+                        typedLatLng!.longitude
+                      ),
+                    );
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return WefoodPopup(
+                          context: context,
+                          title: 'Dirección guardada como',
+                          description: finalDirections,
+                          cancelButtonTitle: 'OK',
+                          cancelButtonBehaviour: () {
+                            Navigator.pop(context);
+                          },
+                        );
                       }
                     ).then((onValue) {
-                    Navigator.pop(context);
+                      Navigator.pop(context);
+                    });
                   });
                 } catch(e) {
                   setState(() {
@@ -299,18 +302,13 @@ class _BusinessEditDirectionsState extends State<BusinessEditDirections> {
                 });
               }
             },
-            child: const Text('GUARDAR'),
           ),
         ),
-        if(error != '') Container(
-          margin: EdgeInsets.only(
-            top: MediaQuery.of(context).size.height * 0.05,
-          ),
-          child: Align(
-            alignment: Alignment.center,
-            child: Text(error),
-          ),
-        ),
+        if(error != '') FeedbackMessage(
+          message: error,
+          isError: true,
+          isCentered: true,
+        )
       ],
     );
   }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:wefood/blocs/blocs.dart';
+import 'package:wefood/commands/open_loading_popup.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
 import 'package:wefood/models/models.dart';
@@ -103,24 +104,7 @@ class _EditProductState extends State<EditProduct> {
       if(returnedImage != null) {
         imageFile = File(returnedImage.path);
         Navigator.pop(context);
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 100,
-                    ),
-                    child: const LoadingIcon(),
-                  ),
-                ],
-              ),
-            );
-          }
-        );
+        openLoadingPopup(context);
         Api.uploadImage(
           idUser: context.read<UserInfoCubit>().state.user.id!,
           meaning: '${Utils.productTypeToChar(widget.productType).toLowerCase()}$position',

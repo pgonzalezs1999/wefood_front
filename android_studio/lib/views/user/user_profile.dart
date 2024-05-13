@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/commands/contact_support.dart';
+import 'package:wefood/commands/open_loading_popup.dart';
 import 'package:wefood/commands/share_app.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/main.dart';
@@ -81,33 +82,16 @@ class _UserProfileState extends State<UserProfile> {
   _pickImageFromGallery() {
     ImagePicker().pickImage(source: ImageSource.gallery).then((XFile? returnedImage) {
       if(returnedImage != null) {
+        openLoadingPopup(context);
         Api.uploadImage(
           idUser: context.read<UserInfoCubit>().state.user.id!,
           meaning: 'profile',
           file: File(returnedImage.path),
         ).then((ImageModel imageModel) {
-          Navigator.pop(context);
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 100,
-                      ),
-                      child: const LoadingIcon(),
-                    ),
-                  ],
-                ),
-              );
-            }
-          );
           http.get(
             Uri.parse(imageModel.route!)
           ).then((response) {
+            Navigator.pop(context);
             setState(() {
               context.read<UserInfoCubit>().setPicture(
                 Image.network(
@@ -140,30 +124,13 @@ class _UserProfileState extends State<UserProfile> {
   _pickImageFromCamera() {
     ImagePicker().pickImage(source: ImageSource.camera).then((XFile? returnedImage) {
       if(returnedImage != null) {
+        Navigator.pop(context);
+        openLoadingPopup(context);
         Api.uploadImage(
           idUser: context.read<UserInfoCubit>().state.user.id!,
           meaning: 'profile',
           file: File(returnedImage.path),
         ).then((ImageModel imageModel) {
-          Navigator.pop(context);
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 100,
-                      ),
-                      child: const LoadingIcon(),
-                    ),
-                  ],
-                ),
-              );
-            }
-          );
           http.get(
             Uri.parse(imageModel.route!)
           ).then((response) {
@@ -669,12 +636,12 @@ class _UserProfileState extends State<UserProfile> {
                             });
                           },
                           child: const Text('SÍ'),
-                        )
+                        ),
                       ],
                     );
                   }
                 );
-              }
+              },
             ),
           ],
         ),

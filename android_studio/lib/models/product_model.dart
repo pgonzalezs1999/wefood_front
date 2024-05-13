@@ -2,6 +2,8 @@ import 'package:wefood/commands/utils.dart';
 
 class ProductModel {
   int? id;
+  int? businessId;
+  String? type;
   double? price;
   int? amount;
   DateTime? endingDate;
@@ -18,12 +20,13 @@ class ProductModel {
   bool? workingOnFriday;
   bool? workingOnSaturday;
   bool? workingOnSunday;
-  String? type;
 
   ProductModel.empty();
 
   ProductModel.fromJson(Map<String, dynamic> json):
     id = int.tryParse('${json['id']}'),
+    businessId = int.tryParse('${json['id_business']}'),
+    type = json['product_type'] as String?,
     price = double.tryParse('${json['price']}'),
     amount = int.tryParse('${json['amount']}'),
     endingDate = (json['ending_date'] != null) ? DateTime.parse(json['ending_date']) as DateTime? : null,
@@ -39,8 +42,7 @@ class ProductModel {
     workingOnThursday = Utils.controlBool(json['working_on_thursday']) as bool?,
     workingOnFriday = Utils.controlBool(json['working_on_friday']) as bool?,
     workingOnSaturday = Utils.controlBool(json['working_on_saturday']) as bool?,
-    workingOnSunday = Utils.controlBool(json['working_on_sunday']) as bool?,
-    type = json['type'] as String?;
+    workingOnSunday = Utils.controlBool(json['working_on_sunday']) as bool?;
 
   static DateTime? _parseTime(String? time) { // Convert HH:mm:ss to DateTime
     if(time != null) {
@@ -58,6 +60,8 @@ class ProductModel {
 
   static void printInfo(ProductModel product) {
     print('IMPRIMIENDO PRODUCT CON ID: ${product.id}');
+    print('-> businessId: ${product.businessId}');
+    print('-> type: ${product.type}');
     print('-> price: ${product.price}');
     print('-> amount: ${product.amount}');
     print('-> endingDate: ${product.endingDate}');
@@ -74,6 +78,5 @@ class ProductModel {
     print('-> workingOnFriday: ${product.workingOnFriday}');
     print('-> workingOnSaturday: ${product.workingOnSaturday}');
     print('-> workingOnSunday: ${product.workingOnSunday}');
-    print('-> type: ${product.type}');
   }
 }

@@ -66,11 +66,11 @@ class Utils {
   }) {
     String? result;
     if(type != null) {
-      if(type == 'B') {
+      if(type.toUpperCase() == 'B') {
         result = isCapitalized ? 'Desayunos' : 'desayunos';
-      } else if(type == 'L') {
+      } else if(type.toUpperCase() == 'L') {
         result = isCapitalized ? 'Almuerzos' : 'almuerzos';
-      } else if(type == 'D'){
+      } else if(type.toUpperCase() == 'D'){
         result = isCapitalized ? 'Cenas' : 'cenas';
       } else {
         throw Exception('Unhandled productType on Utils.productTypeToChar');

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:wefood/commands/open_loading_popup.dart';
 import 'package:wefood/commands/utils.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
@@ -34,47 +35,48 @@ class _PendingOrdersBusinessState extends State<PendingOrdersBusiness> {
     }
   }
 
-  _setPendingList({
+  Future<void> _setPendingList({
     required PendingOrdersBusinessCubit cubit
   }) async {
     try {
-      List<OrderModel> orderList = await Api.getPendingOrdersBusiness();
-      if(orderList.isEmpty) {
-        setState(() {
-          resultWidgetPendingList = resultWidgetPendingList = Align( // TODO poner algo más currado
-            alignment: Alignment.center,
-            child: Card(
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: MediaQuery.of(context).size.width * 0.05,
-                  vertical: MediaQuery.of(context).size.width * 0.025,
-                ),
-                child: const Text(
-                  'Cuando alguien compre alguno de sus productos, aparecerán aquí',
-                  textAlign: TextAlign.center,
+      Api.getPendingOrdersBusiness().then((List<OrderModel> orderList) {
+        if(orderList.isEmpty) {
+          setState(() {
+            resultWidgetPendingList = resultWidgetPendingList = Align( // TODO poner algo más currado
+              alignment: Alignment.center,
+              child: Card(
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: MediaQuery.of(context).size.width * 0.05,
+                    vertical: MediaQuery.of(context).size.width * 0.025,
+                  ),
+                  child: const Text(
+                    'Cuando alguien compre alguno de sus productos, aparecerán aquí',
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ),
-            ),
-          );
-        });
-      } else {
-        cubit.setWholeList(orderList);
-        int i = 0;
-        setState(() {
-          resultWidgetPendingList = SingleChildScrollView(
-            child: Column(
-              children: cubit.state.map((OrderModel order) {
-                i = i + 1;
-                return PendingOrderBusiness(
-                  id: order.id!,
-                  receptionMethod: Utils.stringToOrderReceptionMethod(order.receptionMethod),
-                  isFirst: (i != 1),
-                );
-              }).toList(),
-            ),
-          );
-        });
-      }
+            );
+          });
+        } else {
+          cubit.setWholeList(orderList);
+          int i = 0;
+          setState(() {
+            resultWidgetPendingList = SingleChildScrollView(
+              child: Column(
+                children: cubit.state.map((OrderModel order) {
+                  i = i + 1;
+                  return PendingOrderBusiness(
+                    id: order.id!,
+                    receptionMethod: Utils.stringToOrderReceptionMethod(order.receptionMethod),
+                    isFirst: (i != 1),
+                  );
+                }).toList(),
+              ),
+            );
+          });
+        }
+      });
     } catch(error) {
       setState(() {
         resultWidgetPendingList = Container(
@@ -112,39 +114,39 @@ class _PendingOrdersBusinessState extends State<PendingOrdersBusiness> {
             showDialog(
               context: context,
               builder: (context) {
-                return StatefulBuilder(
-                  builder: (context, setState) {
-                    return AlertDialog(
-                      title: const Text('¿Confirmar recogida?'),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Text('¿Confirmar el pedido ${Utils.numberToHexadecimal(qrOrderId)}'),
-                        ],
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text('CANCELAR'),
-                        ),
-                        TextButton(
-                          onPressed: () async {
-                            await Api.completeOrderBusiness(
-                              idOrder: qrOrderId,
-                            ).then((_) {
-                              _setPendingList(
-                                cubit: pendingOrdersBusinessCubit,
-                              );
-                              Navigator.pop(context);
-                            });
-                          },
-                          child: const Text('CONFIRMAR'),
-                        ),
-                      ],
-                    );
-                  },
+                return WefoodPopup(
+                  context: context,
+                  title: '¿Confirmar el pedido ${Utils.numberToHexadecimal(qrOrderId)}',
+                  cancelButtonTitle: 'CANCELAR',
+                  actions: [
+                    TextButton(
+                      child: const Text('CONFIRMAR'),
+                      onPressed: () {
+                        openLoadingPopup(context);
+                        Api.completeOrderBusiness(
+                          idOrder: qrOrderId,
+                        ).then((_) {
+                          _setPendingList(
+                            cubit: pendingOrdersBusinessCubit,
+                          ).then((_) {
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return WefoodPopup(
+                                  context: context,
+                                  title: '¡Pedido confirmado!',
+                                  description: 'Ya puede entregarle el paquete a su cliente. En los próximos dís recibirá el dinero correspondiente',
+                                  cancelButtonTitle: 'OK',
+                                );
+                              }
+                            );
+                          });
+                        });
+                      },
+                    ),
+                  ],
                 );
               },
             );

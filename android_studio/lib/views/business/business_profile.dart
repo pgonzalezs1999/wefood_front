@@ -1,9 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/commands/contact_support.dart';
+import 'package:wefood/commands/open_loading_popup.dart';
 import 'package:wefood/commands/share_app.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/main.dart';
@@ -53,77 +55,147 @@ class _BusinessProfileState extends State<BusinessProfile> {
     );
   }
 
-  void _getProfileImage() async {
+  void _getProfileImage() {
     try {
-      ImageModel? imageModel = await Api.getImage(
+      Api.getImage(
         idUser: context.read<UserInfoCubit>().state.user.id!,
         meaning: 'profile',
-      );
-      setState(() {
-        imageRoute = imageModel.route;
+      ).then((ImageModel imageModel) {
+        Image image = Image.network(
+          imageModel.route!,
+          fit: BoxFit.cover,
+        );
+        context.read<UserInfoCubit>().setPicture(image);
+        setState(() {
+          context.read<UserInfoCubit>().state;
+          imageRoute = imageModel.route;
+        });
       });
     } catch(e) {
       print('No se ha encontrado la imagen en la base de datos');
     }
   }
 
-  Future _pickImageFromGallery() async {
-    final returnedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if(returnedImage != null) {
-      setState(() {
-        _selectedImage = File(returnedImage.path);
-      });
-      ImageModel responseImage = await Api.uploadImage(
-        idUser: context.read<UserInfoCubit>().state.user.id!,
-        meaning: 'profile',
-        file: _selectedImage!,
-      );
-      setState(() {
-        imageRoute = responseImage.route;
-      });
-      Navigator.pop(context);
-    }
-  }
-
-  Future _pickImageFromCamera() async {
-    final returnedImage = await ImagePicker().pickImage(source: ImageSource.camera);
-    if(returnedImage != null) {
-      setState(() {
-        _selectedImage = File(returnedImage.path);
-      });
-      ImageModel responseImage = await Api.uploadImage(
-        idUser: context.read<UserInfoCubit>().state.user.id!,
-        meaning: 'profile',
-        file: _selectedImage!,
-      );
-      setState(() {
-        imageRoute = responseImage.route;
-      });
-      Navigator.pop(context);
-    }
-  }
-
-  _updateDirections() {
-    setState(() {
-      context.read<UserInfoCubit>().state;
+  _pickImageFrom({
+    required ImageSource source,
+  }) {
+    ImagePicker().pickImage(source: source).then((XFile? returnedImage) {
+      if(returnedImage != null) {
+        setState(() {
+          _selectedImage = File(returnedImage.path);
+        });
+        Navigator.pop(context);
+        openLoadingPopup(context);
+        Api.uploadImage(
+          idUser: context.read<UserInfoCubit>().state.user.id!,
+          meaning: 'profile',
+          file: _selectedImage!,
+        ).then((ImageModel imageModel) {
+          Image image = Image.network(
+            imageModel.route!,
+            fit: BoxFit.cover,
+          );
+          context.read<UserInfoCubit>().setPicture(image);
+          setState(() {
+            context.read<UserInfoCubit>().state;
+            imageRoute = imageModel.route;
+          });
+          Navigator.pop(context);
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return WefoodPopup(
+                context: context,
+                title: '¡Imagen añadida correctamente!',
+              );
+            }
+          );
+        });
+      }
     });
+  }
+
+  _removePicture() {
+    Navigator.pop(context);
+    openLoadingPopup(context);
+    Api.removeImage(
+      idUser: context.read<UserInfoCubit>().state.user.id!,
+      meaning: 'profile',
+    ).then((_) {
+      context.read<UserInfoCubit>().removePicture();
+      setState(() {
+        context.read<UserInfoCubit>().state;
+      });
+      Navigator.pop(context);
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return WefoodPopup(
+            context: context,
+            title: 'Imagen eliminada correctamente',
+            cancelButtonTitle: 'OK',
+          );
+        }
+      );
+    }).onError(() {
+      Navigator.pop(context);
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return WefoodPopup(
+            context: context,
+            title: 'Ha ocurrido un error',
+            description: 'Por favor, inténtelo de nuevo más tarde',
+            cancelButtonTitle: 'OK',
+          );
+        }
+      );
+    });
+  }
+
+  _retrieveData() {
+    if(context.read<UserInfoCubit>().state.business.id == null) {
+      Api.getSessionBusiness().then((BusinessExpandedModel data) {
+        setState(() {
+          context.read<UserInfoCubit>().setBusinessName(data.business.name);
+          context.read<UserInfoCubit>().setBusinessDescription(data.business.description);
+          context.read<UserInfoCubit>().setBusinessDirections(data.business.directions);
+          context.read<UserInfoCubit>().setBusinessLatLng(
+              LatLng(
+                data.business.latitude ?? 0,
+                data.business.longitude ?? 0,
+              )
+          );
+        });
+        setState(() {
+          isRetrievingData = false;
+        });
+      }).onError((error, stackTrace) {
+        setState(() {
+          isRetrievingData = false;
+          retrievingDataError = true;
+        });
+      });
+    }
   }
 
   @override
   void initState() {
-    _getProfileImage();
-    _updateDirections();
+    if(context.read<UserInfoCubit>().state.image == null) {
+      _getProfileImage();
+    }
+    _retrieveData();
     super.initState();
   }
 
   String? imageRoute;
   File? _selectedImage;
+  Widget resultWidget = const LoadingIcon();
+  bool retrievingDataError = false;
+  bool isRetrievingData = true;
 
   @override
   Widget build(BuildContext context) {
-
-    final UserInfoCubit userInfoCubit = context.watch<UserInfoCubit>();
-
     return WefoodNavigationScreen(
       children: [
         Container(
@@ -149,19 +221,23 @@ class _BusinessProfileState extends State<BusinessProfile> {
                               children: [
                                 TextButton(
                                   onPressed: () async {
-                                    _pickImageFromGallery();
+                                    _pickImageFrom(
+                                      source: ImageSource.gallery,
+                                    );
                                   },
                                   child: const Text('ESCOGER FOTO DE LA GALERÍA'),
                                 ),
                                 TextButton(
                                   onPressed: () async {
-                                    _pickImageFromCamera();
+                                    _pickImageFrom(
+                                      source: ImageSource.camera,
+                                    );
                                   },
                                   child: const Text('SACAR FOTO CON LA CÁMARA'),
                                 ),
                                 TextButton(
                                   onPressed: () async {
-                                    // TODO FALTA ESTO
+                                    _removePicture();
                                   },
                                   child: const Text('ELIMINAR FOTO'),
                                 ),
@@ -199,12 +275,9 @@ class _BusinessProfileState extends State<BusinessProfile> {
                           borderRadius: BorderRadius.circular(1000),
                           child: SizedBox.fromSize(
                             size: Size.fromRadius(MediaQuery.of(context).size.width * 0.1),
-                            child: (imageRoute != null)
-                                ? Image.network(
-                              imageRoute!,
-                              fit: BoxFit.cover,
-                            )
-                                : Container(
+                            child: (context.read<UserInfoCubit>().state.image != null)
+                            ? context.read<UserInfoCubit>().state.image!
+                            : Container(
                               color: Colors.grey.withOpacity(0.25),
                               child: Icon(
                                 Icons.person,
@@ -219,7 +292,54 @@ class _BusinessProfileState extends State<BusinessProfile> {
                   ),
                 ),
               ),
-              const BusinessInfo(),
+              if(isRetrievingData == true) const LoadingIcon(),
+              if(isRetrievingData == false && retrievingDataError == true) Container(
+                margin: EdgeInsets.symmetric(
+                  vertical: MediaQuery.of(context).size.height * 0.05,
+                ),
+                child: const Text('Error'),
+              ),
+              if(isRetrievingData == false && retrievingDataError == false) Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    EditableField(
+                      feedbackText: (context.read<UserInfoCubit>().state.business.name != null) ? 'Nombre: ${context.read<UserInfoCubit>().state.business.name!}' : 'Añade tu nombre',
+                      firstTopic: 'nombre',
+                      firstInitialValue: (context.read<UserInfoCubit>().state.business.name != null) ? context.read<UserInfoCubit>().state.business.name! : '',
+                      firstMinimumLength: 6,
+                      firstMaximumLength: 100,
+                      onSave: (newValue, newSecondValue) async {
+                        dynamic response = await Api.updateBusinessName(
+                          name: newValue,
+                        );
+                        setState(() {});
+                        return response;
+                      },
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    EditableField(
+                      feedbackText: 'Descripción: ${context.read<UserInfoCubit>().state.business.description}',
+                      firstTopic: 'descripción',
+                      firstInitialValue: context.read<UserInfoCubit>().state.business.description ?? '',
+                      firstMinimumLength: 6,
+                      firstMaximumLength: 255,
+                      onSave: (newValue, newSecondValue) async {
+                        dynamic response = await Api.updateBusinessDescription(
+                          description: newValue,
+                        );
+                        setState(() {});
+                        return response;
+                      },
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -232,13 +352,13 @@ class _BusinessProfileState extends State<BusinessProfile> {
               child: Row(
                 children: [
                   Expanded(
-                    child: Text('Ubicación: ${userInfoCubit.state.business.directions}'),
+                    child: Text('Ubicación: ${context.read<UserInfoCubit>().state.business.directions}'),
                   ),
                   const SizedBox(
                     width: 10,
                   ),
                   const Icon(
-                      Icons.edit
+                    Icons.edit
                   ),
                 ],
               ),
@@ -329,7 +449,7 @@ class _BusinessProfileState extends State<BusinessProfile> {
                             _navigateToMain();
                           },
                           child: const Text('SÍ'),
-                        )
+                        ),
                       ],
                     );
                   }

@@ -30,12 +30,6 @@ class ItemButton extends StatefulWidget {
 }
 
 class _ItemButtonState extends State<ItemButton> {
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(

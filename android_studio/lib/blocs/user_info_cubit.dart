@@ -2,7 +2,6 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:wefood/models/models.dart';
-import 'package:http/http.dart' as http;
 
 class UserInfoCubit extends Cubit<BusinessExpandedModel> {
 
@@ -27,6 +26,12 @@ class UserInfoCubit extends Cubit<BusinessExpandedModel> {
   void setPicture(Image image) {
     BusinessExpandedModel updatedState = state;
     updatedState.image = image;
+    emit(updatedState);
+  }
+
+  void removePicture() {
+    BusinessExpandedModel updatedState = state;
+    updatedState.image = null;
     emit(updatedState);
   }
 

@@ -4,7 +4,6 @@ export 'package:wefood/components/settings_element.dart';
 export 'package:wefood/components/wefood_popup.dart';
 export 'package:wefood/components/wefood_screen.dart';
 export 'package:wefood/components/loading_icon.dart';
-export 'package:wefood/components/business_info.dart';
 export 'package:wefood/components/choosable_numeric_input.dart';
 export 'package:wefood/components/comment.dart';
 export 'package:wefood/components/edit_product_button.dart';
