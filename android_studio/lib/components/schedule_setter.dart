@@ -119,15 +119,15 @@ class _ScheduleSetterState extends State<ScheduleSetter> {
                           }
                         } else {
                           showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return WefoodPopup(
-                                  context: context,
-                                  title: 'Datos incorrectos',
-                                  description: 'La hora "desde las" tiene que ser más temprano que la hora "hasta las"',
-                                  cancelButtonTitle: 'OK',
-                                );
-                              }
+                            context: context,
+                            builder: (BuildContext context) {
+                              return WefoodPopup(
+                                context: context,
+                                title: 'Datos incorrectos',
+                                description: 'La hora "desde las" tiene que ser más temprano que la hora "hasta las"',
+                                cancelButtonTitle: 'OK',
+                              );
+                            }
                           );
                         }
                       }

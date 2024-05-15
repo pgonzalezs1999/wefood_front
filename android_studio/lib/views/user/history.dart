@@ -24,12 +24,6 @@ class _HistoryState extends State<History> {
     try {
       List<ProductExpandedModel> orders = await Api.getOrderHistoryCustomer();
       orders = orders.reversed.toList();
-      /*for(int i=0; i<items.length; i++) {
-        items[i].image = await Api.getImage(
-          idUser: items[i].user.id!,
-          meaning: '${items[i].product.type!.toLowerCase()}1',
-        );
-      }*/
       setState(() {
         context.read<FavouriteItemsCubit>().set(orders);
         _retrievingFavourites = LoadingStatus.successful;

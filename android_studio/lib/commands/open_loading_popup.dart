@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wefood/components/components.dart';
 
-openLoadingPopup(BuildContext context) async {
+openLoadingPopup(BuildContext context) {
   showDialog(
     context: context,
     barrierDismissible: false,

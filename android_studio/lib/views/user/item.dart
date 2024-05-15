@@ -171,8 +171,8 @@ class _ItemState extends State<Item> {
                                     margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
                                     padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
                                     child: (info.isFavourite == true)
-                                        ? const Icon(Icons.favorite)
-                                        : const Icon(Icons.favorite_outline),
+                                      ? const Icon(Icons.favorite)
+                                      : const Icon(Icons.favorite_outline),
                                   ),
                                   onTap: () async {
                                     setState(() {
@@ -314,7 +314,10 @@ class _ItemState extends State<Item> {
                                   style: Theme.of(context).textTheme.titleMedium,
                                 ),
                                 Text('${info.business.rate}  '),
-                              ] + _printStarts(info.business.rate!),
+                                PrintStars(
+                                    rate: info.business.rate!,
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -476,7 +479,7 @@ class _ItemState extends State<Item> {
                               children: info.business.comments!.map((CommentExpandedModel c) => Comment(comment: c)).toList(),
                             ),
                           ],
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -499,31 +502,5 @@ class _ItemState extends State<Item> {
       String result = '${time.split(":")[0]}:${time.split(":")[1]}';
       return result;
     }
-  }
-
-  Icon _chooseStarIcon({
-    required double rate,
-    required double step
-  }) {
-    IconData iconData = Icons.star_half;
-    if(rate > step + 0.2) {
-      iconData = Icons.star;
-    } else if(rate < step - 0.2) {
-      iconData = Icons.star_outline;
-    }
-    return Icon(
-      iconData,
-      size: 20,
-    );
-  }
-
-  List<Widget> _printStarts(double rate) {
-    List<Widget> result = [];
-    result.add(_chooseStarIcon(rate: rate, step: 0.5));
-    result.add(_chooseStarIcon(rate: rate, step: 1.5));
-    result.add(_chooseStarIcon(rate: rate, step: 2.5));
-    result.add(_chooseStarIcon(rate: rate, step: 3.5));
-    result.add(_chooseStarIcon(rate: rate, step: 4.5));
-    return result;
   }
 }

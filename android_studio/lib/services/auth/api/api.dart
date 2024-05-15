@@ -966,4 +966,76 @@ class Api {
       throw Exception(error);
     }
   }
+
+  static Future<BusinessExpandedModel> getBusiness({
+    required int idBusiness
+  }) async {
+    try {
+      final response = await Middleware.endpoint(
+        name: 'getBusiness',
+        type: HttpType.post,
+        body: {
+          'id_business': idBusiness.toString(),
+        }
+      );
+      BusinessExpandedModel business = BusinessExpandedModel.fromJson(response);
+      return business;
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static Future addComment({
+    required int idBusiness,
+    required String message,
+    required double rate,
+  }) async {
+    try {
+      await Middleware.endpoint(
+        name: 'addComment',
+        type: HttpType.post,
+        body: {
+          'id_business': idBusiness.toString(),
+          'message': message,
+          'rate': rate.toString(),
+        }
+      );
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static Future<List<CommentExpandedModel>> getCommentsFromBusiness({
+    required int idBusiness,
+  }) async {
+    try {
+      final response = await Middleware.endpoint(
+        name: 'getCommentsFromBusiness',
+        type: HttpType.post,
+        body: {
+          'id_business': idBusiness.toString(),
+        }
+      );
+      List<CommentExpandedModel> comments = (response['comments'] as List<dynamic>).map((comment) => CommentExpandedModel.fromJson(comment)).toList();
+      return comments;
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static Future deleteComment({
+    required int idBusiness,
+  }) async {
+    try {
+      await Middleware.endpoint(
+          name: 'deleteComment',
+          type: HttpType.post,
+          body: {
+            'id_business': idBusiness.toString(),
+          }
+      );
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
 }
