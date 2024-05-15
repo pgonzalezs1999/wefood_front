@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -72,7 +73,9 @@ class _BusinessProfileState extends State<BusinessProfile> {
         });
       });
     } catch(e) {
-      print('No se ha encontrado la imagen en la base de datos');
+      if(kDebugMode) {
+        print('No se ha encontrado la imagen en la base de datos');
+      }
     }
   }
 
@@ -84,7 +87,6 @@ class _BusinessProfileState extends State<BusinessProfile> {
         setState(() {
           _selectedImage = File(returnedImage.path);
         });
-        Navigator.pop(context);
         openLoadingPopup(context);
         Api.uploadImage(
           idUser: context.read<UserInfoCubit>().state.user.id!,
@@ -109,7 +111,9 @@ class _BusinessProfileState extends State<BusinessProfile> {
                 title: '¡Imagen añadida correctamente!',
               );
             }
-          );
+          ).then((_) {
+            Navigator.pop(context);
+          });
         });
       }
     });
@@ -408,11 +412,16 @@ class _BusinessProfileState extends State<BusinessProfile> {
                       title: '¿Seguro que quieres cerrar sesión?',
                       actions: <TextButton>[
                         TextButton(
-                          onPressed: () async {
-                            await Api.logout();
-                            _deleteTokens();
-                            Navigator.pop(context);
-                            _navigateToMain();
+                          onPressed: () {
+                            Api.logout().then((_) {
+                              _deleteTokens();
+                              Navigator.pop(context);
+                              _navigateToMain();
+                            }).onError((Object error, StackTrace stackTrace) {
+                              _deleteTokens();
+                              Navigator.pop(context);
+                              _navigateToMain();
+                            });
                           },
                           child: const Text('SÍ'),
                         )
@@ -442,11 +451,25 @@ class _BusinessProfileState extends State<BusinessProfile> {
                       description: 'Perderás toda tu información y no podrás recuperarla más adelante.',
                       actions: <TextButton>[
                         TextButton(
-                          onPressed: () async {
-                            await Api.signOut();
-                            _deleteTokens();
-                            Navigator.pop(context);
-                            _navigateToMain();
+                          onPressed: () {
+                            Api.signOut().then((_) {
+                              _deleteTokens();
+                              Navigator.pop(context);
+                              _navigateToMain();
+                            }).onError((error, StackTrace stackTrace) {
+                              Navigator.pop(context);
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return WefoodPopup(
+                                    context: context,
+                                    title: 'Ha ocurrido un error',
+                                    description: 'Por favor, inténtelo de nuevo más tarde',
+                                    cancelButtonTitle: 'OK',
+                                  );
+                                }
+                              );
+                            });
                           },
                           child: const Text('SÍ'),
                         ),

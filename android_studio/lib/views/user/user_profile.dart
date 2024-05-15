@@ -32,17 +32,24 @@ class _UserProfileState extends State<UserProfile> {
     );
   }
 
-  void _navigateToFavourites() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const FavouritesScreen()),
-    );
-  }
-
   void _navigateToPendingOrders() {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const PendingOrdersCustomer()),
+    );
+  }
+
+  void _navigateToHistory() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const History()),
+    );
+  }
+
+  void _navigateToFavourites() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const FavouritesScreen()),
     );
   }
 
@@ -542,12 +549,9 @@ class _UserProfileState extends State<UserProfile> {
             ),
             SettingsElement(
               iconData: Icons.history,
-              title: 'Historial de pedidos - FALTA',
-              onTap: () async { // TODO falta esto
-                // TODO quitar async y el mostrar accessToken
-                String? at = await UserSecureStorage().read(key: 'accessToken');
-                print('ACCESS_TOKEN: $at');
-                // TODO falta esto
+              title: 'Historial de pedidos',
+              onTap: () {
+                _navigateToHistory();
               },
             ),
             SettingsElement(
@@ -625,14 +629,23 @@ class _UserProfileState extends State<UserProfile> {
                       actions: <TextButton>[
                         TextButton(
                           onPressed: () {
-                            Api.signOut().then(() {
+                            Api.signOut().then((_) {
                               _deleteTokens();
                               Navigator.pop(context);
                               _navigateToMain();
-                            }).onError(() {
-                              _deleteTokens();
+                            }).onError((error, stackTrace) {
                               Navigator.pop(context);
-                              _navigateToMain();
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return WefoodPopup(
+                                    context: context,
+                                    title: 'Ha ocurrido un error',
+                                    description: 'Por favor, inténtelo de nuevo más tarde',
+                                    cancelButtonTitle: 'OK',
+                                  );
+                                }
+                              );
                             });
                           },
                           child: const Text('SÍ'),

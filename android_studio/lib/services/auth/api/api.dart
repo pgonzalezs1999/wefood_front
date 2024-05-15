@@ -512,7 +512,7 @@ class Api {
     }
   }
 
-  static signOut() async {
+  static Future signOut() async {
     try {
       await Middleware.endpoint(
         name: 'signout',
@@ -949,6 +949,19 @@ class Api {
           'meaning': meaning.toString(),
         },
       );
+    } catch(error) {
+      throw Exception(error);
+    }
+  }
+
+  static getOrderHistoryCustomer() async {
+    try {
+      final response = await Middleware.endpoint(
+        name: 'getOrderHistoryCustomer',
+        type: HttpType.get,
+      );
+      List<ProductExpandedModel> orders = (response['orders'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();
+      return orders;
     } catch(error) {
       throw Exception(error);
     }

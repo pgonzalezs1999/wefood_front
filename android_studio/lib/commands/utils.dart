@@ -27,6 +27,12 @@ class Utils {
     )} del ${dateTime.year}';
   }
 
+  static String displayDateTimeShort(DateTime dateTime) {
+    return '${dateTime.day}/${monthNumberToString(
+      number: dateTime.month,
+    )}/${dateTime.year}';
+  }
+
   static String productTypeToChar(ProductType type) {
     String result;
     if(type == ProductType.breakfast) {
@@ -63,17 +69,21 @@ class Utils {
   static String? productTypeCharToString({
     String? type,
     bool isCapitalized = false,
+    bool isPlural = true,
   }) {
     String? result;
     if(type != null) {
       if(type.toUpperCase() == 'B') {
-        result = isCapitalized ? 'Desayunos' : 'desayunos';
+        result = isCapitalized ? 'Desayuno' : 'desayuno';
       } else if(type.toUpperCase() == 'L') {
-        result = isCapitalized ? 'Almuerzos' : 'almuerzos';
+        result = isCapitalized ? 'Almuerzo' : 'almuerzo';
       } else if(type.toUpperCase() == 'D'){
-        result = isCapitalized ? 'Cenas' : 'cenas';
+        result = isCapitalized ? 'Cena' : 'cena';
       } else {
         throw Exception('Unhandled productType on Utils.productTypeToChar');
+      }
+      if(isPlural == true) {
+        result = '${result}s';
       }
     }
     return result;

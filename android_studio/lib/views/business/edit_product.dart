@@ -459,7 +459,7 @@ class _EditProductState extends State<EditProduct> {
                         price = double.tryParse(value);
                       });
                     },
-                    labelText: 'Hasta',
+                    labelText: 'Precio',
                     type: InputType.decimal,
                     feedbackWidget: (price != null)
                       ? (price! < Environment.minimumPrice)
@@ -518,7 +518,7 @@ class _EditProductState extends State<EditProduct> {
                         amount = int.tryParse(value);
                       });
                     },
-                    labelText: 'Hasta',
+                    labelText: 'Packs',
                     type: InputType.integer,
                   ),
                 ),

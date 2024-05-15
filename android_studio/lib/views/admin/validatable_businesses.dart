@@ -32,7 +32,7 @@ class _ValidatableBusinessesState extends State<ValidatableBusinesses> {
   @override
   Widget build(BuildContext context) {
     return WefoodScreen(
-      title: 'Validar establecimientos',
+      title: 'Validar negocios',
       body: [
         if(isRetrievingData == true) const LoadingIcon(),
         if(isRetrievingData == false) Column(
@@ -43,17 +43,35 @@ class _ValidatableBusinessesState extends State<ValidatableBusinesses> {
                 bottom: 20,
               ),
               child: Card(
+                elevation: 2,
                 child: Container(
+                  decoration: BoxDecoration(
+                    border: Border(
+                      top: BorderSide(
+                        color: Theme.of(context).colorScheme.primary,
+                        width: 0.25,
+                      ),
+                      left: BorderSide(
+                        color: Theme.of(context).colorScheme.primary,
+                        width: 0.25,
+                      ),
+                      right: BorderSide(
+                        color: Theme.of(context).colorScheme.primary,
+                        width: 0.25,
+                      ),
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,
                     vertical: 20,
                   ),
                   child: Column(
                     children: <Widget>[
-                      const Text(
+                      Text(
                         'Establecimiento solicitado:',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w900, // TODO deshardcodear estilo
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(
@@ -78,11 +96,9 @@ class _ValidatableBusinessesState extends State<ValidatableBusinesses> {
                       const Divider(
                         height: 30,
                       ),
-                      const Text(
+                      Text(
                         'Usuario solicitante:',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w900, // TODO deshardcodear estilo
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
                       const SizedBox(
                         height: 10,
@@ -209,7 +225,7 @@ class _ValidatableRowState extends State<_ValidatableRow> {
           Text(
             '${widget.title}: ',
             style: const TextStyle(
-              fontWeight: FontWeight.w800, // TODO deshardcodear estilo,
+              fontWeight: FontWeight.w600,
             ),
           ),
           Expanded(

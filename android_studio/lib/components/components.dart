@@ -22,3 +22,4 @@ export 'package:wefood/components/image_slot.dart';
 export 'package:wefood/components/image_with_loader.dart';
 export 'package:wefood/components/clock_graphic.dart';
 export 'package:wefood/components/schedule_setter.dart';
+export 'package:wefood/components/order_history_button_customer.dart';

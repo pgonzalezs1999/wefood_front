@@ -40,12 +40,18 @@ class _AdminProfileState extends State<AdminProfile> {
   Widget build(BuildContext context) {
     return WefoodNavigationScreen(
       children: [
-        Align(
+        Container(
+          margin: const EdgeInsets.symmetric(
+            vertical: 20,
+          ),
           alignment: Alignment.center,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              const Text('Gestión de administradores'),
+              Text(
+                'Gestión de administradores',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
               Container(
                 margin: EdgeInsets.only(
                   top: MediaQuery.of(context).size.height * 0.01,

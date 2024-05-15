@@ -16,6 +16,7 @@ class BusinessModel {
   double? rate;
   DateTime? createdAt;
   List<CommentExpandedModel>? comments;
+  String? deletedAt;
 
   BusinessModel.empty();
 
@@ -36,7 +37,8 @@ class BusinessModel {
     createdAt = (json['created_at'] != null) ? DateTime.parse(json['created_at']) as DateTime? : null,
     comments = json['comments'] != null
       ? List<CommentExpandedModel>.from((json['comments'] as List<dynamic>).map((comment) => CommentExpandedModel.fromJson(comment as Map<String, dynamic>)))
-      : null;
+      : null,
+    deletedAt = json['deleted_at'] as String?;
 
   static void printInfo(BusinessModel business) {
     print('IMPRIMIENDO BUSINESS CON ID: ${business.id}');
@@ -54,5 +56,6 @@ class BusinessModel {
     print('-> rate: ${business.rate}');
     print('-> createdAt: ${business.createdAt}');
     print('-> comments: ${business.comments}');
+    print('-> deletedAt: ${business.comments}');
   }
 }

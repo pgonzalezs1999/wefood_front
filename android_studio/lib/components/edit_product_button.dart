@@ -111,15 +111,15 @@ class _EditProductButtonState extends State<EditProductButton> {
                   width: MediaQuery.of(context).size.width * 0.5,
                 ),
                 Container(
-                  color: Colors.white.withOpacity(0.85),
+                  color: Colors.white.withOpacity((widget.product?.id != null) ? 0.85 : 0.9),
                   width: double.infinity,
                   height: double.infinity,
                 ),
                 ClipRect(
                   child: BackdropFilter(
                     filter: ImageFilter.blur(
-                      sigmaX: 4,
-                      sigmaY: 4,
+                      sigmaX: (widget.product?.id != null) ? 2 : 1,
+                      sigmaY: (widget.product?.id != null) ? 2 : 1,
                     ),
                     child: Container(
                       height: double.infinity,
