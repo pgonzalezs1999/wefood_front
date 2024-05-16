@@ -24,3 +24,4 @@ export 'package:wefood/components/clock_graphic.dart';
 export 'package:wefood/components/schedule_setter.dart';
 export 'package:wefood/components/order_history_button_customer.dart';
 export 'package:wefood/components/print_stars.dart';
+export 'package:wefood/components/blocked_button.dart';

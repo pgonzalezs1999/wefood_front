@@ -7,17 +7,23 @@ import 'package:wefood/types.dart';
 
 class Middleware {
 
-  static const Duration timeOutDuration = Duration(seconds: 10);
+  static const Duration timeOutDuration = Duration(seconds: 3);
 
   static Future get({
     required Uri url,
     required auth,
   }) async {
-    final response = await http.get(
+    try {
+      final response = await http.get(
         url,
         headers: auth
-    );
-    return response;
+      ).timeout(timeOutDuration, onTimeout: () {
+        throw TimeoutException('TimeoutException');
+      });
+      return response;
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future post({
@@ -25,12 +31,18 @@ class Middleware {
     required auth,
     body,
   }) async {
-    final response = await http.post(
+    try {
+      final response = await http.post(
         url,
         headers: auth,
         body: body
-    );
-    return response;
+      ).timeout(timeOutDuration, onTimeout: () {
+        throw TimeoutException('TimeoutException');
+      });
+      return response;
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future multipartPost({
@@ -39,16 +51,22 @@ class Middleware {
     body,
     file,
   }) async {
-    var request = http.MultipartRequest('POST', Uri.parse(url),);
-    request.headers.addAll(auth);
-    request.fields.addAll(body);
-    final sendFile = await http.MultipartFile.fromPath(
-      'image',
-      file.path,
-    );
-    request.files.add(sendFile);
-    final response = await http.Response.fromStream(await request.send());
-    return response;
+    try {
+      var request = http.MultipartRequest('POST', Uri.parse(url),);
+      request.headers.addAll(auth);
+      request.fields.addAll(body);
+      final sendFile = await http.MultipartFile.fromPath(
+        'image',
+        file.path,
+      ).timeout(timeOutDuration, onTimeout: () {
+        throw TimeoutException('TimeoutException');
+      });
+      request.files.add(sendFile);
+      final response = await http.Response.fromStream(await request.send());
+      return response;
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future endpoint({
@@ -70,7 +88,7 @@ class Middleware {
           response = await get(
             url: uri,
             auth: auth,
-          ).timeout(timeOutDuration);
+          );
           return jsonDecode(utf8.decode(response.bodyBytes));
         case HttpType.post:
           print('HACIENDO POST DE: $uri CON BODY: $body');
@@ -78,7 +96,7 @@ class Middleware {
             url: uri,
             body: body,
             auth: auth,
-          ).timeout(timeOutDuration);
+          );
           return jsonDecode(utf8.decode(response.bodyBytes));
         case HttpType.multipartPost:
           print('HACIENDO MULTIPART_POST DE: $fullUrl CON BODY: $body');
@@ -87,13 +105,13 @@ class Middleware {
             body: body,
             file: file,
             auth: auth!,
-          ).timeout(timeOutDuration);
+          );
           return response;
         default:
           throw Exception("Unsupported HTTP method");
       }
     } catch(error) {
-      return error;
+      rethrow;
     }
   }
 }

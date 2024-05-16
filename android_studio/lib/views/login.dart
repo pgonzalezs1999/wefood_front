@@ -1,7 +1,11 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:wefood/components/components.dart';
+import 'package:wefood/environment.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api/api.dart';
+import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/types.dart';
 import 'package:wefood/views/views.dart';
 
@@ -76,20 +80,25 @@ class _LoginState extends State<Login> {
               WefoodInput(
                 labelText: 'Nombre de usuario o email',
                 onChanged: (value) {
-                  username = value;
+                  setState(() {
+                    username = value;
+                  });
                 },
               ),
               WefoodInput(
                 labelText: 'Contraseña',
                 type: InputType.secret,
                 onChanged: (value) {
-                  password = value;
+                  setState(() {
+                    password = value;
+                  });
                 },
               ),
             ],
           ),
         ),
-        if(authenticating != LoadingStatus.loading) ElevatedButton(
+        if(authenticating != LoadingStatus.loading && username != '' && password != '') ElevatedButton(
+          child: const Text('INICIAR SESIÓN'),
           onPressed: () {
             setState(() {
               authenticating = LoadingStatus.loading;
@@ -98,17 +107,61 @@ class _LoginState extends State<Login> {
               context: context,
               username: username,
               password: password,
-              onError: () {
+            ).then((AuthModel authModel) {
+              if(authModel.accessToken != null) {
+                UserSecureStorage().writeDateTime(
+                  key: 'accessTokenExpiresAt',
+                  value: DateTime.now().add(Duration(seconds: authModel.expiresAt!))
+                );
+                UserSecureStorage().write(key: 'accessToken', value: authModel.accessToken!);
+                UserSecureStorage().write(key: 'username', value: username);
+                UserSecureStorage().write(key: 'password', value: password);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Home()),
+                );
+              } else if(authModel.error != null) {
                 setState(() {
                   authenticating = LoadingStatus.error;
                 });
+                String? title = 'Ha ocurrido un error';
+                String? description = 'Por favor, inténtelo de nuevo más tarde. Si el error persiste, póngase en contacto con soporte.';
+                if(authModel.error!.toLowerCase().contains('unauthorized')) {
+                  title = 'Usuario o contraseña incorrectos';
+                  description = null;
+                }
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return WefoodPopup(
+                      context: context,
+                      title: title,
+                      description: description,
+                      cancelButtonTitle: 'OK',
+                    );
+                  }
+                );
               }
-            );
+            }).onError((error, stackTrace) {
+              setState(() {
+                authenticating = LoadingStatus.error;
+              });
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return WefoodPopup(
+                    context: context,
+                    title: (error.runtimeType == TimeoutException) ? 'No se ha podido conectar con el servidor' : 'Ha ocurrido un error',
+                    description: 'Por favor, inténtelo de nuevo más tarde. Si el error consiste, póngase en contacto con soporte.',
+                    cancelButtonTitle: 'OK',
+                  );
+                }
+              );
+            });
           },
-          child: const Text('INICIAR SESIÓN'),
         ),
-        const SizedBox(
-          height: 20,
+        if(authenticating != LoadingStatus.loading && (username == '' || password == '')) const BlockedButton(
+          text: 'INICIAR SESIÓN',
         ),
         if(authenticating == LoadingStatus.loading) const CircularProgressIndicator(),
         Row(
@@ -140,6 +193,26 @@ class _LoginState extends State<Login> {
             _navigateToTermsAndConditions();
           },
           child: const Text('Términos y condiciones legales'),
+        ),
+        Container(
+          padding: const EdgeInsets.only(
+            bottom: 10,
+          ),
+          width: MediaQuery.of(context).size.width * 0.5,
+          child: const Divider(
+            height: 20,
+          ),
+        ),
+        const Text('¿Alguna incidencia? Escríbenos a '),
+        TextButton(
+          onPressed: () async {
+            String message = 'Buenas tardes. Quería hacer una consulta sobre la aplicación de WeFood:\n\n';
+            String subject = 'Consulta sobre la aplicación WeFood';
+            await launchUrl(
+              Uri.parse('mailto:${Environment.supportEmail}?subject=$subject&body=$message'),
+            );
+          },
+          child: const Text(Environment.supportEmail),
         ),
       ],
     );

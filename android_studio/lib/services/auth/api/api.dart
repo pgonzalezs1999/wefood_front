@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,81 +8,17 @@ import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/middleware.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/types.dart';
-import 'package:wefood/views/views.dart';
 import 'dart:convert';
 
 class Api {
 
-  static List<AppException> handledErrors = [
-    WefoodApiNotRespondingException(),
-    WefoodUnauthorizedException(),
-    WefoodBadRequestException(),
-    WefoodFetchDataException(),
-    WefoodDefaultException(),
-  ];
-
-  static _displayError({
-    required BuildContext context,
-    required dynamic error,
-    String title = '',
-    String description = '',
-    String imageUrl = 'assets/images/logo.png',
-  }) {
-    title = error;
-    FocusScope.of(context).unfocus();
-    if(handledErrors.any((e) => e.runtimeType == error.runtimeType)) {
-      title = error.titleMessage;
-      description = error.descriptionMessage ?? '';
-      imageUrl = error.imageUrl ?? '';
-    } else if(error.runtimeType == String) {
-      title = error;
-    }
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                margin: EdgeInsets.symmetric(
-                  vertical: MediaQuery.of(context).size.height * 0.025,
-                ),
-                child: Image.asset(
-                  imageUrl,
-                  width: MediaQuery.of(context).size.width * 0.5,
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: MediaQuery.of(context).size.width * 0.05,
-                  vertical: MediaQuery.of(context).size.height * 0.025,
-                ),
-                child: Text(title),
-              ),
-              Text(description),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  static Future<AuthModel?> login({
+  static Future<AuthModel> login({
     required BuildContext context,
     required String username,
     required String password,
-    Function()? onError,
   }) async {
     try {
-      final response = await Middleware.endpoint(
+      dynamic response = await Middleware.endpoint(
         name: 'login',
         type: HttpType.post,
         body: {
@@ -90,40 +27,9 @@ class Api {
         },
         needsAccessToken: false,
       );
-      if(response['access_token'] == null) {
-        if(onError != null) {
-          onError();
-        }
-        _displayError(context: context, error: response['error']);
-      } else {
-        AuthModel authModel = AuthModel.fromParameters(
-            response['access_token'],
-            response['expires_in']
-        );
-        await UserSecureStorage().write(key: 'accessToken', value: authModel.accessToken!);
-        await UserSecureStorage().writeDateTime(
-            key: 'accessTokenExpiresAt',
-            value: DateTime.now().add(Duration(seconds: authModel.expiresAt!))
-        );
-        await UserSecureStorage().write(key: 'username', value: username);
-        await UserSecureStorage().write(key: 'password', value: password);
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const Home()),
-        );
-        return authModel;
-      }
-    } catch(error) {
-      if(onError != null) {
-        onError();
-      }
-      await UserSecureStorage().delete(key: 'accessToken');
-      await UserSecureStorage().delete(key: 'accessTokenExpiresAt');
-      await UserSecureStorage().delete(key: 'username');
-      await UserSecureStorage().delete(key: 'password');
-      _displayError(context: context, error: error);
-    }
-    return null;
+      AuthModel authModel = AuthModel.fromJson(response);
+      return authModel;
+    } catch(error) { rethrow; }
   }
 
   static Future<UserModel> getProfile() async {
@@ -134,9 +40,7 @@ class Api {
       );
       UserModel userModel = UserModel.fromJson(response['message']);
       return userModel;
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<BusinessExpandedModel> getSessionBusiness() async {
@@ -147,9 +51,7 @@ class Api {
       );
       BusinessExpandedModel businessModel = BusinessExpandedModel.fromJson(response);
       return businessModel;
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static updateUsername({
@@ -164,9 +66,7 @@ class Api {
           }
       );
       return response;
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static updateRealName({
@@ -183,9 +83,7 @@ class Api {
         }
       );
       return response;
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static updateBusinessName({
@@ -200,9 +98,7 @@ class Api {
           }
       );
       return response;
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static updateBusinessDescription({
@@ -217,9 +113,7 @@ class Api {
           }
       );
       return response;
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static updateBusinessDirections({
@@ -240,9 +134,7 @@ class Api {
           }
       );
       return response;
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<List<ProductExpandedModel>> getFavouriteItems() async {
@@ -253,9 +145,7 @@ class Api {
       );
       List<ProductExpandedModel> products = (response['products'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();
       return products;
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<List<ProductExpandedModel>> getNearbyItems({
@@ -273,9 +163,7 @@ class Api {
       );
       List<ProductExpandedModel> products = (response['items'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();
       return products;
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<List<ProductExpandedModel>> getRecommendedItems({
@@ -293,9 +181,7 @@ class Api {
       );
       List<ProductExpandedModel> products = (response['items'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();
       return products;
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<ProductExpandedModel> getProduct({
@@ -308,9 +194,7 @@ class Api {
       );
       ProductExpandedModel product = ProductExpandedModel.fromJson(response);
       return product;
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<ProductExpandedModel> getItem({
@@ -323,9 +207,7 @@ class Api {
       );
       ProductExpandedModel product = ProductExpandedModel.fromJson(response);
       return product;
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<FavouriteModel> addFavourite({
@@ -341,9 +223,7 @@ class Api {
       );
       FavouriteModel favourite = FavouriteModel.fromJson(response);
       return favourite;
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<FavouriteModel> removeFavourite({
@@ -351,17 +231,15 @@ class Api {
   }) async {
     try {
       dynamic response = await Middleware.endpoint(
-          name: 'removeFavourite',
-          type: HttpType.post,
-          body: {
-            'id_business': idBusiness.toString(),
-          }
+        name: 'removeFavourite',
+        type: HttpType.post,
+        body: {
+          'id_business': idBusiness.toString(),
+        }
       );
       FavouriteModel favourite = FavouriteModel.fromJson(response['favourite']);
       return favourite;
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<bool> checkUsernameAvailability({
@@ -369,16 +247,14 @@ class Api {
   }) async {
     try {
       dynamic response = await Middleware.endpoint(
-          name: 'checkUsernameAvailability',
-          type: HttpType.post,
-          body: {
-            'username': username,
-          }
+        name: 'checkUsernameAvailability',
+        type: HttpType.post,
+        body: {
+          'username': username,
+        }
       );
       return response['availability'];
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<bool> checkEmailAvailability({
@@ -386,16 +262,14 @@ class Api {
   }) async {
     try {
       dynamic response = await Middleware.endpoint(
-          name: 'checkEmailAvailability',
-          type: HttpType.post,
-          body: {
-            'email': email.toString(),
-          }
+        name: 'checkEmailAvailability',
+        type: HttpType.post,
+        body: {
+          'email': email.toString(),
+        }
       );
       return response['availability'];
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<bool> checkPhoneAvailability({
@@ -403,16 +277,14 @@ class Api {
   }) async {
     try {
       dynamic response = await Middleware.endpoint(
-          name: 'checkPhoneAvailability',
-          type: HttpType.post,
-          body: {
-            'phone': phone.toString(),
-          }
+        name: 'checkPhoneAvailability',
+        type: HttpType.post,
+        body: {
+          'phone': phone.toString(),
+        }
       );
       return response['availability'];
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<bool> checkTaxIdAvailability({
@@ -427,9 +299,7 @@ class Api {
           }
       );
       return response['availability'];
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<List<CountryModel>> getAllCountries() async {
@@ -441,9 +311,7 @@ class Api {
       );
       List<CountryModel> countries = (response['message'] as List<dynamic>).map((country) => CountryModel.fromJson(country)).toList();
       return countries;
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<UserModel> signIn({
@@ -462,9 +330,7 @@ class Api {
           }
       );
       return UserModel.fromJson(response['user']);
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future createBusiness({
@@ -498,9 +364,7 @@ class Api {
           'latitude': latitude.toString(),
         }
       );
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static _clearData(BuildContext context) {
@@ -526,9 +390,7 @@ class Api {
           name: 'logout',
           type: HttpType.get,
       );
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future signOut(BuildContext context) async {
@@ -539,9 +401,7 @@ class Api {
       ).then((_) {
         _clearData(context);
       });
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<bool> checkValidity({
@@ -557,9 +417,7 @@ class Api {
       );
       bool validity = (response['validity'] == 1 || response['validity'] == '1' || response['validity'] == true);
       return validity;
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future cancelValidation({
@@ -576,9 +434,7 @@ class Api {
       if(response['message'] == null) {
         throw Exception(response['error']);
       }
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<BusinessProductsResumeModel> getBusinessProductsResume() async {
@@ -589,9 +445,7 @@ class Api {
       );
       BusinessProductsResumeModel result = BusinessProductsResumeModel.fromJson(response);
       return result;
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<ProductModel> updateProduct({
@@ -639,9 +493,7 @@ class Api {
       );
       ProductModel result = ProductModel.fromJson(response['product']);
       return result;
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<void> deleteProduct({
@@ -658,9 +510,7 @@ class Api {
       if(response['message'] == null) {
         throw Exception();
       }
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<ProductModel> createProduct({
@@ -708,9 +558,7 @@ class Api {
       );
       ProductModel result = ProductModel.fromJson(response['product']);
       return result;
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<List<BusinessExpandedModel>> getValidatableBusinesses() async {
@@ -721,9 +569,7 @@ class Api {
       );
       List<BusinessExpandedModel> result = (response['results'] as List<dynamic>).map((business) => BusinessExpandedModel.fromJson(business)).toList();
       return result;
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<void> validateBusiness({
@@ -741,9 +587,7 @@ class Api {
       } else {
         throw Exception('ERROR WHILE VALIDATING BUSINESS');
       }
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<void> refuseBusiness({
@@ -760,9 +604,7 @@ class Api {
       if(response['message'] == null) {
         throw Exception('ERROR WHILE REFUSING BUSINESS');
       }
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<void> orderItem({
@@ -781,9 +623,7 @@ class Api {
       if(response['message'] == null) {
         throw Exception('ERROR WHILE REFUSING BUSINESS');
       }
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<List<ProductExpandedModel>> getPendingOrdersCustomer() async {
@@ -797,9 +637,7 @@ class Api {
       }
       List<ProductExpandedModel> result = (response['results'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();
       return result;
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<List<OrderModel>> getPendingOrdersBusiness() async {
@@ -813,9 +651,7 @@ class Api {
       }
       List<OrderModel> result = (response['orders'] as List<dynamic>).map((order) => OrderModel.fromJson(order)).toList();
       return result;
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<void> completeOrderCustomer({
@@ -832,9 +668,7 @@ class Api {
       if(response['message'] == null) {
         throw Exception('ERROR WHILE GETTING PENDING ITEMS');
       }
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<void> completeOrderBusiness({
@@ -851,9 +685,7 @@ class Api {
       if(response['message'] == null) {
         throw Exception('ERROR WHILE GETTING PENDING ITEMS');
       }
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<ImageModel> getImage({
@@ -894,9 +726,7 @@ class Api {
       final responseBody = jsonDecode(response.body);
       ImageModel imageModel = ImageModel.fromJson(responseBody['image']);
       return imageModel;
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<List<ProductExpandedModel>> searchItemsByFilters({
@@ -934,9 +764,7 @@ class Api {
       );
       List<ProductExpandedModel> products = (response['items'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();
       return products;
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<List<ProductExpandedModel>> searchItemsByText({
@@ -952,9 +780,7 @@ class Api {
       );
       List<ProductExpandedModel> products = (response['items'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();
       return products;
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static removeImage({
@@ -970,9 +796,7 @@ class Api {
           'meaning': meaning.toString(),
         },
       );
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static getOrderHistoryCustomer() async {
@@ -983,9 +807,7 @@ class Api {
       );
       List<ProductExpandedModel> orders = (response['orders'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();
       return orders;
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<BusinessExpandedModel> getBusiness({
@@ -1001,9 +823,7 @@ class Api {
       );
       BusinessExpandedModel business = BusinessExpandedModel.fromJson(response);
       return business;
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future addComment({
@@ -1021,9 +841,7 @@ class Api {
           'rate': rate.toString(),
         }
       );
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future<List<CommentExpandedModel>> getCommentsFromBusiness({
@@ -1039,9 +857,7 @@ class Api {
       );
       List<CommentExpandedModel> comments = (response['comments'] as List<dynamic>).map((comment) => CommentExpandedModel.fromJson(comment)).toList();
       return comments;
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 
   static Future deleteComment({
@@ -1049,14 +865,12 @@ class Api {
   }) async {
     try {
       await Middleware.endpoint(
-          name: 'deleteComment',
-          type: HttpType.post,
-          body: {
-            'id_business': idBusiness.toString(),
-          }
+        name: 'deleteComment',
+        type: HttpType.post,
+        body: {
+          'id_business': idBusiness.toString(),
+        }
       );
-    } catch(error) {
-      throw Exception(error);
-    }
+    } catch(error) { rethrow; }
   }
 }

@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wefood/blocs/blocs.dart';
-import 'package:wefood/blocs/recommended_items_cubit.dart';
+import 'package:wefood/components/components.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/services/secure_storage.dart';
@@ -156,42 +156,60 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _getAccessToken() async {
-    String? accessToken = await UserSecureStorage().read(key: 'accessToken');
-    DateTime? expiresAt = await UserSecureStorage().readDateTime(key: 'accessTokenExpiresAt');
-    String? username = await UserSecureStorage().read(key: 'username');
-    String? password = await UserSecureStorage().read(key: 'password');
-    bool readyToLogin = false;
-    if(accessToken != null && accessToken != '') {
-      if(expiresAt != null && accessToken != '') {
-        if(DateTime.now().difference(expiresAt) > const Duration(milliseconds: 0)) {
-          readyToLogin = true;
-        }
-      }
-    }
-    if(readyToLogin == false) {
-      if(username != null && password != null) {
-        AuthModel? auth = await Api.login(
-          context: context,
-          username: username,
-          password: password,
-        );
-        if(auth != null) {
-          readyToLogin = true;
-        }
-      }
-    }
-
-    if(readyToLogin == true) {
-      _navigateToHome();
-    } else {
-      _navigateToLogin();
-    }
+  void _getAccessToken() {
+    UserSecureStorage().read(key: 'accessToken').then((String? accessToken) {
+      UserSecureStorage().readDateTime(key: 'accessTokenExpiresAt').then((DateTime? expiresAt) {
+        UserSecureStorage().read(key: 'username').then((String? username) {
+          UserSecureStorage().read(key: 'password').then((String? password) {
+            bool readyToLogin = false;
+            if(accessToken != null && accessToken != '' && expiresAt != null) {
+              if(DateTime.now().difference(expiresAt) > const Duration(milliseconds: 0)) {
+                readyToLogin = true;
+              }
+            }
+            if(readyToLogin == false) {
+              if(username != null && password != null) {
+                Api.login(
+                  context: context,
+                  username: username,
+                  password: password,
+                ).then((AuthModel? auth) {
+                  if(auth != null) {
+                    _navigateToHome();
+                  } else {
+                    _navigateToLogin();
+                  }
+                }).onError((error, stackTrace) {
+                  _navigateToLogin();
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (BuildContext context) {
+                      return WefoodPopup(
+                        context: context,
+                        title: 'No se ha podido conectar con el servidor',
+                        description: 'Por favor, inicie sesión de nuevo',
+                        cancelButtonTitle: 'OK',
+                      );
+                    }
+                  );
+                });
+              } else {
+                _navigateToLogin();
+              }
+            } else {
+              _navigateToHome();
+            }
+          });
+        });
+      });
+    });
   }
 
   @override
   void initState() {
     super.initState();
+    print('--> initState del main');
     _getAccessToken();
   }
 

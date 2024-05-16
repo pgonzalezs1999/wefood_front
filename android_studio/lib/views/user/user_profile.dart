@@ -66,18 +66,22 @@ class _UserProfileState extends State<UserProfile> {
           idUser: context.read<UserInfoCubit>().state.user.id!,
           meaning: 'profile',
         ).then((ImageModel imageModel) {
-          http.get(
+          if(imageModel.route != null) {
+            http.get(
               Uri.parse(imageModel.route!)
-          ).then((response) {
-            setState(() {
-              context.read<UserInfoCubit>().setPicture(
-                ImageWithLoader.network(
-                  route: imageModel.route!,
-                  fit: BoxFit.cover,
-                )
-              );
+            ).then((response) {
+              setState(() {
+                context.read<UserInfoCubit>().setPicture(
+                  ImageWithLoader.network(
+                    route: imageModel.route!,
+                    fit: BoxFit.cover,
+                  )
+                );
+              });
             });
-          });
+          }
+        }).onError((error, stackTrace) {
+          print('No se ha encontrado la foto de perfil para este usuario');
         });
       } catch(e) {
         return;
