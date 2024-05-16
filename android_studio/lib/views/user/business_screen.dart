@@ -7,6 +7,7 @@ import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api/api.dart';
+import 'package:wefood/types.dart';
 
 class BusinessScreen extends StatefulWidget {
 
@@ -29,16 +30,17 @@ class _BusinessScreenState extends State<BusinessScreen> {
   String newCommentMessage = '';
   double selectedRate = 4;
   bool hasCommented = false;
+  LoadingStatus loadingFavourite = LoadingStatus.unset;
 
   List<DropdownMenuItem<double>> _rateOptions() {
     List<DropdownMenuItem<double>> amounts = [];
-    for(double i = 5; i >= 0.5; i-=0.5) {
+    for(double i = 5; i >= 1; i-=1) {
       amounts.add(
           DropdownMenuItem<double>(
             value: i,
             child: Row(
               children: <Widget>[
-                Text(i.toString()),
+                Text(i.toStringAsFixed(0)),
                 const SizedBox(
                   width: 5,
                 ),
@@ -86,26 +88,6 @@ class _BusinessScreenState extends State<BusinessScreen> {
       hasCommented = result;
     });
     return result;
-  }
-
-  _chooseFavouriteIcon(bool newState) async {
-    try {
-      List<ProductExpandedModel> favourites = await Api.getFavouriteItems();
-      setState(() {
-        context.read<FavouriteItemsCubit>().set(favourites);
-      });
-    } catch(error) {
-      return;
-    }
-    setState(() {
-      if(newState == true) {
-        widget.businessExpanded.isFavourite = true;
-        favouriteIcon = const Icon(Icons.favorite);
-      } else {
-        widget.businessExpanded.isFavourite = false;
-        favouriteIcon = const Icon(Icons.favorite_outline);
-      }
-    });
   }
 
   void _getProfileImage() async {
@@ -172,34 +154,38 @@ class _BusinessScreenState extends State<BusinessScreen> {
                               ),
                               margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
                               padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
-                              child: (widget.businessExpanded.isFavourite == true)
-                                ? const Icon(Icons.favorite)
-                                : const Icon(Icons.favorite_outline),
+                              child: (loadingFavourite == LoadingStatus.loading)
+                                ? ReducedLoadingIcon(
+                                  customMargin: MediaQuery.of(context).size.width * 0.016,
+                                )
+                                : (widget.businessExpanded.isFavourite == true)
+                                  ? const Icon(Icons.favorite)
+                                  : const Icon(Icons.favorite_outline),
                             ),
                             onTap: () async {
-                              setState(() {
-                                favouriteIcon = const LoadingIcon();
-                              });
-                              try {
-                                if(widget.businessExpanded.isFavourite == true) {
-                                  _chooseFavouriteIcon(false);
-                                  await Api.removeFavourite(idBusiness: widget.businessExpanded.business.id!);
-                                } else {
-                                  _chooseFavouriteIcon(true);
-                                  await Api.addFavourite(idBusiness: widget.businessExpanded.business.id!);
-                                }
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return WefoodPopup(
-                                      context: context,
-                                      title: '¡Cambios guardados!',
-                                      cancelButtonTitle: 'OK',
-                                    );
+                              if(loadingFavourite != LoadingStatus.loading) {
+                                setState(() {
+                                  loadingFavourite = LoadingStatus.loading;
+                                });
+                                try {
+                                  if(widget.businessExpanded.isFavourite == true) {
+                                    Api.removeFavourite(idBusiness: widget.businessExpanded.business.id!).then((_) {
+                                      setState(() {
+                                        loadingFavourite = LoadingStatus.successful;
+                                        widget.businessExpanded.isFavourite = false;
+                                      });
+                                    });
+                                  } else {
+                                    Api.addFavourite(idBusiness: widget.businessExpanded.business.id!).then((_) {
+                                      setState(() {
+                                        loadingFavourite = LoadingStatus.successful;
+                                        widget.businessExpanded.isFavourite = true;
+                                      });
+                                    });
                                   }
-                                );
-                              } catch(e) {
-                                _chooseFavouriteIcon(widget.businessExpanded.isFavourite!);
+                                } catch(e) {
+                                  loadingFavourite = LoadingStatus.error;
+                                }
                               }
                             },
                           ),

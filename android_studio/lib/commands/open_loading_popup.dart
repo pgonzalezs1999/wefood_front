@@ -6,17 +6,21 @@ openLoadingPopup(BuildContext context) {
     context: context,
     barrierDismissible: false,
     builder: (BuildContext context) {
-      return AlertDialog(
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Container(
-              padding: const EdgeInsets.symmetric(
-                vertical: 50,
+      return PopScope(
+        canPop: false,
+        onPopInvoked: (_) {},
+        child: AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 50,
+                ),
+                child: const LoadingIcon(),
               ),
-              child: const LoadingIcon(),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     }

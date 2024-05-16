@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import 'package:wefood/commands/utils.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api/api.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class OrderCustomer extends StatefulWidget {
 
@@ -172,7 +174,22 @@ class _OrderCustomerState extends State<OrderCustomer> {
                   Text(
                     'Código: ${Utils.numberToHexadecimal(widget.id)}',
                     style: Theme.of(context).textTheme.titleMedium,
-                  )
+                  ),
+                  const SizedBox(
+                    height: 25,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      const Text('Teléfono de contacto:'),
+                      TextButton(
+                        child: Text('(+${info.user.phonePrefix}) ${info.user.phone}'),
+                        onPressed: () {
+                          launchUrlString('tel://${info.user.phone}');
+                        },
+                      ),
+                    ],
+                  ),
                 ],
               );
             }

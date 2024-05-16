@@ -13,9 +13,7 @@ class LoadingIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     double? containerSize = (size != null) ? size! * 0.555 : null;
-
     return SizedBox(
       height: containerSize,
       width: containerSize,
@@ -27,11 +25,15 @@ class LoadingIcon extends StatelessWidget {
 }
 
 class ReducedLoadingIcon extends StatelessWidget {
-  const ReducedLoadingIcon({super.key});
+  final double customMargin;
+  const ReducedLoadingIcon({
+    super.key,
+    this.customMargin = 15,
+  });
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(15),
+      margin: EdgeInsets.all(customMargin),
       child: LoadingIcon(
         size: Theme.of(context).textTheme.displaySmall?.fontSize,
         strokeWidth: 1.5,

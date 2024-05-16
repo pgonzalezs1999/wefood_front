@@ -26,6 +26,7 @@ class _OrderHistoryButtonCustomerState extends State<OrderHistoryButtonCustomer>
   void _navigateToBusinessScreen({
     required businessExpanded
   }) {
+    openLoadingPopup(context);
     Api.getBusiness(
       idBusiness: widget.productExpanded.business.id!,
     ).then((BusinessExpandedModel businessExpanded) {
@@ -34,7 +35,9 @@ class _OrderHistoryButtonCustomerState extends State<OrderHistoryButtonCustomer>
         MaterialPageRoute(builder: (context) => BusinessScreen(
           businessExpanded: businessExpanded,
         )),
-      );
+      ).whenComplete(() {
+        Navigator.pop(context);
+      });
     }).onError((error, stackTrace) {
       Navigator.pop(context);
       showDialog(
