@@ -114,6 +114,9 @@ class _ItemState extends State<Item> {
     Api.getItem(
       id: widget.productExpanded.item.id!,
     ).then((ProductExpandedModel response) {
+      if(response.business.comments != null && response.business.comments!.isNotEmpty) {
+        response.business.comments = response.business.comments!.reversed.toList();
+      }
       setState(() {
         info = response;
       });
@@ -240,13 +243,13 @@ class _ItemState extends State<Item> {
                                   child: SizedBox.fromSize(
                                     size: Size.fromRadius(MediaQuery.of(context).size.width * 0.05),
                                     child: (profileImageRoute != null)
-                                        ? Image.network(
-                                      profileImageRoute!,
-                                      fit: BoxFit.cover,
-                                    )
-                                        : const Icon(
-                                      Icons.business,
-                                    ),
+                                      ? Image.network(
+                                        profileImageRoute!,
+                                        fit: BoxFit.cover,
+                                      )
+                                      : const Icon(
+                                        Icons.business,
+                                      ),
                                   ),
                                 ),
                               ),
@@ -334,7 +337,7 @@ class _ItemState extends State<Item> {
                             'Valoración: ',
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
-                          Text('${info!.business.rate}  '),
+                          Text('${info!.business.rate?.toStringAsFixed(1)}  '),
                           PrintStars(
                             rate: info!.business.rate!,
                           ),
@@ -497,7 +500,10 @@ class _ItemState extends State<Item> {
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       Column(
-                        children: info!.business.comments!.map((CommentExpandedModel c) => Comment(comment: c)).toList(),
+                        children: info!.business.comments!.map((CommentExpandedModel c) => Comment(
+                          comment: c,
+                          deletable: false,
+                        )).toList(),
                       ),
                     ],
                   ),

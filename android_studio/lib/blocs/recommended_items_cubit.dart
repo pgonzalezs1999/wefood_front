@@ -29,4 +29,8 @@ class RecommendedItemsCubit extends Cubit<List<ProductExpandedModel>> {
     updatedState.removeWhere((i) => i.item.id == itemId);
     emit(updatedState);
   }
+
+  void delete() {
+    emit(List<ProductExpandedModel>.empty());
+  }
 }

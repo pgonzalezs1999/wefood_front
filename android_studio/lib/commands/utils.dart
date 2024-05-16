@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wefood/environment.dart';
 import 'package:wefood/types.dart';
 
 class Utils {
@@ -232,5 +233,9 @@ class Utils {
       }
     }
     return result;
+  }
+
+  static String completeImageUrl(String url) {
+    return '${Environment.storageUrl}$url';
   }
 }

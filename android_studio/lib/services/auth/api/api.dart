@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/commands/utils.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/middleware.dart';
@@ -501,7 +503,24 @@ class Api {
     }
   }
 
-  static Future logout() async {
+  static _clearData(BuildContext context) {
+    UserSecureStorage().delete(key: 'accessToken');
+    UserSecureStorage().delete(key: 'accessTokenExpiresAt');
+    UserSecureStorage().delete(key: 'username');
+    UserSecureStorage().delete(key: 'password');
+    context.read<UserInfoCubit>().delete();
+    context.read<BusinessBreakfastCubit>().delete();
+    context.read<BusinessLunchCubit>().delete();
+    context.read<BusinessDinnerCubit>().delete();
+    context.read<PendingOrdersBusinessCubit>().delete();
+    context.read<RecommendedItemsCubit>().delete();
+    context.read<NearbyItemsCubit>().delete();
+    context.read<FavouriteItemsCubit>().delete();
+    context.read<SearchFiltersCubit>().delete();
+  }
+
+  static Future logout(BuildContext context) async {
+    _clearData(context);
     try {
       await Middleware.endpoint(
           name: 'logout',
@@ -512,12 +531,14 @@ class Api {
     }
   }
 
-  static Future signOut() async {
+  static Future signOut(BuildContext context) async {
     try {
-      await Middleware.endpoint(
+      Middleware.endpoint(
         name: 'signout',
         type: HttpType.post,
-      );
+      ).then((_) {
+        _clearData(context);
+      });
     } catch(error) {
       throw Exception(error);
     }

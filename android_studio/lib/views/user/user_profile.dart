@@ -11,7 +11,6 @@ import 'package:wefood/components/components.dart';
 import 'package:wefood/main.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api/api.dart';
-import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/types.dart';
 import 'package:wefood/views/views.dart';
 import 'package:http/http.dart' as http;
@@ -168,13 +167,6 @@ class _UserProfileState extends State<UserProfile> {
         });
       }
     });
-  }
-
-  void _deleteTokens() async {
-    await UserSecureStorage().delete(key: 'accessToken');
-    await UserSecureStorage().delete(key: 'accessTokenExpiresAt');
-    await UserSecureStorage().delete(key: 'username');
-    await UserSecureStorage().delete(key: 'password');
   }
 
   _rebuildDirectionsCubit() async {
@@ -459,10 +451,15 @@ class _UserProfileState extends State<UserProfile> {
                                                   message: '¡Libre!',
                                                   isError: false,
                                                 )
-                                                : const FeedbackMessage(
-                                                  message: 'No disponible',
-                                                  isError: true,
-                                                ),
+                                                : (auxUsername == context.read<UserInfoCubit>().state.user.username)
+                                                  ? const FeedbackMessage(
+                                                    message: 'Nombre actual',
+                                                    isError: true,
+                                                  )
+                                                  : const FeedbackMessage(
+                                                    message: 'No disponible',
+                                                    isError: true,
+                                                  ),
                                         onChanged: (String value) {
                                           setState(() {
                                             usernameAvailabilityStatus = LoadingStatus.loading;
@@ -472,18 +469,26 @@ class _UserProfileState extends State<UserProfile> {
                                             () {
                                               if(value == auxUsername) {
                                                 if(2 <= value.length && value.length <= 50) {
-                                                  Api.checkUsernameAvailability(
-                                                    username: value,
-                                                  ).then((bool availability) {
+                                                  if(value == context.read<UserInfoCubit>().state.user.username) {
                                                     setState(() {
-                                                      usernameAvailable = availability;
-                                                      usernameAvailabilityStatus = LoadingStatus.successful;
-                                                    });
-                                                  }).onError((Object error, StackTrace stackTrace) {
-                                                    setState(() {
+                                                      usernameAvailable = false;
                                                       usernameAvailabilityStatus = LoadingStatus.error;
                                                     });
-                                                  });
+                                                  } else {
+                                                    Api.checkUsernameAvailability(
+                                                      username: value,
+                                                    ).then((bool availability) {
+                                                      setState(() {
+                                                        usernameAvailable = availability;
+                                                        usernameAvailabilityStatus = LoadingStatus.successful;
+                                                      });
+                                                    }).onError((Object error, StackTrace stackTrace) {
+                                                      setState(() {
+                                                        usernameAvailable = false;
+                                                        usernameAvailabilityStatus = LoadingStatus.error;
+                                                      });
+                                                    });
+                                                  }
                                                 }
                                               }
                                             }
@@ -497,7 +502,8 @@ class _UserProfileState extends State<UserProfile> {
                                   ),
                                   cancelButtonTitle: 'CANCELAR',
                                   actions: [
-                                    if(5 <= auxUsername.length && auxUsername.length <= 50) TextButton(
+                                    if(usernameAvailable) TextButton(
+                                      child: const Text('CONFIRMAR'),
                                       onPressed: () {
                                         Api.updateUsername(
                                           username: auxUsername,
@@ -518,7 +524,6 @@ class _UserProfileState extends State<UserProfile> {
                                           );
                                         });
                                       },
-                                      child: const Text('CONFIRMAR'),
                                     ),
                                   ],
                                 );
@@ -590,12 +595,10 @@ class _UserProfileState extends State<UserProfile> {
                       actions: <TextButton>[
                         TextButton(
                           onPressed: () {
-                            Api.logout().then((_) {
-                              _deleteTokens();
+                            Api.logout(context).then((_) {
                               Navigator.pop(context);
                               _navigateToMain();
                             }).onError((Object error, StackTrace stackTrace) {
-                              _deleteTokens();
                               Navigator.pop(context);
                               _navigateToMain();
                             });
@@ -616,7 +619,7 @@ class _UserProfileState extends State<UserProfile> {
               },
             ),
             SettingsElement(
-              iconData: Icons.delete,
+              iconData: Icons.delete_outline,
               title: 'Darme de baja',
               onTap: () {
                 showDialog(
@@ -629,8 +632,7 @@ class _UserProfileState extends State<UserProfile> {
                       actions: <TextButton>[
                         TextButton(
                           onPressed: () {
-                            Api.signOut().then((_) {
-                              _deleteTokens();
+                            Api.signOut(context).then((_) {
                               Navigator.pop(context);
                               _navigateToMain();
                             }).onError((error, stackTrace) {

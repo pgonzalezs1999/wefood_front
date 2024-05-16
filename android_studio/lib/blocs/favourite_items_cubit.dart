@@ -29,4 +29,8 @@ class FavouriteItemsCubit extends Cubit<List<ProductExpandedModel>> {
     updatedState.removeWhere((i) => i.business.id == businessId);
     emit(updatedState);
   }
+
+  void delete() {
+    emit(List<ProductExpandedModel>.empty(growable: true));
+  }
 }

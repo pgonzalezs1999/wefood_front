@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wefood/blocs/blocs.dart';
@@ -9,12 +8,14 @@ import 'package:wefood/services/auth/api/api.dart';
 class Comment extends StatefulWidget {
 
   final CommentExpandedModel comment;
+  final bool deletable;
   final Function()? onModify;
   final Function()? onDelete;
 
   const Comment({
     super.key,
     required this.comment,
+    this.deletable = true,
     this.onModify,
     this.onDelete,
   });
@@ -25,34 +26,9 @@ class Comment extends StatefulWidget {
 
 class _CommentState extends State<Comment> {
 
-  _retrieveImage() {
-    try {
-      Api.getImage(
-        idUser: widget.comment.user.id!,
-        meaning: 'profile',
-      ).then((ImageModel imageModel) {
-        if(imageModel.route != null) {
-          setState(() {
-            image = ImageWithLoader.network(
-              route: imageModel.route!,
-              fit: BoxFit.cover,
-            );
-          });
-        }
-      });
-    } catch(error) {
-      if(kDebugMode) {
-        print('No se ha podido cargar la imagen');
-      }
-    }
-  }
-
-  Image? image;
-
   @override
   void initState() {
     super.initState();
-    _retrieveImage();
   }
 
   @override
@@ -62,12 +38,18 @@ class _CommentState extends State<Comment> {
         top: 20,
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           ClipRRect(
             borderRadius: BorderRadius.circular(999),
             child: SizedBox.fromSize(
               size: Size.fromRadius(MediaQuery.of(context).size.width * 0.05),
-              child: Container(
+              child: (widget.comment.image.route != null)
+                ? ImageWithLoader.network(
+                  route: widget.comment.image.route!,
+                  fit: BoxFit.cover,
+                )
+                : Container(
                 color: Theme.of(context).colorScheme.surfaceContainer,
                 child: const Icon(
                   Icons.person,
@@ -84,6 +66,7 @@ class _CommentState extends State<Comment> {
               children: <Widget>[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
                       widget.comment.user.username ?? 'Sin nombre',
@@ -98,7 +81,7 @@ class _CommentState extends State<Comment> {
               ],
             ),
           ),
-          if(widget.comment.user.id == context.read<UserInfoCubit>().state.user.id) Row(
+          if(widget.comment.user.id == context.read<UserInfoCubit>().state.user.id && widget.deletable == true) Row(
             children: <Widget>[
               const SizedBox(
                 width: 20,
@@ -109,50 +92,50 @@ class _CommentState extends State<Comment> {
                 ),
                 onTap: () {
                   showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return WefoodPopup(
-                        context: context,
-                        title: '¿Eliminar comentario?',
-                        actions: <TextButton>[
-                          TextButton(
-                            child: const Text('SÍ'),
-                            onPressed: () {
-                              Api.deleteComment(
-                                idBusiness: widget.comment.comment.idBusiness!,
-                              ).then((_) {
-                                Navigator.pop(context);
-                                if(widget.onDelete != null) {
-                                  widget.onDelete!();
-                                }
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return WefoodPopup(
-                                      context: context,
-                                      title: '¡Comentario eliminado correctamente!',
-                                      cancelButtonTitle: 'OK',
-                                    );
+                      context: context,
+                      builder: (BuildContext context) {
+                        return WefoodPopup(
+                          context: context,
+                          title: '¿Eliminar comentario?',
+                          actions: <TextButton>[
+                            TextButton(
+                              child: const Text('SÍ'),
+                              onPressed: () {
+                                Api.deleteComment(
+                                  idBusiness: widget.comment.comment.idBusiness!,
+                                ).then((_) {
+                                  Navigator.pop(context);
+                                  if(widget.onDelete != null) {
+                                    widget.onDelete!();
                                   }
-                                ).onError((error, stackTrace) {
                                   showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return WefoodPopup(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return WefoodPopup(
+                                          context: context,
+                                          title: '¡Comentario eliminado correctamente!',
+                                          cancelButtonTitle: 'OK',
+                                        );
+                                      }
+                                  ).onError((error, stackTrace) {
+                                    showDialog(
                                         context: context,
-                                        title: 'Ha ocurrido un error',
-                                        description: 'Por favor, inténtelo de nuevo más tarde',
-                                        cancelButtonTitle: 'OK',
-                                      );
-                                    }
-                                  );
+                                        builder: (BuildContext context) {
+                                          return WefoodPopup(
+                                            context: context,
+                                            title: 'Ha ocurrido un error',
+                                            description: 'Por favor, inténtelo de nuevo más tarde',
+                                            cancelButtonTitle: 'OK',
+                                          );
+                                        }
+                                    );
+                                  });
                                 });
-                              });
-                            },
-                          )
-                        ],
-                      );
-                    }
+                              },
+                            )
+                          ],
+                        );
+                      }
                   );
                 },
               ),

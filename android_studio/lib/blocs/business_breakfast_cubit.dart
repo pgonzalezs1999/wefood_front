@@ -8,4 +8,8 @@ class BusinessBreakfastCubit extends Cubit<ProductModel?> {
   void set(ProductModel? value) {
     emit(value);
   }
+
+  void delete() {
+    emit(null);
+  }
 }

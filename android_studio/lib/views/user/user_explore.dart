@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wefood/blocs/blocs.dart';
-import 'package:wefood/blocs/recommended_items_cubit.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/models/models.dart';
@@ -44,12 +43,6 @@ class _UserExploreState extends State<UserExplore> {
           longitude: userLongitude,
           latitude: userLatitude,
         );
-        for(int i=0; i<items.length; i++) {
-          items[i].image = await Api.getImage(
-            idUser: items[i].user.id!,
-            meaning: '${items[i].product.type!.toLowerCase()}1',
-          );
-        }
         setState(() {
           context.read<RecommendedItemsCubit>().set(items);
         });
@@ -99,12 +92,6 @@ class _UserExploreState extends State<UserExplore> {
             );
           });
         } else {
-          for(int i=0; i<items.length; i++) {
-            items[i].image = await Api.getImage(
-              idUser: items[i].user.id!,
-              meaning: '${items[i].product.type!.toLowerCase()}1',
-            );
-          }
           setState(() {
             context.read<NearbyItemsCubit>().set(items);
           });
@@ -141,14 +128,8 @@ class _UserExploreState extends State<UserExplore> {
       _retrievingFavourites = LoadingStatus.loading;
     });
     try {
-    List<ProductExpandedModel> items = await Api.getFavouriteItems();
-    items.sort(compareByDate);
-      for(int i=0; i<items.length; i++) {
-        items[i].image = await Api.getImage(
-          idUser: items[i].user.id!,
-          meaning: '${items[i].product.type!.toLowerCase()}1',
-        );
-      }
+      List<ProductExpandedModel> items = await Api.getFavouriteItems();
+      items.sort(compareByDate);
       setState(() {
         context.read<FavouriteItemsCubit>().set(items);
         _retrievingFavourites = LoadingStatus.successful;

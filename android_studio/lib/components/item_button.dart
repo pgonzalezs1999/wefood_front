@@ -14,14 +14,12 @@ class ItemButton extends StatefulWidget {
 
   final ProductExpandedModel productExpanded;
   final bool? horizontalScroll;
-  final NextScreen? nextScreen;
   final Function()? comebackBehaviour;
 
   const ItemButton({
     super.key,
     this.horizontalScroll,
     required this.productExpanded,
-    this.nextScreen = NextScreen.item,
     this.comebackBehaviour,
   });
 
@@ -30,6 +28,7 @@ class ItemButton extends StatefulWidget {
 }
 
 class _ItemButtonState extends State<ItemButton> {
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -44,25 +43,14 @@ class _ItemButtonState extends State<ItemButton> {
         : null,
       child: GestureDetector(
         onTap: () {
-          if(widget.nextScreen == NextScreen.item) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => Item(
-                productExpanded: widget.productExpanded,
-              )),
-            ).whenComplete(() {
-              (widget.comebackBehaviour != null) ? widget.comebackBehaviour!() : null;
-            });
-          } else if(widget.nextScreen == NextScreen.orderCustomer) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => OrderCustomer(
-                id: widget.productExpanded.order.id!,
-              )),
-            ).whenComplete(() {
-              (widget.comebackBehaviour != null) ? widget.comebackBehaviour!() : null;
-            });
-          }
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Item(
+              productExpanded: widget.productExpanded,
+            )),
+          ).whenComplete(() {
+            (widget.comebackBehaviour != null) ? widget.comebackBehaviour!() : null;
+          });
         },
         child: Card(
           shape: RoundedRectangleBorder(
@@ -78,8 +66,8 @@ class _ItemButtonState extends State<ItemButton> {
                   child: SizedBox(
                     height: 145,
                     child: (widget.productExpanded.image.route != null)
-                    ? Image(
-                      image: NetworkImage(widget.productExpanded.image.route!),
+                    ? ImageWithLoader.network(
+                      route: widget.productExpanded.image.route!,
                       fit: BoxFit.fitWidth,
                       width: double.infinity,
                     )
@@ -171,7 +159,7 @@ class _ItemButtonState extends State<ItemButton> {
                                         Icons.star,
                                         size: 15,
                                       ),
-                                      Text(' ${widget.productExpanded.business.rate ?? 0} | '),
+                                      Text(' ${widget.productExpanded.business.rate?.toStringAsFixed(1) ?? 0} | '),
                                     ],
                                   ),
                                   const Icon(

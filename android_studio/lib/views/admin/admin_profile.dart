@@ -3,7 +3,6 @@ import 'package:wefood/commands/share_app.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/main.dart';
 import 'package:wefood/services/auth/api/api.dart';
-import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/views/views.dart';
 
 class AdminProfile extends StatefulWidget {
@@ -20,13 +19,6 @@ class _AdminProfileState extends State<AdminProfile> {
       context,
       MaterialPageRoute(builder: (context) => const MyApp()),
     );
-  }
-
-  void _deleteTokens() async {
-    await UserSecureStorage().delete(key: 'accessToken');
-    await UserSecureStorage().delete(key: 'accessTokenExpiresAt');
-    await UserSecureStorage().delete(key: 'username');
-    await UserSecureStorage().delete(key: 'password');
   }
 
   void _navigateToTermsAndConditions() {
@@ -87,10 +79,13 @@ class _AdminProfileState extends State<AdminProfile> {
                       actions: <TextButton>[
                         TextButton(
                           onPressed: () async {
-                            await Api.logout();
-                            _deleteTokens();
-                            Navigator.pop(context);
-                            _navigateToMain();
+                            Api.logout(context).then((_) {
+                              Navigator.pop(context);
+                              _navigateToMain();
+                            }).onError((error, stackTrace) {
+                              Navigator.pop(context);
+                              _navigateToMain();
+                            });
                           },
                           child: const Text('SÍ'),
                         ),

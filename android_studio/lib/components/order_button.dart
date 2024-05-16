@@ -101,7 +101,7 @@ class _OrderButtonState extends State<OrderButton> with SingleTickerProviderStat
                               Text(' ${widget.productExpanded.business.rate ?? 0} | '),
                             ],
                           ),
-                          (Utils.minutesFromNowToDateTime(widget.productExpanded.product.endingHour!) < 60)
+                          (Utils.minutesFromNowToDateTime(widget.productExpanded.product.endingHour!) < 60 && (widget.productExpanded.item.date!.day == DateTime.now().day))
                             ? AnimatedBuilder(
                               animation: CurvedAnimation(
                                 parent: _controller,

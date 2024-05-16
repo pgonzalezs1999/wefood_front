@@ -71,4 +71,8 @@ class UserInfoCubit extends Cubit<BusinessExpandedModel> {
     updatedState.business.longitude = latLng?.longitude;
     emit(updatedState);
   }
+
+  void delete() {
+    emit(BusinessExpandedModel.empty());
+  }
 }

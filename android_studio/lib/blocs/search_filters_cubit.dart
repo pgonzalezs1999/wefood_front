@@ -59,4 +59,8 @@ class SearchFiltersCubit extends Cubit<Filters> {
     updatedState.dessert = value;
     emit(updatedState);
   }
+
+  void delete() {
+    emit(Filters());
+  }
 }

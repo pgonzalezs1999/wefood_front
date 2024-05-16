@@ -42,11 +42,11 @@ class _BusinessProfileState extends State<BusinessProfile> {
     );
   }
 
-  void _deleteTokens() async {
-    await UserSecureStorage().delete(key: 'accessToken');
-    await UserSecureStorage().delete(key: 'accessTokenExpiresAt');
-    await UserSecureStorage().delete(key: 'username');
-    await UserSecureStorage().delete(key: 'password');
+  void _navigateToBusinessComments() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const BusinessComments()),
+    );
   }
 
   void _navigateToTermsAndConditions() {
@@ -378,6 +378,13 @@ class _BusinessProfileState extends State<BusinessProfile> {
               },
             ),
             SettingsElement(
+              iconData: Icons.comment_outlined,
+              title: 'Ver comentarios',
+              onTap: () {
+                _navigateToBusinessComments();
+              },
+            ),
+            SettingsElement(
               iconData: Icons.share,
               title: 'Comparte la app',
               onTap: () async {
@@ -413,12 +420,10 @@ class _BusinessProfileState extends State<BusinessProfile> {
                       actions: <TextButton>[
                         TextButton(
                           onPressed: () {
-                            Api.logout().then((_) {
-                              _deleteTokens();
+                            Api.logout(context).then((_) {
                               Navigator.pop(context);
                               _navigateToMain();
                             }).onError((Object error, StackTrace stackTrace) {
-                              _deleteTokens();
                               Navigator.pop(context);
                               _navigateToMain();
                             });
@@ -439,7 +444,7 @@ class _BusinessProfileState extends State<BusinessProfile> {
               },
             ),
             SettingsElement(
-              iconData: Icons.delete,
+              iconData: Icons.delete_outline,
               title: 'Darme de baja',
               onTap: () {
                 showDialog(
@@ -452,8 +457,7 @@ class _BusinessProfileState extends State<BusinessProfile> {
                       actions: <TextButton>[
                         TextButton(
                           onPressed: () {
-                            Api.signOut().then((_) {
-                              _deleteTokens();
+                            Api.signOut(context).then((_) {
                               Navigator.pop(context);
                               _navigateToMain();
                             }).onError((error, StackTrace stackTrace) {

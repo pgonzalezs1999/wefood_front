@@ -261,7 +261,7 @@ class _BusinessScreenState extends State<BusinessScreen> {
                             'Valoración: ',
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
-                          Text('${widget.businessExpanded.business.rate?.toStringAsFixed(2)}  '),
+                          Text('${widget.businessExpanded.business.rate?.toStringAsFixed(1)}  '),
                           PrintStars(rate: widget.businessExpanded.business.rate!),
                         ],
                       ),

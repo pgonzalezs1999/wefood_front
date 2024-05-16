@@ -14,4 +14,8 @@ class PendingOrdersBusinessCubit extends Cubit<List<OrderModel>> {
   void setWholeList(List<OrderModel> list) {
     emit(list);
   }
+
+  void delete() {
+    emit([]);
+  }
 }

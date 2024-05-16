@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/models/models.dart';
-import 'package:wefood/services/auth/api/api.dart';
 
 class SearchedItems extends StatefulWidget {
 
@@ -19,26 +18,6 @@ class SearchedItems extends StatefulWidget {
 }
 
 class _SearchedItemsState extends State<SearchedItems> {
-
-  _setImages() async {
-    for(int i=0; i<widget.items.length; i++) {
-      Api.getImage(
-        idUser: widget.items[i].user.id!,
-        meaning: '${widget.items[i].product.type!.toLowerCase()}1',
-      ).then((ImageModel imageModel) {
-        setState(() {
-          widget.items[i].image = imageModel;
-        });
-      });
-    }
-  }
-
-  @override
-  void initState() {
-    _setImages();
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return WefoodScreen(
@@ -71,13 +50,7 @@ class _SearchedItemsState extends State<SearchedItems> {
           child: Column(
             children: <Text>[
               Text(
-                '¿Pocos resultados?',
-                style: TextStyle(
-                  color: Colors.grey, // TODO deshardcodear estilo
-                ),
-              ),
-              Text(
-                'Prueba a flexibilizar los filtros o buscar palabras más generales. ¡Seguro que encuentras lo que buscas!',
+                '¿Pocos resultados?\nPrueba a flexibilizar los filtros o buscar palabras más generales. ¡Seguro que encuentras lo que buscas!',
                 style: TextStyle(
                   color: Colors.grey, // TODO deshardcodear estilo
                 ),
