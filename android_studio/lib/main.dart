@@ -161,22 +161,12 @@ class _MyHomePageState extends State<MyHomePage> {
       UserSecureStorage().readDateTime(key: 'accessTokenExpiresAt').then((DateTime? expiresAt) {
         UserSecureStorage().read(key: 'username').then((String? username) {
           UserSecureStorage().read(key: 'password').then((String? password) {
-            bool readyToLogin = false;
-            print('ACCESS_TOKEN = $accessToken');
-            print('EXPIRES_AT = $expiresAt');
-            print('USERNAME = $username');
-            print('PASSWORD = $password');
             if(accessToken != null && accessToken != '' && expiresAt != null) {
-              if(DateTime.now().difference(expiresAt) > const Duration(milliseconds: 0)) {
-                readyToLogin = true;
-              }
-            }
-            if(readyToLogin == false) {
-              if(username != null && password != null) {
+              if(expiresAt.difference(DateTime.now()) > const Duration(milliseconds: 0)) {
                 Api.login(
                   context: context,
-                  username: username,
-                  password: password,
+                  username: username!,
+                  password: password!,
                 ).then((AuthModel? auth) {
                   if(auth != null) {
                     _navigateToHome();
@@ -184,7 +174,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     _navigateToLogin();
                   }
                 }).onError((error, stackTrace) {
-                  _navigateToLogin();
                   showDialog(
                     context: context,
                     barrierDismissible: false,
@@ -197,12 +186,25 @@ class _MyHomePageState extends State<MyHomePage> {
                       );
                     }
                   );
+                  _navigateToLogin();
                 });
               } else {
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext context) {
+                    return WefoodPopup(
+                      context: context,
+                      title: 'Ha caducado la sesión',
+                      description: 'Por favor, inicie sesión de nuevo',
+                      cancelButtonTitle: 'OK',
+                    );
+                  }
+                );
                 _navigateToLogin();
               }
             } else {
-              _navigateToHome();
+              _navigateToLogin();
             }
           });
         });

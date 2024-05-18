@@ -53,8 +53,19 @@ class _WaitingVerificationState extends State<WaitingVerification> {
                 context: context,
                 username: username!,
                 password: password!,
-              ).then((AuthModel? authModel) {
+              ).then((AuthModel authModel) {
+                UserSecureStorage().writeDateTime(
+                  key: 'accessTokenExpiresAt',
+                  value: DateTime.now().add(Duration(seconds: authModel.expiresAt!))
+                );
+                UserSecureStorage().write(key: 'accessToken', value: authModel.accessToken!);
+                UserSecureStorage().write(key: 'username', value: username);
+                UserSecureStorage().write(key: 'password', value: password);
                 _timer.cancel();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Home()),
+                );
               });
             }
             setState(() {

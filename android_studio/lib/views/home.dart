@@ -41,9 +41,7 @@ class _HomeState extends State<Home> {
     _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
       Duration difference = accessTokenExpiresAt!.difference(DateTime.now());
       accessTokenMinutesLeft = difference.inMinutes;
-      if(accessTokenMinutesLeft! > 0) {
-        _showPopup();
-      } else {
+      if(accessTokenMinutesLeft! <= 0) {
         _timer.cancel();
         clearData(context);
         _navigateToMain();
@@ -60,18 +58,10 @@ class _HomeState extends State<Home> {
                 Navigator.pop(context);
               },
             );
-          }
+            }
         );
       }
     });
-  }
-
-  void _showPopup() {
-    final snackBar = SnackBar(
-      content: Text('El JWT caduca en $accessTokenMinutesLeft minutos'),
-      duration: const Duration(seconds: 3),
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   @override
@@ -80,19 +70,16 @@ class _HomeState extends State<Home> {
     super.dispose();
   }
 
-  void _getAccessToken() async {
-    accessToken = await UserSecureStorage().read(key: 'accessToken') ?? '';
-    setState(() {});
-  }
-
-  void _getAccessTokenExpiresAt() async {
-    accessTokenExpiresAt =
-    await UserSecureStorage().readDateTime(key: 'accessTokenExpiresAt');
-    if(accessTokenExpiresAt != null) {
-      Duration difference = accessTokenExpiresAt!.difference(DateTime.now());
-      accessTokenMinutesLeft = difference.inMinutes;
-    }
-    setState(() {});
+  void _getAccessToken() {
+    UserSecureStorage().read(key: 'accessToken').then((String? token) {
+      accessToken = (token != null) ? token : '';
+      UserSecureStorage().readDateTime(key: 'accessTokenExpiresAt').then((DateTime? expirationDate) {
+        accessTokenExpiresAt = expirationDate;
+        Duration difference = accessTokenExpiresAt!.difference(DateTime.now());
+        accessTokenMinutesLeft = difference.inMinutes;
+        _startTimer();
+      });
+    });
   }
 
   bool shouldWaitForValidation({
@@ -110,10 +97,8 @@ class _HomeState extends State<Home> {
 
   @override
   void initState() {
-    super.initState();
     _getAccessToken();
-    _getAccessTokenExpiresAt();
-    _startTimer();
+    super.initState();
   }
 
   @override

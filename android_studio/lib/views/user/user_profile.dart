@@ -301,7 +301,9 @@ class _UserProfileState extends State<UserProfile> {
                         children: <Widget>[
                           Expanded(
                             child: Text(
-                              '¡Hola de nuevo, ${context.read<UserInfoCubit>().state.user.realName}!',
+                              (context.read<UserInfoCubit>().state.user.realName != null)
+                                ? '¡Hola de nuevo, ${context.read<UserInfoCubit>().state.user.realName}!'
+                                : 'Introduzca su nombre',
                             ),
                           ),
                           const Icon(

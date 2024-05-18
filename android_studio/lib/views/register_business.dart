@@ -107,7 +107,6 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
   updateMarker(businessLocationString) async {
     LatLng newLocation = await getLatLngFromAddress(businessLocationString);
     setState(() {
-      directions = businessLocationString;
       businessLocation = newLocation;
       cameraPosition = CameraPosition(
         target: businessLocation!,
@@ -128,7 +127,9 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
           final location = results[0]['geometry']['location'];
           final lat = location['lat'] as double;
           final lng = location['lng'] as double;
-          directions = results[0]['formatted_address'];
+          setState(() {
+            directions = results[0]['formatted_address'];
+          });
 
           final addressComponents = results[0]['address_components'] as List<dynamic>;
           for(var component in addressComponents) {
@@ -327,7 +328,7 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
               },
               feedbackWidget: (businessName.isEmpty == false && businessName.length < 6)
                 ?  const FeedbackMessage(
-                  message: 'Demasiado corta',
+                  message: 'Demasiado corto',
                   isError: true,
                 )
                 : (businessName.isEmpty == false && businessName.length > 100)
@@ -501,6 +502,7 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
                 myLocationButtonEnabled: true,
               ),
             ),
+            Text('Se guardará: $directions'),
             Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -615,6 +617,7 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
             ),
             if(authenticating != LoadingStatus.loading) Center(
               child: ElevatedButton(
+                child: const Text('REGISTRARME'),
                 onPressed: () async {
                   if(_readyToRegister() == true) {
                     setState(() {
@@ -648,7 +651,6 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
                     }
                   }
                 },
-                child: const Text('REGISTRARME'),
               ),
             ),
             const SizedBox(

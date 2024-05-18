@@ -45,6 +45,13 @@ class _RegisterUserState extends State<RegisterUser> {
     );
   }
 
+  void _navigateToHome() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const Home()),
+    );
+  }
+
   _handleUsernameChange(String value) async {
     if(6 <= value.length && value.length <= 30) {
       setState(() {
@@ -65,14 +72,14 @@ class _RegisterUserState extends State<RegisterUser> {
                 searchingUsernameAvailability = LoadingStatus.successful;
               });
             }).onError(
-                (Object error, StackTrace stackTrace) {
-                  available = false;
-                  setState(() {
-                    username = value;
-                    usernameIsAvailable = false;
-                    searchingUsernameAvailability = LoadingStatus.error;
-                  });
-                }
+              (Object error, StackTrace stackTrace) {
+                available = false;
+                setState(() {
+                  username = value;
+                  usernameIsAvailable = false;
+                  searchingUsernameAvailability = LoadingStatus.error;
+                });
+              }
             );
           }
         }
@@ -312,8 +319,43 @@ class _RegisterUserState extends State<RegisterUser> {
                       context: context,
                       username: username,
                       password: password
-                    ).then((AuthModel? authModel) {
+                    ).then((AuthModel authModel) {
+                      if(authModel.accessToken != null) {
+                        UserSecureStorage().writeDateTime(
+                            key: 'accessTokenExpiresAt',
+                            value: DateTime.now().add(Duration(seconds: authModel.expiresAt!))
+                        );
+                        UserSecureStorage().write(key: 'accessToken', value: authModel.accessToken!);
+                        UserSecureStorage().write(key: 'username', value: username);
+                        UserSecureStorage().write(key: 'password', value: password);
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const Home()),
+                        );
+                      } else if(authModel.error != null) {
+                        setState(() {
+                          authenticating = LoadingStatus.error;
+                        });
+                        String? title = 'Ha ocurrido un error';
+                        String? description = 'Por favor, inténtelo de nuevo más tarde. Si el error persiste, póngase en contacto con soporte.';
+                        if(authModel.error!.toLowerCase().contains('unauthorized')) {
+                          title = 'Usuario o contraseña incorrectos';
+                          description = null;
+                        }
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return WefoodPopup(
+                              context: context,
+                              title: title,
+                              description: description,
+                              cancelButtonTitle: 'OK',
+                            );
+                          }
+                        );
+                      }
                       authenticating = LoadingStatus.successful;
+                      _navigateToHome();
                     });
                   });
                 }
