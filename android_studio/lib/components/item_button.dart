@@ -93,10 +93,10 @@ class _ItemButtonState extends State<ItemButton> {
                           Row(
                             children: <Widget>[
                               if(widget.productExpanded.product.vegetarian == true) const ProductTag(title: 'Vegetariano'),
-                              if(widget.productExpanded.product.vegan == true) const ProductTag(title: 'Vegano'),
+                              if(widget.productExpanded.product.mediterranean == true) const ProductTag(title: 'Mediterráneo'),
                               if(widget.productExpanded.product.junk == true) const ProductTag(title: 'C. rápida'),
                               if(widget.productExpanded.product.dessert == true) const ProductTag(title: 'Postres'),
-                              if(widget.productExpanded.product.vegetarian == false && widget.productExpanded.product.vegan == false && widget.productExpanded.product.junk == false && widget.productExpanded.product.dessert == false) const Text(''),
+                              if(widget.productExpanded.product.vegetarian == false && widget.productExpanded.product.mediterranean == false && widget.productExpanded.product.junk == false && widget.productExpanded.product.dessert == false) const Text(''),
                             ],
                           ),
                           if(widget.productExpanded.isFavourite == true) ClipRect(

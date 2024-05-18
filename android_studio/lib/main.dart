@@ -162,6 +162,10 @@ class _MyHomePageState extends State<MyHomePage> {
         UserSecureStorage().read(key: 'username').then((String? username) {
           UserSecureStorage().read(key: 'password').then((String? password) {
             bool readyToLogin = false;
+            print('ACCESS_TOKEN = $accessToken');
+            print('EXPIRES_AT = $expiresAt');
+            print('USERNAME = $username');
+            print('PASSWORD = $password');
             if(accessToken != null && accessToken != '' && expiresAt != null) {
               if(DateTime.now().difference(expiresAt) > const Duration(milliseconds: 0)) {
                 readyToLogin = true;
@@ -209,7 +213,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    print('--> initState del main');
     _getAccessToken();
   }
 

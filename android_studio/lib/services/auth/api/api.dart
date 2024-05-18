@@ -1,12 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:wefood/blocs/blocs.dart';
+import 'package:wefood/commands/clear_data.dart';
 import 'package:wefood/commands/utils.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/middleware.dart';
-import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/types.dart';
 import 'dart:convert';
 
@@ -367,24 +365,8 @@ class Api {
     } catch(error) { rethrow; }
   }
 
-  static _clearData(BuildContext context) {
-    UserSecureStorage().delete(key: 'accessToken');
-    UserSecureStorage().delete(key: 'accessTokenExpiresAt');
-    UserSecureStorage().delete(key: 'username');
-    UserSecureStorage().delete(key: 'password');
-    context.read<UserInfoCubit>().delete();
-    context.read<BusinessBreakfastCubit>().delete();
-    context.read<BusinessLunchCubit>().delete();
-    context.read<BusinessDinnerCubit>().delete();
-    context.read<PendingOrdersBusinessCubit>().delete();
-    context.read<RecommendedItemsCubit>().delete();
-    context.read<NearbyItemsCubit>().delete();
-    context.read<FavouriteItemsCubit>().delete();
-    context.read<SearchFiltersCubit>().delete();
-  }
-
   static Future logout(BuildContext context) async {
-    _clearData(context);
+    clearData(context);
     try {
       await Middleware.endpoint(
           name: 'logout',
@@ -399,7 +381,7 @@ class Api {
         name: 'signout',
         type: HttpType.post,
       ).then((_) {
-        _clearData(context);
+        clearData(context);
       });
     } catch(error) { rethrow; }
   }
@@ -456,7 +438,7 @@ class Api {
     required String startHour,
     required String endHour,
     required String vegetarian,
-    required String vegan,
+    required String mediterranean,
     required String junk,
     required String dessert,
     required String workingOnMonday,
@@ -479,7 +461,7 @@ class Api {
           'starting_hour': startHour.toString(),
           'ending_hour': endHour.toString(),
           'vegetarian': vegetarian.toString(),
-          'vegan': vegan.toString(),
+          'mediterranean': mediterranean.toString(),
           'junk': junk.toString(),
           'dessert': dessert.toString(),
           'working_on_monday': workingOnMonday.toString(),
@@ -520,7 +502,7 @@ class Api {
     required String startHour,
     required String endHour,
     required String vegetarian,
-    required String vegan,
+    required String mediterranean,
     required String dessert,
     required String junk,
     required String workingOnMonday,
@@ -543,7 +525,7 @@ class Api {
           'starting_hour': startHour.toString(),
           'ending_hour': endHour.toString(),
           'vegetarian': vegetarian.toString(),
-          'vegan': vegan.toString(),
+          'mediterranean': mediterranean.toString(),
           'dessert': dessert.toString(),
           'junk': junk.toString(),
           'working_on_monday': workingOnMonday.toString(),
@@ -734,7 +716,7 @@ class Api {
     required double latitude,
     required double distance,
     required bool vegetarian,
-    required bool vegan,
+    required bool mediterranean,
     required bool dessert,
     required bool junk,
     required double price,
@@ -752,7 +734,7 @@ class Api {
           'latitude': latitude.toString(),
           'distance': distance.toString(),
           'vegetarian': vegetarian ? "1" : "0",
-          'vegan': vegan ? "1" : "0",
+          'mediterranean': mediterranean ? "1" : "0",
           'dessert': dessert ? "1" : "0",
           'junk': junk ? "1" : "0",
           'price': price.toString(),

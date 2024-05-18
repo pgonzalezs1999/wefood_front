@@ -25,20 +25,20 @@ class _ProductTagState extends State<ProductTag> {
 
     IconData icon = Icons.hide_source;
     switch(widget.title) { // TODO poner iconos con mas sentido
-      case 'Vegetariano': icon = Icons.energy_savings_leaf;
+      case 'Vegetariano': icon = Icons.nature;
       break;
-      case 'Vegano': icon = Icons.nature;
+      case 'Mediterráneo': icon = Icons.sunny;
       break;
       case 'C. rápida': icon = Icons.fastfood;
       break;
-      case 'Postres': icon = Icons.cookie;
+      case 'Postres': icon = Icons.cake;
       break;
     }
 
     return Container(
       decoration: BoxDecoration(
         border: Border.all(
-          color: Colors.black,
+          color: Theme.of(context).colorScheme.primary,
           width: 0.25,
         ),
         borderRadius: BorderRadius.circular(999),

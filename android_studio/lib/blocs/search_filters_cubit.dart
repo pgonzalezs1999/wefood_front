@@ -36,9 +36,9 @@ class SearchFiltersCubit extends Cubit<Filters> {
     emit(updatedState);
   }
 
-  void setVegan(bool value) {
+  void setMediterranean(bool value) {
     Filters updatedState = state;
-    updatedState.vegan = value;
+    updatedState.mediterranean = value;
     emit(updatedState);
   }
 

@@ -10,7 +10,7 @@ class ProductModel {
   DateTime? startingHour;
   DateTime? endingHour;
   bool? vegetarian;
-  bool? vegan;
+  bool? mediterranean;
   bool? dessert;
   bool? junk;
   bool? workingOnMonday;
@@ -33,7 +33,7 @@ class ProductModel {
     startingHour = _parseTime(json['starting_hour']),
     endingHour = _parseTime(json['ending_hour']),
     vegetarian = Utils.controlBool(json['vegetarian']) as bool?,
-    vegan = Utils.controlBool(json['vegan']) as bool?,
+    mediterranean = Utils.controlBool(json['mediterranean']) as bool?,
     dessert = Utils.controlBool(json['dessert']) as bool?,
     junk = Utils.controlBool(json['junk']) as bool?,
     workingOnMonday = Utils.controlBool(json['working_on_monday']) as bool?,
@@ -70,7 +70,7 @@ class ProductModel {
     print('-> dessert: ${product.dessert}');
     print('-> junk: ${product.junk}');
     print('-> vegetarian: ${product.vegetarian}');
-    print('-> vegan: ${product.vegan}');
+    print('-> mediterranean: ${product.mediterranean}');
     print('-> workingOnMonday: ${product.workingOnMonday}');
     print('-> workingOnTuesday: ${product.workingOnTuesday}');
     print('-> workingOnWednesday: ${product.workingOnWednesday}');

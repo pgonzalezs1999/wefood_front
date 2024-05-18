@@ -47,7 +47,7 @@ class _EditProductState extends State<EditProduct> {
   bool dessert = false;
   bool junk = false;
   bool vegetarian = false;
-  bool vegan = false;
+  bool mediterranean = false;
   bool mondays = true;
   bool tuesdays = true;
   bool wednesdays = true;
@@ -81,7 +81,7 @@ class _EditProductState extends State<EditProduct> {
       result = _setError('El campo cantidad es obligatorio');
     } else if(amount! < 1) {
       result = _setError('Cantidad mínima: 1 pack');
-    } else if(Utils.sumTrueBooleans([junk, dessert, vegetarian, vegan]) > 2) {
+    } else if(Utils.sumTrueBooleans([junk, dessert, vegetarian, mediterranean]) > 2) {
       result = _setError('Se tiene que seleccionar como máximo 2 categorías');
     } else if(Utils.sumTrueBooleans([mondays, tuesdays, wednesdays, thursdays, fridays, saturdays, sundays]) == 0) {
       result = _setError('Se tiene que seleccionar al menos 1 día de la semana');
@@ -145,7 +145,7 @@ class _EditProductState extends State<EditProduct> {
       startHour: Utils.timeOfDayToSqlTimeString(startTime),
       endHour: Utils.timeOfDayToSqlTimeString(endTime),
       vegetarian: Utils.boolToSqlString(vegetarian),
-      vegan: Utils.boolToSqlString(vegan),
+      mediterranean: Utils.boolToSqlString(mediterranean),
       junk: Utils.boolToSqlString(junk),
       dessert: Utils.boolToSqlString(dessert),
       workingOnMonday: Utils.boolToSqlString(mondays),
@@ -213,7 +213,7 @@ class _EditProductState extends State<EditProduct> {
       startHour: Utils.timeOfDayToSqlTimeString(startTime),
       endHour: Utils.timeOfDayToSqlTimeString(endTime),
       vegetarian: Utils.boolToSqlString(vegetarian),
-      vegan: Utils.boolToSqlString(vegan),
+      mediterranean: Utils.boolToSqlString(mediterranean),
       junk: Utils.boolToSqlString(junk),
       dessert: Utils.boolToSqlString(dessert),
       workingOnMonday: Utils.boolToSqlString(mondays),
@@ -365,7 +365,7 @@ class _EditProductState extends State<EditProduct> {
       dessert = response.product.dessert!;
       junk = response.product.junk!;
       vegetarian = response.product.vegetarian!;
-      vegan = response.product.vegan!;
+      mediterranean = response.product.mediterranean!;
       mondays = response.product.workingOnMonday!;
       tuesdays = response.product.workingOnTuesday!;
       wednesdays = response.product.workingOnWednesday!;
@@ -576,11 +576,11 @@ class _EditProductState extends State<EditProduct> {
                           }
                         ),
                         CheckBoxRow(
-                          title: 'Vegano',
-                          value: vegan,
+                          title: 'Mediterráneo',
+                          value: mediterranean,
                           onChanged: () {
                             setState(() {
-                              vegan = !vegan;
+                              mediterranean = !mediterranean;
                             });
                           }
                         ),
@@ -588,7 +588,7 @@ class _EditProductState extends State<EditProduct> {
                     )
                   ],
                 ),
-                if(Utils.sumTrueBooleans([junk, dessert, vegetarian, vegan]) > 2) const FeedbackMessage(
+                if(Utils.sumTrueBooleans([junk, dessert, vegetarian, mediterranean]) > 2) const FeedbackMessage(
                   message: 'Máximo 2 categorías',
                   isError: true
                 ),

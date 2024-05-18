@@ -140,11 +140,11 @@ class _SearchFiltersState extends State<SearchFilters> {
                     }
                 ),
                 CheckBoxRow(
-                    title: 'Vegano',
-                    value: context.read<SearchFiltersCubit>().state.vegan,
+                    title: 'Mediterráneo',
+                    value: context.read<SearchFiltersCubit>().state.mediterranean,
                     onChanged: () {
                       setState(() {
-                        context.read<SearchFiltersCubit>().setVegan(!context.read<SearchFiltersCubit>().state.vegan);
+                        context.read<SearchFiltersCubit>().setMediterranean(!context.read<SearchFiltersCubit>().state.mediterranean);
                       });
                     }
                 ),
@@ -221,7 +221,7 @@ class _SearchFiltersState extends State<SearchFilters> {
                     latitude: -12.5, // TODO deshardcodear
                     distance: 99999, // TODO deshardcodear
                     vegetarian: context.read<SearchFiltersCubit>().state.vegetarian,
-                    vegan: context.read<SearchFiltersCubit>().state.vegan,
+                    mediterranean: context.read<SearchFiltersCubit>().state.mediterranean,
                     dessert: context.read<SearchFiltersCubit>().state.dessert,
                     junk: context.read<SearchFiltersCubit>().state.junk,
                     price: context.read<SearchFiltersCubit>().state.maximumPrice ?? 999999,

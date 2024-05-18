@@ -6,7 +6,7 @@ class Filters {
   TimeOfDay? endTime;
   bool onlyToday = false;
   bool onlyAvailable = false;
-  bool vegan = false;
+  bool mediterranean = false;
   bool vegetarian = false;
   bool junk = false;
   bool dessert = false;

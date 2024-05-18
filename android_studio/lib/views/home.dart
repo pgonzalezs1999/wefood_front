@@ -2,7 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wefood/blocs/blocs.dart';
+import 'package:wefood/commands/clear_data.dart';
 import 'package:wefood/components/components.dart';
+import 'package:wefood/main.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api/api.dart';
 import 'package:wefood/services/secure_storage.dart';
@@ -28,16 +30,46 @@ class _HomeState extends State<Home> {
     });
   }
 
+  void _navigateToMain() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const MyApp()),
+    );
+  }
+
   void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 60), (timer) {
-      _showPopup();
+    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      Duration difference = accessTokenExpiresAt!.difference(DateTime.now());
+      accessTokenMinutesLeft = difference.inMinutes;
+      if(accessTokenMinutesLeft! > 0) {
+        _showPopup();
+      } else {
+        _timer.cancel();
+        clearData(context);
+        _navigateToMain();
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return WefoodPopup(
+              context: context,
+              title: 'Ha caducado la sesión',
+              description: 'Por favor, inicie sesión de nuevo',
+              cancelButtonTitle: 'OK',
+              cancelButtonBehaviour: () {
+                Navigator.pop(context);
+              },
+            );
+          }
+        );
+      }
     });
   }
 
   void _showPopup() {
     final snackBar = SnackBar(
       content: Text('El JWT caduca en $accessTokenMinutesLeft minutos'),
-      duration: const Duration(seconds: 5),
+      duration: const Duration(seconds: 3),
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
@@ -56,7 +88,7 @@ class _HomeState extends State<Home> {
   void _getAccessTokenExpiresAt() async {
     accessTokenExpiresAt =
     await UserSecureStorage().readDateTime(key: 'accessTokenExpiresAt');
-    if (accessTokenExpiresAt != null) {
+    if(accessTokenExpiresAt != null) {
       Duration difference = accessTokenExpiresAt!.difference(DateTime.now());
       accessTokenMinutesLeft = difference.inMinutes;
     }

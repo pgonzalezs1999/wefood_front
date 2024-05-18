@@ -382,7 +382,7 @@ class _ItemState extends State<Item> {
                       )
                     ],
                   ),
-                  if(info!.product.vegetarian == true || info!.product.vegan == true || info!.product.junk == true || info!.product.dessert == true) Column(
+                  if(info!.product.vegetarian == true || info!.product.mediterranean == true || info!.product.junk == true || info!.product.dessert == true) Column(
                     children: <Widget>[
                       Align(
                         alignment: Alignment.centerLeft,
@@ -395,7 +395,7 @@ class _ItemState extends State<Item> {
                       Row(
                         children: <Widget>[
                           if(info!.product.vegetarian == true) const ProductTag(title: 'Vegetariano'),
-                          if(info!.product.vegan == true) const ProductTag(title: 'Vegano'),
+                          if(info!.product.mediterranean == true) const ProductTag(title: 'Mediterráneo'),
                           if(info!.product.junk == true) const ProductTag(title: 'C. rápida'),
                           if(info!.product.dessert == true) const ProductTag(title: 'Postres'),
                         ],
@@ -426,6 +426,7 @@ class _ItemState extends State<Item> {
                                             mainAxisSize: MainAxisSize.min,
                                             children: <Widget>[
                                               Row(
+                                                mainAxisAlignment: MainAxisAlignment.center,
                                                 children: <Widget>[
                                                   const Text('Cantidad:'),
                                                   const SizedBox(
@@ -445,7 +446,7 @@ class _ItemState extends State<Item> {
                                                 ],
                                               ),
                                               if(info!.product.price != null) Align(
-                                                alignment: Alignment.centerLeft,
+                                                alignment: Alignment.center,
                                                 child: Text('Precio total:  ${(info!.product.price! * selectedAmount).toStringAsFixed(2)} Sol/.'),
                                               ),
                                             ],
