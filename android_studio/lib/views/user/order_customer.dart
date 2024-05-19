@@ -5,7 +5,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 import 'package:wefood/commands/utils.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/models/models.dart';
-import 'package:wefood/services/auth/api/api.dart';
+import 'package:wefood/services/auth/api.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class OrderCustomer extends StatefulWidget {

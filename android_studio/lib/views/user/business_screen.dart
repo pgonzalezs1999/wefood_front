@@ -6,7 +6,7 @@ import 'package:maps_launcher/maps_launcher.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
 import 'package:wefood/models/models.dart';
-import 'package:wefood/services/auth/api/api.dart';
+import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/types.dart';
 
 class BusinessScreen extends StatefulWidget {

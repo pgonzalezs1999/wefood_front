@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:wefood/commands/clear_data.dart';
 import 'package:wefood/commands/share_app.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/main.dart';
-import 'package:wefood/services/auth/api/api.dart';
+import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/views/views.dart';
 
 class AdminProfile extends StatefulWidget {
@@ -79,7 +80,8 @@ class _AdminProfileState extends State<AdminProfile> {
                       actions: <TextButton>[
                         TextButton(
                           onPressed: () async {
-                            Api.logout(context).then((_) {
+                            clearData(context);
+                            Api.logout().then((_) {
                               Navigator.pop(context);
                               _navigateToMain();
                             }).onError((error, stackTrace) {

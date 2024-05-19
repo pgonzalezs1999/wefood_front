@@ -6,7 +6,7 @@ import 'package:wefood/commands/clear_data.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/main.dart';
 import 'package:wefood/models/models.dart';
-import 'package:wefood/services/auth/api/api.dart';
+import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/views/views.dart';
 
@@ -41,7 +41,7 @@ class _HomeState extends State<Home> {
     _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
       Duration difference = accessTokenExpiresAt!.difference(DateTime.now());
       accessTokenMinutesLeft = difference.inMinutes;
-      if(accessTokenMinutesLeft! <= 0) {
+      if(accessTokenMinutesLeft == null || accessTokenMinutesLeft! <= 0) {
         _timer.cancel();
         clearData(context);
         _navigateToMain();
@@ -58,7 +58,7 @@ class _HomeState extends State<Home> {
                 Navigator.pop(context);
               },
             );
-            }
+          }
         );
       }
     });

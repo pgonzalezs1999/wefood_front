@@ -2,12 +2,11 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:maps_launcher/maps_launcher.dart';
-import 'package:wefood/commands/open_loading_popup.dart';
 import 'package:wefood/commands/utils.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
 import 'package:wefood/models/models.dart';
-import 'package:wefood/services/auth/api/api.dart';
+import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/types.dart';
 import 'package:wefood/views/views.dart';
 
@@ -82,7 +81,11 @@ class _ItemState extends State<Item> {
   void _navigateToBusinessScreen({
     required businessExpanded
   }) {
-    openLoadingPopup(context);
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const WefoodLoadingPopup(),
+    );
     Api.getBusiness(
       idBusiness: widget.productExpanded.business.id!,
     ).then((BusinessExpandedModel businessExpanded) {

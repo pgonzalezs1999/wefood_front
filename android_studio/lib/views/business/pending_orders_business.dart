@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:wefood/commands/open_loading_popup.dart';
 import 'package:wefood/commands/utils.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
 import 'package:wefood/models/models.dart';
-import 'package:wefood/services/auth/api/api.dart';
+import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/blocs/blocs.dart';
 
 class PendingOrdersBusiness extends StatefulWidget {
@@ -122,7 +121,11 @@ class _PendingOrdersBusinessState extends State<PendingOrdersBusiness> {
                     TextButton(
                       child: const Text('CONFIRMAR'),
                       onPressed: () {
-                        openLoadingPopup(context);
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (_) => const WefoodLoadingPopup(),
+                        );
                         Api.completeOrderBusiness(
                           idOrder: qrOrderId,
                         ).then((_) {

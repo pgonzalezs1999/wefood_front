@@ -25,3 +25,4 @@ export 'package:wefood/components/schedule_setter.dart';
 export 'package:wefood/components/order_history_button_customer.dart';
 export 'package:wefood/components/print_stars.dart';
 export 'package:wefood/components/blocked_button.dart';
+export 'package:wefood/components/wefood_loading_popup.dart';

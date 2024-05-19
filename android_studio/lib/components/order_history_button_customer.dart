@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:wefood/commands/open_loading_popup.dart';
+import 'package:wefood/components/components.dart';
 import 'package:wefood/components/wefood_popup.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/commands/utils.dart';
-import 'package:wefood/services/auth/api/api.dart';
+import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/views/views.dart';
 
 class OrderHistoryButtonCustomer extends StatefulWidget {
@@ -26,7 +26,11 @@ class _OrderHistoryButtonCustomerState extends State<OrderHistoryButtonCustomer>
   void _navigateToBusinessScreen({
     required businessExpanded
   }) {
-    openLoadingPopup(context);
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const WefoodLoadingPopup(),
+    );
     Api.getBusiness(
       idBusiness: widget.productExpanded.business.id!,
     ).then((BusinessExpandedModel businessExpanded) {

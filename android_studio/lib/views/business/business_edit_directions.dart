@@ -11,7 +11,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
-import 'package:wefood/services/auth/api/api.dart';
+import 'package:wefood/services/auth/api.dart';
 
 class BusinessEditDirections extends StatefulWidget {
 

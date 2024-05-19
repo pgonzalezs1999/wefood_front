@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wefood/commands/utils.dart';
 import 'package:wefood/models/models.dart';
-import 'package:wefood/services/auth/api/api.dart';
+import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/components/components.dart';
 
 class ValidatableBusinesses extends StatefulWidget {

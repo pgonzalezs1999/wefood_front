@@ -4,13 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:wefood/blocs/blocs.dart';
+import 'package:wefood/commands/call_request.dart';
+import 'package:wefood/commands/clear_data.dart';
 import 'package:wefood/commands/contact_support.dart';
-import 'package:wefood/commands/open_loading_popup.dart';
+import 'package:wefood/services/loading/loading_test.dart';
 import 'package:wefood/commands/share_app.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/main.dart';
 import 'package:wefood/models/models.dart';
-import 'package:wefood/services/auth/api/api.dart';
+import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/types.dart';
 import 'package:wefood/views/views.dart';
 import 'package:http/http.dart' as http;
@@ -92,7 +94,11 @@ class _UserProfileState extends State<UserProfile> {
   _pickImageFromGallery() {
     ImagePicker().pickImage(source: ImageSource.gallery).then((XFile? returnedImage) {
       if(returnedImage != null) {
-        openLoadingPopup(context);
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => const WefoodLoadingPopup(),
+        );
         Api.uploadImage(
           idUser: context.read<UserInfoCubit>().state.user.id!,
           meaning: 'profile',
@@ -135,7 +141,11 @@ class _UserProfileState extends State<UserProfile> {
     ImagePicker().pickImage(source: ImageSource.camera).then((XFile? returnedImage) {
       if(returnedImage != null) {
         Navigator.pop(context);
-        openLoadingPopup(context);
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => const WefoodLoadingPopup(),
+        );
         Api.uploadImage(
           idUser: context.read<UserInfoCubit>().state.user.id!,
           meaning: 'profile',
@@ -149,7 +159,7 @@ class _UserProfileState extends State<UserProfile> {
                 Image.network(
                   imageModel.route!,
                   fit: BoxFit.cover,
-                )
+                ),
               );
             });
             Navigator.pop(context);
@@ -601,13 +611,52 @@ class _UserProfileState extends State<UserProfile> {
                       actions: <TextButton>[
                         TextButton(
                           onPressed: () {
-                            Api.logout(context).then((_) {
+                            callRequestWithLoading(
+                              context: context,
+                              request: Api.logout,
+                              closePreviousPopup: true,
+                              onSuccess: () {
+                                clearData(context);
+                                _navigateToMain();
+                              },
+                              onError: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return WefoodPopup(
+                                      context: context,
+                                      title: '¡ERROOOOOOOOOOOR!',
+                                      cancelButtonTitle: 'OK',
+                                    );
+                                  }
+                                );
+                                /*Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => WefoodPopup(
+                                      context: context,
+                                      title: 'POR FIN LLEGO HASTA AQUÍ!!!',
+                                      cancelButtonTitle: 'OK',
+                                    ),
+                                    fullscreenDialog: false,
+                                    maintainState: false,
+                                  ),
+                                );*/
+                              },
+                            );
+                            /*Api.logout().then((_) {
+                              clearData(context);
                               Navigator.pop(context);
                               _navigateToMain();
                             }).onError((Object error, StackTrace stackTrace) {
-                              Navigator.pop(context);
-                              _navigateToMain();
-                            });
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(builder: (context) => WefoodPopup(context: context)),
+                              );
+                              //clearData(context);
+                              //Navigator.pop(context);
+                              //_navigateToMain();
+                            });*/
                           },
                           child: const Text('SÍ'),
                         )

@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/commands/utils.dart';
 import 'package:wefood/models/models.dart';
-import 'package:wefood/services/auth/api/api.dart';
+import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/types.dart';
 import 'package:wefood/views/views.dart';
 
@@ -26,12 +26,15 @@ class EditProductButton extends StatefulWidget {
 class _EditProductButtonState extends State<EditProductButton> {
 
   void _retrieveImage() async {
-    ImageModel? imageModel = await Api.getImage(
+    Api.getImage(
       idUser: context.read<UserInfoCubit>().state.user.id!,
       meaning: '${Utils.productTypeToChar(widget.productType)}1',
-    );
-    setState(() {
-      imageRoute = imageModel.route;
+    ).then((ImageModel? imageModel) {
+      if(imageModel?.route != null) {
+        setState(() {
+          imageRoute = imageModel!.route!;
+        });
+      }
     });
   }
 
