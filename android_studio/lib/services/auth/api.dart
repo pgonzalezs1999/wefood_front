@@ -29,6 +29,27 @@ class Api {
     } catch(error) { rethrow; }
   }
 
+  static Future<String> logout() async {
+    try {
+      dynamic response = await Middleware.endpoint(
+        name: 'logout',
+        type: HttpType.get,
+      );
+      return response['message'];
+    } catch(error) { rethrow; }
+  }
+
+  static Future signOut(BuildContext context) async {
+    try {
+      Middleware.endpoint(
+        name: 'signout',
+        type: HttpType.post,
+      ).then((_) {
+        clearData(context);
+      });
+    } catch(error) { rethrow; }
+  }
+
   static Future<UserModel> getProfile() async {
     try {
       final response = await Middleware.endpoint(
@@ -364,31 +385,6 @@ class Api {
     } catch(error) { rethrow; }
   }
 
-  static Future<void> logout() async {
-    try {
-      await Future.delayed(
-        const Duration(seconds: 2),
-        () async {
-          await Middleware.endpoint(
-            name: 'logout',
-            type: HttpType.get,
-          );
-        }
-      );
-    } catch(error) { rethrow; }
-  }
-
-  static Future signOut(BuildContext context) async {
-    try {
-      Middleware.endpoint(
-        name: 'signout',
-        type: HttpType.post,
-      ).then((_) {
-        clearData(context);
-      });
-    } catch(error) { rethrow; }
-  }
-
   static Future<bool> checkValidity({
     required String username,
   }) async {
@@ -718,15 +714,7 @@ class Api {
     required double longitude,
     required double latitude,
     required double distance,
-    required bool vegetarian,
-    required bool mediterranean,
-    required bool dessert,
-    required bool junk,
-    required double price,
-    required TimeOfDay startingHour,
-    required TimeOfDay endingHour,
-    required bool onlyToday,
-    required bool onlyAvailable,
+    required Filters filters
   }) async {
     try {
       final response = await Middleware.endpoint(
@@ -736,15 +724,15 @@ class Api {
           'longitude': longitude.toString(),
           'latitude': latitude.toString(),
           'distance': distance.toString(),
-          'vegetarian': vegetarian ? "1" : "0",
-          'mediterranean': mediterranean ? "1" : "0",
-          'dessert': dessert ? "1" : "0",
-          'junk': junk ? "1" : "0",
-          'price': price.toString(),
-          'starting_hour': Utils.timeOfDayToSqlTimeString(startingHour),
-          'ending_hour': Utils.timeOfDayToSqlTimeString(endingHour),
-          'only_today': onlyToday ? "1" : "0",
-          'only_available': onlyAvailable ? "1" : "0",
+          'vegetarian': filters.vegetarian ? "1" : "0",
+          'mediterranean': filters.mediterranean ? "1" : "0",
+          'dessert': filters.dessert ? "1" : "0",
+          'junk': filters.junk ? "1" : "0",
+          'price': (filters.maximumPrice ?? 99999).toString(),
+          'starting_hour': Utils.timeOfDayToSqlTimeString(filters.startTime ?? const TimeOfDay(hour: 0, minute: 0)),
+          'ending_hour': Utils.timeOfDayToSqlTimeString(filters.endTime ?? const TimeOfDay(hour: 23, minute: 59)),
+          'only_today': filters.onlyToday ? "1" : "0",
+          'only_available': filters.onlyAvailable ? "1" : "0",
         },
       );
       List<ProductExpandedModel> products = (response['items'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();

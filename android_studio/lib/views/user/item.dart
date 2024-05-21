@@ -2,6 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:maps_launcher/maps_launcher.dart';
+import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/commands/utils.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
@@ -81,36 +82,35 @@ class _ItemState extends State<Item> {
   void _navigateToBusinessScreen({
     required businessExpanded
   }) {
-    showDialog(
+    callRequestWithLoading(
       context: context,
-      barrierDismissible: false,
-      builder: (_) => const WefoodLoadingPopup(),
+      request: () async {
+        return await Api.getBusiness(
+          idBusiness: widget.productExpanded.business.id!,
+        );
+      },
+      onSuccess: (BusinessExpandedModel response) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => BusinessScreen(
+            businessExpanded: response, // businessExpanded,
+          )),
+        );
+      },
+      onError: (error) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return WefoodPopup(
+              context: context,
+              title: 'Ha ocurrido un error al cargar el negocio',
+              description: 'Por favor, inténtelo de nuevo más tarde: $error',
+              cancelButtonTitle: 'OK',
+            );
+          }
+        );
+      }
     );
-    Api.getBusiness(
-      idBusiness: widget.productExpanded.business.id!,
-    ).then((BusinessExpandedModel businessExpanded) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => BusinessScreen(
-          businessExpanded: businessExpanded,
-        )),
-      ).whenComplete(() {
-        Navigator.pop(context);
-      });
-    }).onError((error, stackTrace) {
-      Navigator.pop(context);
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return WefoodPopup(
-            context: context,
-            title: 'Ha ocurrido un error al cargar el negocio',
-            description: 'Por favor, inténtelo de nuevo más tarde: $error',
-            cancelButtonTitle: 'OK',
-          );
-        }
-      );
-    });
   }
 
   _retrieveData() {
@@ -415,80 +415,87 @@ class _ItemState extends State<Item> {
                         if(info!.available != null) if(info!.available! > 0) Text('${info!.available} de ${info!.product.amount} disponibles'),
                         if(info!.available != null) if(info!.available! <= 0) const Text('¡Agotado!'),
                         if(info!.available != null) if(info!.available! > 0) ElevatedButton(
-                            child: const Text('COMPRAR'),
-                            onPressed: () {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return StatefulBuilder(
-                                      builder: (context, setState) {
-                                        return WefoodPopup(
-                                          context: context,
-                                          title: 'Comprar producto',
-                                          content: Column(
-                                            mainAxisSize: MainAxisSize.min,
+                          child: const Text('COMPRAR'),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (_) {
+                                return StatefulBuilder(
+                                  builder: (_, setState) {
+                                    return WefoodPopup(
+                                      context: context,
+                                      title: 'Comprar producto',
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: <Widget>[
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
                                             children: <Widget>[
-                                              Row(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                children: <Widget>[
-                                                  const Text('Cantidad:'),
-                                                  const SizedBox(
-                                                    width: 10,
-                                                  ),
-                                                  DropdownButton<int>(
-                                                    value: selectedAmount,
-                                                    items: _amountOptions(info!.available!),
-                                                    onChanged: (value) {
-                                                      setState(() {
-                                                        selectedAmount =
-                                                        value!;
-                                                      });
-                                                    },
-                                                  ),
-                                                  const Text(' packs'),
-                                                ],
+                                              const Text('Cantidad:'),
+                                              const SizedBox(
+                                                width: 10,
                                               ),
-                                              if(info!.product.price != null) Align(
-                                                alignment: Alignment.center,
-                                                child: Text('Precio total:  ${(info!.product.price! * selectedAmount).toStringAsFixed(2)} Sol/.'),
+                                              DropdownButton<int>(
+                                                value: selectedAmount,
+                                                items: _amountOptions(info!.available!),
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    selectedAmount =
+                                                    value!;
+                                                  });
+                                                },
                                               ),
+                                              const Text(' packs'),
                                             ],
                                           ),
-                                          cancelButtonTitle: 'CANCELAR',
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () async {
-                                                await Api.orderItem(
+                                          if(info!.product.price != null) Align(
+                                            alignment: Alignment.center,
+                                            child: Text('Precio total:  ${(info!.product.price! * selectedAmount).toStringAsFixed(2)} Sol/.'),
+                                          ),
+                                        ],
+                                      ),
+                                      cancelButtonTitle: 'CANCELAR',
+                                      actions: [
+                                        TextButton(
+                                          child: const Text('COMPRAR'),
+                                          onPressed: () async {
+                                            callRequestWithLoading(
+                                              closePreviousPopup: true,
+                                              context: context,
+                                              request: () async {
+                                                return await Api.orderItem(
                                                   idItem: info!.item.id!,
-                                                  amount: selectedAmount,
-                                                ).then((_) {
-                                                  Navigator.pop(context);
-                                                  showDialog(
-                                                      context: context,
-                                                      builder: (BuildContext context) {
-                                                        return WefoodPopup(
-                                                          context: context,
-                                                          title: '¡Producto comprado!',
-                                                          description: 'Esto es todavía un entorno de pruebas. Más adelante, aquí aparecerá la pasarela de pago',
-                                                          cancelButtonTitle: 'OK',
-                                                          cancelButtonBehaviour: () {
-                                                            Navigator.pop(context);
-                                                            Navigator.pop(context);
-                                                          },
-                                                        );
-                                                      }
-                                                  );
-                                                });
+                                                  amount: 99999, // selectedAmount,
+                                                );
                                               },
-                                              child: const Text('COMPRAR'),
-                                            ),
-                                          ],
-                                        );
-                                      }
-                                  );
-                                },
-                              );
-                            }
+                                              onSuccess: () {
+                                                Navigator.pop(context);
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (BuildContext context) {
+                                                    return WefoodPopup(
+                                                      context: context,
+                                                      title: '¡Producto comprado!',
+                                                      description: 'Esto es todavía un entorno de pruebas. Más adelante, aquí aparecerá la pasarela de pago',
+                                                      cancelButtonTitle: 'OK',
+                                                      cancelButtonBehaviour: () {
+                                                        Navigator.pop(context);
+                                                        Navigator.pop(context);
+                                                      },
+                                                    );
+                                                  }
+                                                );
+                                              },
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  }
+                                );
+                              },
+                            );
+                          },
                         ),
                       ],
                     ),

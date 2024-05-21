@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/commands/utils.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api.dart';
@@ -15,6 +16,12 @@ class _ValidatableBusinessesState extends State<ValidatableBusinesses> {
 
   List<BusinessExpandedModel>? businesses = [];
   bool isRetrievingData = true;
+
+  void _removeItem(int businessId) async {
+    setState(() {
+      businesses = businesses?.where((business) => business.business.id != businessId).toList();
+    });
+  }
 
   void _retrieveData() async {
     businesses = await Api.getValidatableBusinesses();
@@ -35,7 +42,7 @@ class _ValidatableBusinessesState extends State<ValidatableBusinesses> {
       title: 'Validar negocios',
       body: [
         if(isRetrievingData == true) const LoadingIcon(),
-        if(isRetrievingData == false) Column(
+        if(isRetrievingData == false && businesses != null && businesses!.isNotEmpty) Column(
           children: businesses!.map(
             (item) => Container(
               width: double.infinity,
@@ -126,6 +133,7 @@ class _ValidatableBusinessesState extends State<ValidatableBusinesses> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <ElevatedButton>[
                           ElevatedButton(
+                            child: const Text('RECHAZAR'),
                             onPressed: () async {
                               showDialog(
                                 context: context,
@@ -148,29 +156,44 @@ class _ValidatableBusinessesState extends State<ValidatableBusinesses> {
                                       ),
                                     ],
                                   );
-                                }
+                                },
                               );
                             },
-                            child: const Text('RECHAZAR'),
                           ),
                           ElevatedButton(
+                            child: const Text('ACEPTAR'),
                             onPressed: () async {
                               showDialog(
                                 context: context,
-                                builder: (BuildContext context) {
+                                builder: (_) {
                                   return WefoodPopup(
-                                    context: context,
+                                    context: _,
                                     title: '¿Aceptar establecimiento?',
                                     actions: <TextButton>[
                                       TextButton(
                                         onPressed: () async {
-                                          await Api.validateBusiness(
-                                            id: item.business.id!,
-                                          ).then((value) async {
-                                            _retrieveData();
-                                          }).then((value) {
-                                            Navigator.pop(context);
-                                          });
+                                          callRequestWithLoading(
+                                            closePreviousPopup: true,
+                                            context: context,
+                                            request: () async {
+                                              return await Api.validateBusiness(
+                                                id: item.business.id!,
+                                              );
+                                            },
+                                            onSuccess: (_) {
+                                              _removeItem(item.business.id!);
+                                              showDialog(
+                                                context: context,
+                                                builder: (BuildContext context) {
+                                                  return WefoodPopup(
+                                                    context: context,
+                                                    title: '¡Negocio validado!',
+                                                    cancelButtonTitle: 'OK',
+                                                  );
+                                                }
+                                              );
+                                            },
+                                          );
                                         },
                                         child: const Text('SÍ'),
                                       ),
@@ -179,7 +202,6 @@ class _ValidatableBusinessesState extends State<ValidatableBusinesses> {
                                 }
                               );
                             },
-                            child: const Text('ACEPTAR'),
                           ),
                         ],
                       )
@@ -189,6 +211,30 @@ class _ValidatableBusinessesState extends State<ValidatableBusinesses> {
               ),
             ),
           ).toList(),
+        ),
+        if(isRetrievingData == false && businesses != null && businesses!.isEmpty) Align( // TODO currarse más esto
+          alignment: Alignment.center,
+          child: Card(
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                vertical: 10,
+                horizontal: 20,
+              ),
+              child: Column(
+                children: <Text>[
+                  Text(
+                    '¡Estamos al día!',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const Text(
+                    'Cuando nuevos negocios soliciten unirse, aparecerán aquí',
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              )
+            ),
+          ),
         ),
         const SizedBox(
           height: 20,

@@ -37,7 +37,7 @@ class _WefoodPopupState extends State<WefoodPopup> {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Container(
-                margin: EdgeInsets.symmetric(
+              margin: EdgeInsets.symmetric(
                 horizontal: MediaQuery.of(context).size.width * 0.1,
                 vertical: MediaQuery.of(context).size.height * 0.05,
               ),

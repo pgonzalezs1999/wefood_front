@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:wefood/blocs/blocs.dart';
+import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
 import 'package:wefood/models/models.dart';
@@ -108,33 +109,41 @@ class _EditProductState extends State<EditProduct> {
           barrierDismissible: false,
           builder: (_) => const WefoodLoadingPopup(),
         );
-        Api.uploadImage(
-          idUser: context.read<UserInfoCubit>().state.user.id!,
-          meaning: '${Utils.productTypeToChar(widget.productType).toLowerCase()}$position',
-          file: imageFile,
-        ).then((ImageModel imageModel) {
-          setState(() {
-            images[position-1] = Image.file(
-              imageFile,
-              fit: BoxFit.cover,
+        callRequestWithLoading(
+          closePreviousPopup: true,
+          context: context,
+          request: () async {
+            return await Api.uploadImage(
+              idUser: context.read<UserInfoCubit>().state.user.id!,
+              meaning: '${Utils.productTypeToChar(widget.productType).toLowerCase()}$position',
+              file: imageFile,
             );
-          });
-          Navigator.pop(context);
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (BuildContext context) {
-              return WefoodPopup(
-                context: context,
-                title: '¡Foto actualizada correctamente!',
-                cancelButtonTitle: 'OK',
-                cancelButtonBehaviour: () {
-                  Navigator.pop(context);
-                },
+          },
+          onSuccess: (ImageModel imageModel) {
+            setState(() {
+              images[position-1] = Image.file(
+                imageFile,
+                fit: BoxFit.cover,
+                height: MediaQuery.of(context).size.width * 0.25,
+                width: MediaQuery.of(context).size.width * 0.5,
               );
-            }
-          );
-        });
+            });
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) {
+                return WefoodPopup(
+                  context: context,
+                  title: '¡Foto actualizada correctamente!',
+                  cancelButtonTitle: 'OK',
+                  cancelButtonBehaviour: () {
+                    Navigator.pop(context);
+                  },
+                );
+              }
+            );
+          },
+        );
       }
     });
   }
@@ -309,31 +318,37 @@ class _EditProductState extends State<EditProduct> {
                           TextButton(
                             child: const Text('SÍ'),
                             onPressed: () {
-                              Api.removeImage(
-                                idUser: context.read<UserInfoCubit>().state.user.id!,
-                                meaning: '${Utils.productTypeToChar(widget.productType).toLowerCase()}${current+1}',
-                              ).then((_) {
-                                for(int i = current; i < images.length - 1; i++) {
-                                  setState(() {
-                                    images[i] = images[i+1];
-                                  });
-                                }
-                                setState(() {
-                                  images[images.length-1] = null;
-                                  lastFilled = lastFilled - 1;
-                                });
-                                Navigator.pop(context);
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return WefoodPopup(
-                                      context: context,
-                                      title: '¡Imagen eliminada correctamente!',
-                                      cancelButtonTitle: 'OK',
-                                    );
+                              callRequestWithLoading(
+                                context: context,
+                                request: () async {
+                                  return await Api.removeImage(
+                                    idUser: context.read<UserInfoCubit>().state.user.id!,
+                                    meaning: '${Utils.productTypeToChar(widget.productType).toLowerCase()}${current+1}',
+                                  );
+                                },
+                                onSuccess: (_) {
+                                  for(int i = current; i < images.length - 1; i++) {
+                                    setState(() {
+                                      images[i] = images[i+1];
+                                    });
                                   }
-                                );
-                              });
+                                  setState(() {
+                                    images[images.length-1] = null;
+                                    lastFilled = lastFilled - 1;
+                                  });
+                                  Navigator.pop(context);
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return WefoodPopup(
+                                        context: context,
+                                        title: '¡Imagen eliminada correctamente!',
+                                        cancelButtonTitle: 'OK',
+                                      );
+                                    }
+                                  );
+                                },
+                              );
                             },
                           ),
                         ],
@@ -392,7 +407,10 @@ class _EditProductState extends State<EditProduct> {
           if(imageModel.route != null) {
             setState(() {
               images[i] = ImageWithLoader.network(
-                  route: imageModel.route!
+                route: imageModel.route!,
+                height: MediaQuery.of(context).size.width * 0.25,
+                width: MediaQuery.of(context).size.width * 0.5,
+                fit: BoxFit.cover,
               );
             });
           }
@@ -748,55 +766,76 @@ class _EditProductState extends State<EditProduct> {
                   height: 10,
                 ),
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Container(
-                      margin: EdgeInsets.only(
-                        right: MediaQuery.of(context).size.width * 0.05,
-                      ),
-                      child: Column(
-                        children: <Widget>[
-                          ImageSlot(
-                            image: (images[0] != null) ? images[0] : null,
-                            isMain: true,
-                            onTap: () async {
-                              _manageImageSlot(0);
-                            },
-                          ),
-                          const Text('Imagen principal'),
-                        ],
+                    Expanded(
+                      child: ImageSlot(
+                        image: (images[0] != null) ? images[0] : null,
+                        height: (MediaQuery.of(context).size.width * 0.1 * 2) + 10,
+                        i: 1,
+                        onTap: () async {
+                          _manageImageSlot(0);
+                        },
                       ),
                     ),
-                    Expanded(
-                      child: Column(
-                        children: <Widget>[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: <int>[0, 1, 2, 3, 4].map((i) {
-                              return ImageSlot(
-                                image: (images[i] != null) ? images[i] : null,
-                                onTap: () async {
-                                  _manageImageSlot(i);
-                                },
-                              );
-                            }).toList(),
-                          ),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.width * 0.025,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: <int>[5, 6, 7, 8, 9].map((i) {
-                              return ImageSlot(
-                                image: (images[i] != null) ? images[i] : null,
-                                onTap: () async {
-                                  _manageImageSlot(i);
-                                },
-                              );
-                            }).toList(),
-                          ),
-                        ],
-                      ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Column(
+                      children: <Widget>[
+                        Row(
+                          children: <Widget>[
+                            ImageSlot(
+                              image: (images[1] != null) ? images[1] : null,
+                              height: MediaQuery.of(context).size.width * 0.1,
+                              width: MediaQuery.of(context).size.width * 0.2,
+                              i: 2,
+                              onTap: () async {
+                                _manageImageSlot(1);
+                              },
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            ImageSlot(
+                              image: (images[2] != null) ? images[2] : null,
+                              height: MediaQuery.of(context).size.width * 0.1,
+                              width: MediaQuery.of(context).size.width * 0.2,
+                              i: 3,
+                              onTap: () async {
+                                _manageImageSlot(2);
+                              },
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Row(
+                          children: <Widget>[
+                            ImageSlot(
+                              image: (images[3] != null) ? images[3] : null,
+                              height: MediaQuery.of(context).size.width * 0.1,
+                              width: MediaQuery.of(context).size.width * 0.2,
+                              i: 4,
+                              onTap: () async {
+                                _manageImageSlot(3);
+                              },
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            ImageSlot(
+                              image: (images[4] != null) ? images[4] : null,
+                              height: MediaQuery.of(context).size.width * 0.1,
+                              width: MediaQuery.of(context).size.width * 0.2,
+                              i: 5,
+                              onTap: () async {
+                                _manageImageSlot(4);
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ],
                 ),

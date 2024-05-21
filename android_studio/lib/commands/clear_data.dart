@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/services/secure_storage.dart';
 
-clearData(BuildContext context) {
-  UserSecureStorage().delete(key: 'accessToken').then((_) {
+clearData(BuildContext context) async {
+  await UserSecureStorage().delete(key: 'accessToken').then((_) {
     UserSecureStorage().delete(key: 'accessTokenExpiresAt').then((_) {
       UserSecureStorage().delete(key: 'username').then((_) {
         UserSecureStorage().delete(key: 'password').then((_) {

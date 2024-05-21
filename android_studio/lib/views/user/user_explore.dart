@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wefood/blocs/blocs.dart';
+import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/models/models.dart';
@@ -229,12 +230,19 @@ class _UserExploreState extends State<UserExplore> {
                               Icons.search,
                             ),
                             onTap: () async {
-                              List<ProductExpandedModel> items = await Api.searchItemsByText(
-                                text: _searchController.text,
-                              );
-                              _navigateToSearchedFilters(
-                                text: _searchController.text,
-                                items: items,
+                              callRequestWithLoading(
+                                context: context,
+                                request: () async {
+                                  return await Api.searchItemsByText(
+                                    text: _searchController.text,
+                                  );
+                                },
+                                onSuccess: (List<ProductExpandedModel> items) {
+                                  _navigateToSearchedFilters(
+                                    text: _searchController.text,
+                                    items: items,
+                                  );
+                                },
                               );
                             },
                           ),
@@ -286,7 +294,7 @@ class _UserExploreState extends State<UserExplore> {
           margin: EdgeInsets.symmetric(
             vertical: MediaQuery.of(context).size.height * 0.05,
           ),
-          child: const Text('Error'),
+          child: const Text('No se han podido obtener los productos favoritos'),
         ),
         if(_retrievingFavourites == LoadingStatus.successful && context.read<FavouriteItemsCubit>().state.isEmpty) Align(
           alignment: Alignment.center,

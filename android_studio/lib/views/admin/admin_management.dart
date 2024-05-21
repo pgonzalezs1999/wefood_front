@@ -15,18 +15,21 @@ class _AdminManagementState extends State<AdminManagement> {
   Widget build(BuildContext context) {
     return WefoodNavigationScreen(
       children: [
-        Align(
-          child: ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ValidatableBusinesses(),
-                ),
-              );
-            },
-            child: const Text('VALIDAR NUEVOS ESTABLECIMIENTOS'),
-          ),
+        Container(
+          height: MediaQuery.of(context).size.height * 0.75,
+          child: Center(
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ValidatableBusinesses(),
+                  ),
+                );
+              },
+              child: const Text('VALIDAR NUEVOS ESTABLECIMIENTOS'),
+            ),
+          )
         ),
       ],
     );

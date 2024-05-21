@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/commands/clear_data.dart';
 import 'package:wefood/commands/share_app.dart';
 import 'package:wefood/components/components.dart';
@@ -16,7 +17,7 @@ class AdminProfile extends StatefulWidget {
 class _AdminProfileState extends State<AdminProfile> {
 
   void _navigateToMain() {
-    Navigator.pushReplacement(
+    Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const MyApp()),
     );
@@ -68,6 +69,13 @@ class _AdminProfileState extends State<AdminProfile> {
               },
             ),
             SettingsElement(
+              iconData: Icons.business,
+              title: 'Términos y condiciones',
+              onTap: () {
+                _navigateToTermsAndConditions();
+              },
+            ),
+            SettingsElement(
               iconData: Icons.logout,
               title: 'Cerrar sesión',
               onTap: () {
@@ -80,29 +88,29 @@ class _AdminProfileState extends State<AdminProfile> {
                       actions: <TextButton>[
                         TextButton(
                           onPressed: () async {
-                            clearData(context);
-                            Api.logout().then((_) {
-                              Navigator.pop(context);
-                              _navigateToMain();
-                            }).onError((error, stackTrace) {
-                              Navigator.pop(context);
-                              _navigateToMain();
-                            });
+                            callRequestWithLoading(
+                              context: context,
+                              request: () async {
+                                return await Api.logout();
+                              },
+                              closePreviousPopup: true,
+                              onSuccess: () {
+                                clearData(context);
+                                _navigateToMain();
+                              },
+                              onError: (error) {
+                                clearData(context);
+                                _navigateToMain();
+                              },
+                            );
                           },
                           child: const Text('SÍ'),
                         ),
                       ],
                     );
-                  }
+                  },
                 );
-              },
-            ),
-            SettingsElement(
-              iconData: Icons.business,
-              title: 'Términos y condiciones',
-              onTap: () {
-                _navigateToTermsAndConditions();
-              },
+              }
             ),
           ],
         ),

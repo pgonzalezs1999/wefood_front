@@ -45,21 +45,6 @@ class _HomeState extends State<Home> {
         _timer.cancel();
         clearData(context);
         _navigateToMain();
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (BuildContext context) {
-            return WefoodPopup(
-              context: context,
-              title: 'Ha caducado la sesión',
-              description: 'Por favor, inicie sesión de nuevo',
-              cancelButtonTitle: 'OK',
-              cancelButtonBehaviour: () {
-                Navigator.pop(context);
-              },
-            );
-          }
-        );
       }
     });
   }
@@ -107,10 +92,12 @@ class _HomeState extends State<Home> {
       future: Api.getProfile(),
       builder: (BuildContext context, AsyncSnapshot<UserModel> response) {
         if(response.hasError) {
+          clearData(context);
+          _navigateToMain();
           return Container(
             margin: EdgeInsets.symmetric(
             vertical: MediaQuery.of(context).size.height * 0.05),
-            child: const Text('Error'),
+            child: const Text('Ha ocurrido un error'),
           );
         } else if(response.hasData) {
           context.read<UserInfoCubit>().setUser(response.data!);

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -7,7 +8,6 @@ import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/commands/clear_data.dart';
 import 'package:wefood/commands/contact_support.dart';
-import 'package:wefood/services/loading/loading_test.dart';
 import 'package:wefood/commands/share_app.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/main.dart';
@@ -77,13 +77,17 @@ class _UserProfileState extends State<UserProfile> {
                   ImageWithLoader.network(
                     route: imageModel.route!,
                     fit: BoxFit.cover,
-                  )
+                    height: MediaQuery.of(context).size.width * 0.5,
+                    width: MediaQuery.of(context).size.width * 0.5,
+                  ),
                 );
               });
             });
           }
         }).onError((error, stackTrace) {
-          print('No se ha encontrado la foto de perfil para este usuario');
+          if(kDebugMode) {
+            print('No se ha encontrado la foto de perfil para este usuario');
+          }
         });
       } catch(e) {
         return;
@@ -91,94 +95,46 @@ class _UserProfileState extends State<UserProfile> {
     }
   }
 
-  _pickImageFromGallery() {
-    ImagePicker().pickImage(source: ImageSource.gallery).then((XFile? returnedImage) {
+  _pickImageFromGalleryFrom({
+    required ImageSource imageSource
+  }) {
+    ImagePicker().pickImage(source: imageSource).then((XFile? returnedImage) {
       if(returnedImage != null) {
-        showDialog(
+        callRequestWithLoading(
+          closePreviousPopup: true,
           context: context,
-          barrierDismissible: false,
-          builder: (_) => const WefoodLoadingPopup(),
-        );
-        Api.uploadImage(
-          idUser: context.read<UserInfoCubit>().state.user.id!,
-          meaning: 'profile',
-          file: File(returnedImage.path),
-        ).then((ImageModel imageModel) {
-          http.get(
-            Uri.parse(imageModel.route!)
-          ).then((response) {
-            Navigator.pop(context);
-            setState(() {
-              context.read<UserInfoCubit>().setPicture(
-                Image.network(
-                  imageModel.route!,
-                  fit: BoxFit.cover,
-                )
-              );
-            });
-            Navigator.pop(context);
-            showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (BuildContext context) {
-                return WefoodPopup(
-                  context: context,
-                  title: '¡Foto de perfil cambiada correctamente!',
-                  cancelButtonTitle: 'OK',
-                  cancelButtonBehaviour: () {
-                    Navigator.pop(context);
-                  },
-                );
-              }
+          request: () async {
+            return await Api.uploadImage(
+              idUser: context.read<UserInfoCubit>().state.user.id!,
+              meaning: 'profile',
+              file: File(returnedImage.path),
             );
-          });
-        });
-      }
-    });
-  }
-
-  _pickImageFromCamera() {
-    ImagePicker().pickImage(source: ImageSource.camera).then((XFile? returnedImage) {
-      if(returnedImage != null) {
-        Navigator.pop(context);
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (_) => const WefoodLoadingPopup(),
-        );
-        Api.uploadImage(
-          idUser: context.read<UserInfoCubit>().state.user.id!,
-          meaning: 'profile',
-          file: File(returnedImage.path),
-        ).then((ImageModel imageModel) {
-          http.get(
-            Uri.parse(imageModel.route!)
-          ).then((response) {
-            setState(() {
-              context.read<UserInfoCubit>().setPicture(
-                Image.network(
-                  imageModel.route!,
-                  fit: BoxFit.cover,
-                ),
-              );
-            });
-            Navigator.pop(context);
-            showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (BuildContext context) {
-                return WefoodPopup(
-                  context: context,
-                  title: '¡Foto de perfil cambiada correctamente!',
-                  cancelButtonTitle: 'OK',
-                  cancelButtonBehaviour: () {
-                    Navigator.pop(context);
-                  },
+          },
+          onSuccess: (ImageModel imageModel) {
+            if(imageModel.route != null) {
+              setState(() {
+                context.read<UserInfoCubit>().setPicture(
+                  Image.network(
+                    imageModel.route!,
+                    fit: BoxFit.cover,
+                    height: MediaQuery.of(context).size.width * 0.5,
+                    width: MediaQuery.of(context).size.width * 0.5,
+                  )
                 );
-              }
-            );
-          });
-        });
+              });
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return WefoodPopup(
+                    context: context,
+                    title: '¡Foto de perfil cambiada correctamente!',
+                    cancelButtonTitle: 'OK',
+                  );
+                }
+              );
+            }
+          }
+        );
       }
     });
   }
@@ -220,47 +176,64 @@ class _UserProfileState extends State<UserProfile> {
                 onTap: () async {
                   showDialog(
                     context: context,
-                    builder: (BuildContext context) {
-                      return StatefulBuilder(builder: (context, StateSetter setState) {
-                        return AlertDialog(
-                          content: Container(
-                            padding: EdgeInsets.symmetric(
-                              vertical: MediaQuery.of(context).size.height * 0.01,
-                            ),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                TextButton(
-                                  onPressed: () async {
-                                    _pickImageFromGallery();
-                                  },
-                                  child: const Text('ESCOGER FOTO DE LA GALERÍA'),
-                                ),
-                                TextButton(
-                                  onPressed: () async {
-                                    _pickImageFromCamera();
-                                  },
-                                  child: const Text('SACAR FOTO CON LA CÁMARA'),
-                                ),
-                                TextButton(
-                                  onPressed: () async {
-                                    // TODO FALTA ESTO
-                                  },
-                                  child: const Text('ELIMINAR FOTO'),
-                                ),
-                              ],
-                            ),
-                          ),
-                          actions: <Widget>[
+                    builder: (_) {
+                      return WefoodPopup(
+                        context: _,
+                        image: context.read<UserInfoCubit>().state.image,
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
                             TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
+                              child: const Text('ESCOGER FOTO DE LA GALERÍA'),
+                              onPressed: () async {
+                                _pickImageFromGalleryFrom(
+                                  imageSource: ImageSource.gallery,
+                                );
                               },
-                              child: const Text('SALIR'),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                _pickImageFromGalleryFrom(
+                                  imageSource: ImageSource.camera,
+                                );
+                              },
+                              child: const Text('SACAR FOTO CON LA CÁMARA'),
+                            ),
+                            if(context.read<UserInfoCubit>().state.image != null) TextButton(
+                              child: const Text('ELIMINAR FOTO'),
+                              onPressed: () {
+                                callRequestWithLoading(
+                                  closePreviousPopup: true,
+                                  context: context,
+                                  request: () async {
+                                    return await Api.removeImage(
+                                      idUser: context.read<UserInfoCubit>().state.user.id!,
+                                      meaning: 'profile',
+                                    );
+                                  },
+                                  onSuccess: (_) {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return WefoodPopup(
+                                          context: context,
+                                          title: 'Imagen eliminada correctamente',
+                                          cancelButtonTitle: 'OK',
+                                        );
+                                      }
+                                    );
+                                    context.read<UserInfoCubit>().removePicture();
+                                    setState(() {
+                                      context.read<UserInfoCubit>().state;
+                                    });
+                                  },
+                                );
+                              },
                             ),
                           ],
-                        );
-                      });
+                        ),
+                        cancelButtonTitle: 'SALIR',
+                      );
                     },
                   );
                 },
@@ -324,9 +297,9 @@ class _UserProfileState extends State<UserProfile> {
                       onTap: () {
                         showDialog(
                           context: context,
-                          builder: (BuildContext context) {
+                          builder: (_) {
                             return StatefulBuilder(
-                              builder: (context, setState) {
+                              builder: (_, setState) {
                                 return WefoodPopup(
                                   context: context,
                                   title: 'Cambiar nombre',
@@ -337,16 +310,16 @@ class _UserProfileState extends State<UserProfile> {
                                         labelText: 'Nombre',
                                         initialText: context.read<UserInfoCubit>().state.user.realName,
                                         feedbackWidget: (auxRealName.length < 2)
+                                          ? const FeedbackMessage(
+                                            message: 'Debe tener 2 caracteres o más',
+                                            isError: true,
+                                          )
+                                          : (auxRealName.length > 30)
                                             ? const FeedbackMessage(
                                               message: 'Debe tener 2 caracteres o más',
                                               isError: true,
                                             )
-                                            : (auxRealName.length > 30)
-                                              ? const FeedbackMessage(
-                                                message: 'Debe tener 2 caracteres o más',
-                                                isError: true,
-                                              )
-                                              : null,
+                                            : null,
                                         onChanged: (String value) {
                                           setState(() {
                                             auxRealName = value;
@@ -381,32 +354,38 @@ class _UserProfileState extends State<UserProfile> {
                                   cancelButtonTitle: 'CANCELAR',
                                   actions: [
                                     if(2 <= auxRealName.length && auxRealName.length <= 30 && 2 <= auxRealSurname.length && auxRealSurname.length <= 30) TextButton(
-                                      onPressed: () {
-                                        Api.updateRealName(
-                                          name: auxRealName,
-                                          surname: auxRealSurname
-                                        ).then((_) {
-                                          Navigator.pop(context);
-                                          showDialog(
-                                            context: context,
-                                            barrierDismissible: false,
-                                            builder: (BuildContext context) {
-                                              return StatefulBuilder(builder: (context, setState) {
-                                                return WefoodPopup(
-                                                  context: context,
-                                                  title: '¡Nombre cambiado correctamente!',
-                                                  cancelButtonTitle: 'OK',
-                                                );
-                                              });
-                                            }
-                                          );
-                                        });
-                                      },
                                       child: const Text('CONFIRMAR'),
+                                      onPressed: () {
+                                        callRequestWithLoading(
+                                          closePreviousPopup: true,
+                                          context: context,
+                                          request: () async {
+                                            return await Api.updateRealName(
+                                              name: auxRealName,
+                                              surname: auxRealSurname
+                                            );
+                                          },
+                                          onSuccess: (_) {
+                                            showDialog(
+                                              context: context,
+                                              barrierDismissible: false,
+                                              builder: (BuildContext context) {
+                                                return StatefulBuilder(builder: (context, setState) {
+                                                  return WefoodPopup(
+                                                    context: context,
+                                                    title: '¡Nombre cambiado correctamente!',
+                                                    cancelButtonTitle: 'OK',
+                                                  );
+                                                });
+                                              },
+                                            );
+                                          },
+                                        );
+                                      },
                                     ),
                                   ],
                                 );
-                              }
+                              },
                             );
                           },
                         ).then((_) {
@@ -438,9 +417,9 @@ class _UserProfileState extends State<UserProfile> {
                       onTap: () {
                         showDialog(
                           context: context,
-                          builder: (BuildContext context) {
+                          builder: (_) {
                             return StatefulBuilder(
-                              builder: (context, setState) {
+                              builder: (_, setState) {
                                 return WefoodPopup(
                                   context: context,
                                   title: 'Cambiar nombre de usuario',
@@ -521,24 +500,30 @@ class _UserProfileState extends State<UserProfile> {
                                     if(usernameAvailable) TextButton(
                                       child: const Text('CONFIRMAR'),
                                       onPressed: () {
-                                        Api.updateUsername(
-                                          username: auxUsername,
-                                        ).then((_) {
-                                          Navigator.pop(context);
-                                          showDialog(
-                                            context: context,
-                                            barrierDismissible: false,
-                                            builder: (BuildContext context) {
-                                              return StatefulBuilder(builder: (context, setState) {
-                                                return WefoodPopup(
-                                                  context: context,
-                                                  title: '¡Nombre de usuario cambiado correctamente!',
-                                                  cancelButtonTitle: 'OK',
-                                                );
-                                              });
-                                            }
-                                          );
-                                        });
+                                        callRequestWithLoading(
+                                          closePreviousPopup: true,
+                                          context: context,
+                                          request: () async {
+                                            return await Api.updateUsername(
+                                              username: auxUsername,
+                                            );
+                                          },
+                                          onSuccess: (_) {
+                                            showDialog(
+                                              context: context,
+                                              barrierDismissible: false,
+                                              builder: (BuildContext context) {
+                                                return StatefulBuilder(builder: (context, setState) {
+                                                  return WefoodPopup(
+                                                    context: context,
+                                                    title: '¡Nombre de usuario cambiado correctamente!',
+                                                    cancelButtonTitle: 'OK',
+                                                  );
+                                                });
+                                              }
+                                            );
+                                          },
+                                        );
                                       },
                                     ),
                                   ],
@@ -610,59 +595,28 @@ class _UserProfileState extends State<UserProfile> {
                       title: '¿Seguro que quieres cerrar sesión?',
                       actions: <TextButton>[
                         TextButton(
-                          onPressed: () {
+                          onPressed: () async {
                             callRequestWithLoading(
                               context: context,
-                              request: Api.logout,
+                              request: () async {
+                                return await Api.logout();
+                              },
                               closePreviousPopup: true,
                               onSuccess: () {
                                 clearData(context);
                                 _navigateToMain();
                               },
-                              onError: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return WefoodPopup(
-                                      context: context,
-                                      title: '¡ERROOOOOOOOOOOR!',
-                                      cancelButtonTitle: 'OK',
-                                    );
-                                  }
-                                );
-                                /*Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => WefoodPopup(
-                                      context: context,
-                                      title: 'POR FIN LLEGO HASTA AQUÍ!!!',
-                                      cancelButtonTitle: 'OK',
-                                    ),
-                                    fullscreenDialog: false,
-                                    maintainState: false,
-                                  ),
-                                );*/
+                              onError: (error) {
+                                clearData(context);
+                                _navigateToMain();
                               },
                             );
-                            /*Api.logout().then((_) {
-                              clearData(context);
-                              Navigator.pop(context);
-                              _navigateToMain();
-                            }).onError((Object error, StackTrace stackTrace) {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(builder: (context) => WefoodPopup(context: context)),
-                              );
-                              //clearData(context);
-                              //Navigator.pop(context);
-                              //_navigateToMain();
-                            });*/
                           },
                           child: const Text('SÍ'),
-                        )
+                        ),
                       ],
                     );
-                  }
+                  },
                 );
               }
             ),
@@ -701,7 +655,7 @@ class _UserProfileState extends State<UserProfile> {
                                     description: 'Por favor, inténtelo de nuevo más tarde',
                                     cancelButtonTitle: 'OK',
                                   );
-                                }
+                                },
                               );
                             });
                           },
@@ -709,7 +663,7 @@ class _UserProfileState extends State<UserProfile> {
                         ),
                       ],
                     );
-                  }
+                  },
                 );
               },
             ),

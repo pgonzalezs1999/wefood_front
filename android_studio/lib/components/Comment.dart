@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wefood/blocs/blocs.dart';
+import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api.dart';
@@ -93,7 +94,7 @@ class _CommentState extends State<Comment> {
                 onTap: () {
                   showDialog(
                       context: context,
-                      builder: (BuildContext context) {
+                      builder: (_) {
                         return WefoodPopup(
                           context: context,
                           title: '¿Eliminar comentario?',
@@ -101,14 +102,19 @@ class _CommentState extends State<Comment> {
                             TextButton(
                               child: const Text('SÍ'),
                               onPressed: () {
-                                Api.deleteComment(
-                                  idBusiness: widget.comment.comment.idBusiness!,
-                                ).then((_) {
-                                  Navigator.pop(context);
-                                  if(widget.onDelete != null) {
-                                    widget.onDelete!();
-                                  }
-                                  showDialog(
+                                callRequestWithLoading(
+                                  closePreviousPopup: true,
+                                  context: context,
+                                  request: () async {
+                                    return await Api.deleteComment(
+                                      idBusiness: widget.comment.comment.idBusiness!,
+                                    );
+                                  },
+                                  onSuccess: (_) {
+                                    if(widget.onDelete != null) {
+                                      widget.onDelete!();
+                                    }
+                                    showDialog(
                                       context: context,
                                       builder: (BuildContext context) {
                                         return WefoodPopup(
@@ -117,20 +123,9 @@ class _CommentState extends State<Comment> {
                                           cancelButtonTitle: 'OK',
                                         );
                                       }
-                                  ).onError((error, stackTrace) {
-                                    showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return WefoodPopup(
-                                            context: context,
-                                            title: 'Ha ocurrido un error',
-                                            description: 'Por favor, inténtelo de nuevo más tarde',
-                                            cancelButtonTitle: 'OK',
-                                          );
-                                        }
                                     );
-                                  });
-                                });
+                                  },
+                                );
                               },
                             )
                           ],

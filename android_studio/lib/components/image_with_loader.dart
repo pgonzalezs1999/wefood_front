@@ -4,6 +4,7 @@ class ImageWithLoader {
 
   static Image network({
     required String route,
+    double? height,
     double? width,
     BoxFit? fit,
   }) {
@@ -16,13 +17,14 @@ class ImageWithLoader {
           child: CircularProgressIndicator(
             strokeWidth: 1,
             value: loadingProgress.expectedTotalBytes != null
-                ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                : null,
+              ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+              : null,
           ),
         );
       },
       route,
       fit: fit ?? BoxFit.cover,
+      height: height,
       width: width,
     );
   }

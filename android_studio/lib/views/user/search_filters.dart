@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wefood/blocs/blocs.dart';
+import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
 import 'package:wefood/models/models.dart';
@@ -176,12 +177,12 @@ class _SearchFiltersState extends State<SearchFilters> {
                     children: <Widget>[
                       const Text('Ver productos agotados'),
                       Switch(
-                          value: context.read<SearchFiltersCubit>().state.onlyAvailable,
-                          onChanged: (bool value) {
-                            setState(() {
-                              context.read<SearchFiltersCubit>().setOnlyAvailable(value);
-                            });
-                          }
+                        value: context.read<SearchFiltersCubit>().state.onlyAvailable,
+                        onChanged: (bool value) {
+                          setState(() {
+                            context.read<SearchFiltersCubit>().setOnlyAvailable(value);
+                          });
+                        }
                       ),
                     ],
                   ),
@@ -208,34 +209,34 @@ class _SearchFiltersState extends State<SearchFilters> {
                       context.read<SearchFiltersCubit>().setEndTime(selectedTime);
                     });
                   },
-                )
+                ),
               ],
             ),
             Align(
               alignment: Alignment.center,
               child: ElevatedButton(
                 child: const Text('BUSCAR'),
-                onPressed: () async {
-                  List<ProductExpandedModel> items = await Api.searchItemsByFilters(
-                    longitude: -77, // TODO deshardcodear
-                    latitude: -12.5, // TODO deshardcodear
-                    distance: 99999, // TODO deshardcodear
-                    vegetarian: context.read<SearchFiltersCubit>().state.vegetarian,
-                    mediterranean: context.read<SearchFiltersCubit>().state.mediterranean,
-                    dessert: context.read<SearchFiltersCubit>().state.dessert,
-                    junk: context.read<SearchFiltersCubit>().state.junk,
-                    price: context.read<SearchFiltersCubit>().state.maximumPrice ?? 999999,
-                    startingHour: context.read<SearchFiltersCubit>().state.startTime ?? const TimeOfDay(hour: 0, minute: 0),
-                    endingHour: context.read<SearchFiltersCubit>().state.endTime ?? const TimeOfDay(hour: 23, minute: 59),
-                    onlyToday: context.read<SearchFiltersCubit>().state.onlyToday,
-                    onlyAvailable: context.read<SearchFiltersCubit>().state.onlyAvailable,
-                  );
-                  _navigateToSearchedItems(
-                    items: items,
+                onPressed: () {
+                  callRequestWithLoading(
+                    context: context,
+                    request: () async {
+                      Filters filters = context.read<SearchFiltersCubit>().state;
+                      return await Api.searchItemsByFilters(
+                        longitude: -77, // TODO deshardcodear
+                        latitude: -12.5, // TODO deshardcodear
+                        distance: 99999, // TODO deshardcodear
+                        filters: filters,
+                      );
+                    },
+                    onSuccess: (List<ProductExpandedModel> items) {
+                      _navigateToSearchedItems(
+                        items: items,
+                      );
+                    },
                   );
                 },
               ),
-            )
+            ),
           ],
         ),
       ],

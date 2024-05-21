@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wefood/blocs/blocs.dart';
 import 'package:maps_launcher/maps_launcher.dart';
+import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
 import 'package:wefood/models/models.dart';
@@ -346,47 +347,41 @@ class _BusinessScreenState extends State<BusinessScreen> {
                                     Icons.send
                                 ),
                                 onPressed: () {
-                                  Api.addComment(
-                                    idBusiness: widget.businessExpanded.business.id!,
-                                    message: newCommentMessage,
-                                    rate: selectedRate,
-                                  ).then((_) {
-                                    setState(() {
-                                      hasCommented = true;
-                                    });
-                                    Api.getCommentsFromBusiness(
-                                      idBusiness: widget.businessExpanded.business.id!,
-                                    ).then((List<CommentExpandedModel> comments) {
-                                      setState(() {
-                                        commentList = comments.map((CommentExpandedModel c) => Comment(
-                                          comment: c,
-                                          onDelete: _onDeleteComment,
-                                        )).toList().reversed.toList();
-                                      });
-                                      showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return WefoodPopup(
-                                            context: context,
-                                            title: '¡Comentario añadido correctamente!',
-                                            cancelButtonTitle: 'OK',
-                                          );
-                                        }
+                                  callRequestWithLoading(
+                                    context: context,
+                                    request: () async {
+                                      return await Api.addComment(
+                                        idBusiness: widget.businessExpanded.business.id!,
+                                        message: newCommentMessage,
+                                        rate: selectedRate,
                                       );
-                                    });
-                                  }).onError((error, stackTrace) {
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return WefoodPopup(
+                                    },
+                                    onSuccess: (_) {
+                                      setState(() {
+                                        hasCommented = true;
+                                      });
+                                      Api.getCommentsFromBusiness(
+                                        idBusiness: widget.businessExpanded.business.id!,
+                                      ).then((List<CommentExpandedModel> comments) {
+                                        setState(() {
+                                          commentList = comments.map((CommentExpandedModel c) => Comment(
+                                            comment: c,
+                                            onDelete: _onDeleteComment,
+                                          )).toList().reversed.toList();
+                                        });
+                                        showDialog(
                                           context: context,
-                                          title: 'Ha ocurrido un error',
-                                          description: 'Por favor, inténtelo de nuevo más tarde -> $error',
-                                          cancelButtonTitle: 'OK',
+                                          builder: (BuildContext context) {
+                                            return WefoodPopup(
+                                              context: context,
+                                              title: '¡Comentario añadido correctamente!',
+                                              cancelButtonTitle: 'OK',
+                                            );
+                                          }
                                         );
-                                      }
-                                    );
-                                  });
+                                      });
+                                    },
+                                  );
                                 },
                               ),
                             ],

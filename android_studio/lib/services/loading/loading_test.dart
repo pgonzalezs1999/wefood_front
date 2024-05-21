@@ -11,7 +11,7 @@ class LoadingTest {
 
   void show({
     required BuildContext context,
-    String text = 'Loading',
+    String text = 'Cargando...',
   }) {
     if(_controller?.update(text) ?? false) {
       return;
