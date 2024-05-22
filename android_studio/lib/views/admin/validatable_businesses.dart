@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/commands/utils.dart';
 import 'package:wefood/models/models.dart';
@@ -98,7 +100,7 @@ class _ValidatableBusinessesState extends State<ValidatableBusinesses> {
                       ),
                       _ValidatableRow(
                         title: 'Dirección',
-                        value: '${item.business.directions} - (long: ${item.business.longitude}, lat: ${item.business.latitude})',
+                        value: '${item.business.directions}\n(long: ${item.business.longitude}, lat: ${item.business.latitude})',
                       ),
                       const Divider(
                         height: 30,
@@ -117,10 +119,12 @@ class _ValidatableBusinessesState extends State<ValidatableBusinesses> {
                       _ValidatableRow(
                         title: 'Correo',
                         value: item.user.email,
+                        isMail: true,
                       ),
                       _ValidatableRow(
                         title: 'Teléfono',
-                        value: '(+${item.user.phone}) ${item.user.phone}',
+                        value: '(+${item.user.phonePrefix}) ${item.user.phone}',
+                        isPhone: true,
                       ),
                       _ValidatableRow(
                         title: 'Solicitado a fecha',
@@ -139,20 +143,35 @@ class _ValidatableBusinessesState extends State<ValidatableBusinesses> {
                             onPressed: () async {
                               showDialog(
                                 context: context,
-                                builder: (BuildContext context) {
+                                builder: (_) {
                                   return WefoodPopup(
-                                    context: context,
+                                    context: _,
                                     title: '¿Rechazar establecimiento?',
                                     actions: <TextButton>[
                                       TextButton(
                                         onPressed: () async {
-                                          await Api.refuseBusiness(
-                                            id: item.business.id!,
-                                          ).then((value) async {
-                                            _retrieveData();
-                                          }).then((value) {
-                                            Navigator.pop(context);
-                                          });
+                                          callRequestWithLoading(
+                                            closePreviousPopup: true,
+                                            context: context,
+                                            request: () async {
+                                              return await Api.refuseBusiness(
+                                                id: item.business.id!,
+                                              );
+                                            },
+                                            onSuccess: (value) async {
+                                              showDialog(
+                                                context: context,
+                                                builder: (BuildContext context) {
+                                                  return WefoodPopup(
+                                                    context: context,
+                                                    title: 'Establecimiento rechazado correctamente',
+                                                    cancelButtonTitle: 'OK',
+                                                  );
+                                                }
+                                              );
+                                              _retrieveData();
+                                            },
+                                          );
                                         },
                                         child: const Text('SÍ'),
                                       ),
@@ -248,12 +267,16 @@ class _ValidatableBusinessesState extends State<ValidatableBusinesses> {
 
 class _ValidatableRow extends StatefulWidget {
 
-  final String? title;
+  final String title;
   final String? value;
+  final bool isPhone;
+  final bool isMail;
 
   const _ValidatableRow({
     required this.title,
     required this.value,
+    this.isPhone = false,
+    this.isMail = false,
   });
 
   @override
@@ -276,14 +299,56 @@ class _ValidatableRowState extends State<_ValidatableRow> {
               fontWeight: FontWeight.w600,
             ),
           ),
-          Expanded(
-            child: Text(
-              widget.value ?? 'null',
-              style: TextStyle(
-                color: (widget.value == null || widget.value?.contains('null') == true) ? Colors.red : null,
+          (widget.isPhone == true)
+            ? GestureDetector(
+              child: Row(
+                children: <Widget>[
+                  Text(
+                    '${widget.value}',
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary, // TODO deshardcodear este estilo
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ),
+              onTap: () {
+                launchUrlString('tel://${widget.value}');
+              },
+            )
+            : (widget.isMail == true)
+              ? GestureDetector(
+                child: Text(
+                  '${widget.value}',
+                  textAlign: TextAlign.start,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary, // TODO deshardcodear este estilo
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+                onTap: () async {
+                  String subject = 'Solicitud de alta en WeFood';
+                  String message = 'Buenas tardes.\n\n'
+                      'Desde WeFood hemos recibido la solicitud de registro para su negocio.\n\n'
+                      'Estamos encantados que de haya elegido nuestra plataforma. Esperamos estar a la altura de sus expectativas.\n\n'
+                      'Para mantener nuestra plataforma libre de estafas y malas experiencias que puedan hacer que nuestros clientes desconfíen de otros negocios, necesitamos que los solicitantes nos aclaren algunas dudas sobre su negocio:\n\n\n\n'
+                      'En cuanto recibamos su respuesta y la verifiquemos, podrá comenzar a ofrecer sus productos, ¡y así ganar un dinero extra mientras lucha contra el desperdicio de alimentos!\n\n'
+                      'Reciba un cordial saludo,\n'
+                      'El equipo de WeFood.';
+                  await launchUrl(
+                    Uri.parse('mailto:${widget.value}?subject=$subject&body=$message'),
+                  );
+                },
+              )
+              : Expanded(
+                  child: Text(
+                    widget.value ?? 'null',
+                    style: TextStyle(
+                      color: (widget.value == null || widget.value?.contains('null') == true) ? Colors.red : null,
+                    ),
+                  ),
+                ),
         ],
       ),
     );

@@ -42,6 +42,23 @@ class WefoodInputState extends State<WefoodInput> {
     super.initState();
   }
 
+  Widget _suffixIcon() {
+    return Focus(
+      canRequestFocus: false,
+      descendantsAreFocusable: false,
+      child: IconButton(
+        onPressed: () => {
+          setState(() {
+            _obscureText = !_obscureText;
+          })
+        },
+        icon: Icon(
+          _obscureText ? Icons.visibility_off : Icons.visibility,
+        ),
+      )
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -65,6 +82,7 @@ class WefoodInputState extends State<WefoodInput> {
         ),
         TextFormField(
           keyboardType: (widget.type == InputType.integer || widget.type == InputType.decimal) ? TextInputType.number : TextInputType.visiblePassword,
+          textInputAction: TextInputAction.next,
           inputFormatters: (_inputFormatter != null) ? [ _inputFormatter! ] : null,
           obscureText: _obscureText,
           onChanged: (text) => widget.onChanged(text),
@@ -87,16 +105,7 @@ class WefoodInputState extends State<WefoodInput> {
               gapPadding: 4,
               borderRadius: const BorderRadius.all(Radius.circular(10))
             ),
-            suffixIcon: (widget.type == InputType.secret) ? IconButton(
-              onPressed: () => {
-                setState(() {
-                  _obscureText = !_obscureText;
-                })
-              },
-              icon: Icon(
-                _obscureText ? Icons.visibility_off : Icons.visibility,
-              ),
-            ) : null,
+            suffixIcon: (widget.type == InputType.secret) ? _suffixIcon() : null,
           ),
         ),
         if(widget.feedbackWidget != null) widget.feedbackWidget!,

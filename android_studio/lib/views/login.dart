@@ -171,6 +171,9 @@ class _LoginState extends State<Login> {
         if(authenticating != LoadingStatus.loading && (username == '' || password == '')) const BlockedButton(
           text: 'INICIAR SESIÓN',
         ),
+        const SizedBox(
+          height: 50,
+        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[

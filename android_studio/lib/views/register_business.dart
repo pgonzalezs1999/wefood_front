@@ -227,8 +227,8 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
       result = _setError('La descripción del establecimiento debe tener 6 caracteres o más');
     } else if(businessDescription.length > 255) {
       result = _setError('La descripción del establecimiento es demasiado larga');
-    } else if(ruc.length != 11) {
-      result = _setError('El RUC debe tener 11 caracteres');
+    } else if(ruc.length != 8 && ruc.length != 11) {
+      result = _setError('El RUC debe tener 8 u 11 caracteres');
     } else if(rucIsAvailable == false) {
       result = _setError('RUC no disponible');
     } else if(errorOnFindingLocation == true) {
@@ -365,11 +365,11 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
                 setState(() {
                   error = '';
                   ruc = value;
-                  if(ruc.length == 11) {
+                  if(ruc.length == 8 || ruc.length == 11) {
                     searchingRucAvailability = LoadingStatus.loading;
                   }
                 });
-                if(ruc.length == 11) {
+                if(ruc.length == 8 || ruc.length == 11) {
                   bool available = false;
                   try {
                     available = await Api.checkTaxIdAvailability(taxId: ruc);
@@ -385,12 +385,12 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
               feedbackWidget: (searchingRucAvailability == LoadingStatus.loading)
                 ? const ReducedLoadingIcon()
                 : (searchingRucAvailability != LoadingStatus.loading && ruc.isEmpty == false)
-                  ? (ruc.length < 11)
+                  ? (ruc.length != 8 && ruc.length < 11)
                     ? const FeedbackMessage(
                       message: 'RUC demasiado corto',
                       isError: true,
                     )
-                    : (ruc.length > 11)
+                    : (ruc.length != 8 && ruc.length > 11)
                       ? const FeedbackMessage(
                         message: 'RUC demasiado largo',
                         isError: true,

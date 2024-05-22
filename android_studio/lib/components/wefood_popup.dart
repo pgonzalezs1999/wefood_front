@@ -33,34 +33,38 @@ class _WefoodPopupState extends State<WefoodPopup> {
   Widget build(BuildContext _) {
     return StatefulBuilder(builder: (_, StateSetter setState) {
       return AlertDialog(
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Container(
-              margin: EdgeInsets.symmetric(
-                horizontal: MediaQuery.of(context).size.width * 0.1,
-                vertical: MediaQuery.of(context).size.height * 0.05,
-              ),
-              child: (widget.image != null)
-                ? widget.image!
-                : const Image(
+        content: Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: MediaQuery.of(context).size.width * 0.1,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Container(
+                margin: EdgeInsets.symmetric(
+                  vertical: MediaQuery.of(context).size.height * 0.05,
+                ),
+                child: (widget.image != null)
+                    ? widget.image!
+                    : const Image(
                   image: AssetImage('assets/images/logo.png'),
                 ),
-            ),
-            if(widget.title != null) Text(
-              widget.title!,
-              style: Theme.of(context).textTheme.titleMedium,
-              textAlign: TextAlign.center,
-            ),
-            if(widget.title != null) const SizedBox(
-              height: 20,
-            ),
-            if(widget.description != null) Text(
-              widget.description!,
-              textAlign: TextAlign.center,
-            ),
-            if(widget.content != null) widget.content!,
-          ],
+              ),
+              if(widget.title != null) Text(
+                widget.title!,
+                style: Theme.of(context).textTheme.titleMedium,
+                textAlign: TextAlign.center,
+              ),
+              if(widget.title != null) const SizedBox(
+                height: 20,
+              ),
+              if(widget.description != null) Text(
+                widget.description!,
+                textAlign: TextAlign.center,
+              ),
+              if(widget.content != null) widget.content!,
+            ],
+          ),
         ),
         actions: [
           TextButton(
