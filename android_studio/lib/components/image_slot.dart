@@ -26,6 +26,7 @@ class _ImageSlotState extends State<ImageSlot> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () async {
+        FocusScope.of(context).unfocus();
         widget.onTap();
       },
       child: Stack(
@@ -37,7 +38,7 @@ class _ImageSlotState extends State<ImageSlot> {
               height: widget.height,
               decoration: BoxDecoration(
                 color: Colors.grey.withOpacity(0.66),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(5),
               ),
               child: Icon(
                 Icons.add,
@@ -49,14 +50,14 @@ class _ImageSlotState extends State<ImageSlot> {
               width: widget.width,
               height: widget.height,
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(5),
                 child: widget.image!,
               ),
             ),
           if(widget.i != null) Container(
-            margin: const EdgeInsets.all(5),
-            height: 18,
-            width: 18,
+            margin: const EdgeInsets.all(3),
+            height: 14,
+            width: 14,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface,
@@ -69,7 +70,7 @@ class _ImageSlotState extends State<ImageSlot> {
             child: Text(
               '${widget.i}',
               style: const TextStyle(
-                fontSize: 10, // TODO deshardcodear este estilo
+                fontSize: 8, // TODO deshardcodear este estilo
               ),
             ),
           ),

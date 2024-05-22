@@ -7,12 +7,9 @@ import 'package:wefood/types.dart';
 
 class Middleware {
 
-  static const Duration timeOutDuration = Duration(seconds: 3);
+  static const Duration timeOutDuration = Duration(seconds: 20);
 
-  static Future get({
-    required Uri url,
-    required auth,
-  }) async {
+  static Future get({ required Uri url,  required auth }) async {
     try {
       final response = await http.get(
         url,
@@ -26,11 +23,7 @@ class Middleware {
     }
   }
 
-  static Future post({
-    required Uri url,
-    required auth,
-    body,
-  }) async {
+  static Future post({ required Uri url,  required auth,  body, }) async {
     try {
       final response = await http.post(
         url,

@@ -93,44 +93,44 @@ class _CommentState extends State<Comment> {
                 ),
                 onTap: () {
                   showDialog(
-                      context: context,
-                      builder: (_) {
-                        return WefoodPopup(
-                          context: context,
-                          title: '¿Eliminar comentario?',
-                          actions: <TextButton>[
-                            TextButton(
-                              child: const Text('SÍ'),
-                              onPressed: () {
-                                callRequestWithLoading(
-                                  closePreviousPopup: true,
-                                  context: context,
-                                  request: () async {
-                                    return await Api.deleteComment(
-                                      idBusiness: widget.comment.comment.idBusiness!,
-                                    );
-                                  },
-                                  onSuccess: (_) {
-                                    if(widget.onDelete != null) {
-                                      widget.onDelete!();
+                    context: context,
+                    builder: (BuildContext context) {
+                      return WefoodPopup(
+                        context: context,
+                        title: '¿Eliminar comentario?',
+                        actions: <TextButton>[
+                          TextButton(
+                            child: const Text('SÍ'),
+                            onPressed: () {
+                              callRequestWithLoading(
+                                context: context,
+                                request: () async {
+                                  return await Api.deleteComment(
+                                    idBusiness: widget.comment.comment.idBusiness!,
+                                  );
+                                },
+                                onSuccess: (_) {
+                                  if(widget.onDelete != null) {
+                                    widget.onDelete!();
+                                  }
+                                  Navigator.pop(context);
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return WefoodPopup(
+                                        context: context,
+                                        title: '¡Comentario eliminado correctamente!',
+                                        cancelButtonTitle: 'OK',
+                                      );
                                     }
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return WefoodPopup(
-                                          context: context,
-                                          title: '¡Comentario eliminado correctamente!',
-                                          cancelButtonTitle: 'OK',
-                                        );
-                                      }
-                                    );
-                                  },
-                                );
-                              },
-                            )
-                          ],
-                        );
-                      }
+                                  );
+                                },
+                              );
+                            },
+                          )
+                        ],
+                      );
+                    }
                   );
                 },
               ),

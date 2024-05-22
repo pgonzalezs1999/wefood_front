@@ -2,19 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/commands/utils.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class OrderCustomer extends StatefulWidget {
 
-  final int id;
+  final int itemId;
+  final int orderId;
 
   const OrderCustomer({
     super.key,
-    required this.id,
+    required this.itemId,
+    required this.orderId,
   });
 
   @override
@@ -34,7 +36,7 @@ class _OrderCustomerState extends State<OrderCustomer> {
       body: [
         FutureBuilder<ProductExpandedModel>(
           future: Api.getItem(
-            id: widget.id,
+            id: widget.itemId,
           ),
           builder: (BuildContext context, AsyncSnapshot<ProductExpandedModel> response) {
             if(response.hasError) {
@@ -92,7 +94,26 @@ class _OrderCustomerState extends State<OrderCustomer> {
                       const SizedBox(
                         width: 10,
                       ),
-                      Text('${info.business.directions}'),
+                      Flexible(
+                        child: Text('${info.business.directions}'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    children: <Widget>[
+                      const Icon(
+                        Icons.watch_later,
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Text(
+                        'Debes estar entre las ${Utils.dateTimeToString(date: info.product.startingHour, showDate: false)}h '
+                        'y las ${Utils.dateTimeToString(date: info.product.endingHour, showDate: false)}h'
+                      ),
                     ],
                   ),
                   Container(
@@ -108,7 +129,7 @@ class _OrderCustomerState extends State<OrderCustomer> {
                     ),
                   ),
                   QrImageView(
-                    data: '${widget.id}',
+                    data: '${widget.orderId}',
                     version: QrVersions.min,
                   ),
                   Container(
@@ -128,9 +149,9 @@ class _OrderCustomerState extends State<OrderCustomer> {
                     onPressed: () async {
                       showDialog(
                         context: context,
-                        builder: (BuildContext context) {
+                        builder: (_) {
                           return WefoodPopup(
-                            context: context,
+                            context: _,
                             title: '¿Confirmar recogida?',
                             description: 'Asegúrese de que el encargado está de acuerdo en confirmar el pedido de esta forma, ya que no se podrá deshacer esta acción',
                             cancelButtonTitle: 'CANCELAR',
@@ -138,28 +159,35 @@ class _OrderCustomerState extends State<OrderCustomer> {
                               TextButton(
                                 child: const Text('CONFIRMAR'),
                                 onPressed: () {
-                                  Api.completeOrderCustomer(
-                                    idOrder: widget.id,
-                                  ).then((_) {
-                                    Navigator.pop(context);
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return WefoodPopup(
-                                          context: context,
-                                          title: '¡Producto recogido!\n\n¡Muchas gracias por confiar en WeFood! ¡Esperamos volver a verle pronto!',
-                                          cancelButtonTitle: 'OK',
-                                          cancelButtonBehaviour: () async {
-                                            setState(() {
-                                              Navigator.pop(context);
-                                              Navigator.pop(context);
-                                              Navigator.pop(context);
-                                            });
-                                          },
-                                        );
-                                      }
-                                    );
-                                  });
+                                  callRequestWithLoading(
+                                    closePreviousPopup: true,
+                                    context: context,
+                                    request: () async {
+                                      return await Api.completeOrderCustomer(
+                                        idOrder: widget.orderId,
+                                      );
+                                    },
+                                    onSuccess: (_) {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return WefoodPopup(
+                                            context: context,
+                                            title: '¡Producto recogido!',
+                                            description: '¡Muchas gracias por confiar en WeFood! ¡Esperamos volver a verle pronto!',
+                                            cancelButtonTitle: 'OK',
+                                            cancelButtonBehaviour: () async {
+                                              setState(() {
+                                                Navigator.pop(context);
+                                                Navigator.pop(context);
+                                                Navigator.pop(context);
+                                              });
+                                            },
+                                          );
+                                        }
+                                      );
+                                    },
+                                  );
                                 },
                               ),
                             ],
@@ -172,7 +200,7 @@ class _OrderCustomerState extends State<OrderCustomer> {
                     height: 20,
                   ),
                   Text(
-                    'Código: ${Utils.numberToHexadecimal(widget.id)}',
+                    'Código: ${Utils.numberToHexadecimal(widget.orderId)}',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(

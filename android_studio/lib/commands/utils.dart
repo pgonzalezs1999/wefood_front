@@ -172,13 +172,20 @@ class Utils {
     return boolean ? '1' : '0';
   }
 
-  static String? dateTimeToString(DateTime? time) {
+  static String? dateTimeToString({
+    required DateTime? date,
+    bool showDate = true,
+    bool showTime = true,
+  }) {
     String result = '';
-    if(time != null) {
-      result = '${time.day}/${Utils.monthNumberToString(
-        number: time.month,
+    if(date != null) {
+      String dateString = (showDate == true) ? '${date.day}/${Utils.monthNumberToString(
+        number: date.month,
         shortened: true,
-      )}/${time.year}, ${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}h';
+      )}/${date.year}' : '';
+      String divider = (showDate == true && showTime == true) ? ', ' : '';
+      String timeString = (showTime == true) ? '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}' : '';
+      result = '$dateString$divider$timeString';
     }
     return result;
   }

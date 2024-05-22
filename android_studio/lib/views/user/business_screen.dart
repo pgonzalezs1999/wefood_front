@@ -37,21 +37,21 @@ class _BusinessScreenState extends State<BusinessScreen> {
     List<DropdownMenuItem<double>> amounts = [];
     for(double i = 5; i >= 1; i-=1) {
       amounts.add(
-          DropdownMenuItem<double>(
-            value: i,
-            child: Row(
-              children: <Widget>[
-                Text(i.toStringAsFixed(0)),
-                const SizedBox(
-                  width: 5,
-                ),
-                const Icon(
-                  Icons.star,
-                  size: 20,
-                )
-              ],
-            ),
-          )
+        DropdownMenuItem<double>(
+          value: i,
+          child: Row(
+            children: <Widget>[
+              Text(i.toStringAsFixed(0)),
+              const SizedBox(
+                width: 5,
+              ),
+              const Icon(
+                Icons.star,
+                size: 20,
+              ),
+            ],
+          ),
+        ),
       );
     }
     return amounts;
@@ -302,101 +302,117 @@ class _BusinessScreenState extends State<BusinessScreen> {
                       )
                     ],
                   ),
-                  if(widget.businessExpanded.business.comments != null && widget.businessExpanded.business.comments!.isNotEmpty) Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  const Divider(
+                    height: 50,
+                  ),
+                  if(widget.businessExpanded.requesterHasBought == true && hasCommented == false) const SizedBox(),
+                  if(widget.businessExpanded.requesterHasBought == true && hasCommented == false) Text(
+                    'Tu opinión es muy importante para nosotros',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  if(widget.businessExpanded.requesterHasBought == true && hasCommented == false) const SizedBox(
+                    height: 10,
+                  ),
+                  if(widget.businessExpanded.requesterHasBought == true && hasCommented == false) WefoodInput(
+                    labelText: 'Añadir comentario',
+                    onChanged: (String value) {
+                      setState(() {
+                        newCommentMessage = value;
+                      });
+                    },
+                  ),
+                  if(widget.businessExpanded.requesterHasBought == true && hasCommented == false) const SizedBox(
+                    height: 10,
+                  ),
+                  if(widget.businessExpanded.requesterHasBought == true && hasCommented == false) Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: <Widget>[
-                      const Divider(
-                        height: 50,
+                      DropdownButton<double>(
+                        value: selectedRate,
+                        items: _rateOptions(),
+                        onChanged: (value) {
+                          setState(() {
+                            selectedRate = value!;
+                          });
+                        },
                       ),
-                      if(hasCommented == false) Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            'Añadir un comentario',
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          WefoodInput(
-                            labelText: 'Añadir comentario',
-                            onChanged: (String value) {
-                              newCommentMessage = value;
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      if(newCommentMessage != '') IconButton(
+                        icon: const Icon(
+                          Icons.send,
+                        ),
+                        onPressed: () {
+                          callRequestWithLoading(
+                            context: context,
+                            request: () async {
+                              return await Api.addComment(
+                                idBusiness: widget.businessExpanded.business.id!,
+                                message: newCommentMessage,
+                                rate: selectedRate,
+                              );
                             },
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: <Widget>[
-                              DropdownButton<double>(
-                                value: selectedRate,
-                                items: _rateOptions(),
-                                onChanged: (value) {
-                                  setState(() {
-                                    selectedRate = value!;
-                                  });
-                                },
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              IconButton(
-                                icon: const Icon(
-                                    Icons.send
-                                ),
-                                onPressed: () {
-                                  callRequestWithLoading(
-                                    context: context,
-                                    request: () async {
-                                      return await Api.addComment(
-                                        idBusiness: widget.businessExpanded.business.id!,
-                                        message: newCommentMessage,
-                                        rate: selectedRate,
-                                      );
-                                    },
-                                    onSuccess: (_) {
-                                      setState(() {
-                                        hasCommented = true;
-                                      });
-                                      Api.getCommentsFromBusiness(
-                                        idBusiness: widget.businessExpanded.business.id!,
-                                      ).then((List<CommentExpandedModel> comments) {
-                                        setState(() {
-                                          commentList = comments.map((CommentExpandedModel c) => Comment(
-                                            comment: c,
-                                            onDelete: _onDeleteComment,
-                                          )).toList().reversed.toList();
-                                        });
-                                        showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            return WefoodPopup(
-                                              context: context,
-                                              title: '¡Comentario añadido correctamente!',
-                                              cancelButtonTitle: 'OK',
-                                            );
-                                          }
-                                        );
-                                      });
-                                    },
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                        ],
+                            onSuccess: (_) {
+                              CommentModel newComment = CommentModel.empty();
+                              newComment.message = newCommentMessage;
+                              newComment.rate = selectedRate;
+                              newComment.idBusiness = widget.businessExpanded.business.id!;
+                              CommentExpandedModel newCommentExpanded = CommentExpandedModel.fromParameters(
+                                userModel: context.read<UserInfoCubit>().state.user,
+                                commentModel: newComment,
+                              );
+                              setState(() {
+                                newCommentMessage = '';
+                                widget.businessExpanded.business.comments?.add(newCommentExpanded);
+                                hasCommented = true;
+                              });
+                              Api.getCommentsFromBusiness(
+                                idBusiness: widget.businessExpanded.business.id!,
+                              ).then((List<CommentExpandedModel> comments) {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return WefoodPopup(
+                                      context: context,
+                                      title: '¡Comentario añadido correctamente!',
+                                      cancelButtonTitle: 'OK',
+                                    );
+                                  }
+                                );
+                                setState(() {
+                                  commentList = comments.map((CommentExpandedModel c) => Comment(
+                                    comment: c,
+                                    onDelete: _onDeleteComment,
+                                  )).toList().reversed.toList();
+                                });
+                              });
+                            },
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                  if(widget.businessExpanded.requesterHasBought == true && hasCommented == false) const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    '¿Qué opinan otros compradores?',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  if(widget.businessExpanded.business.comments!.isNotEmpty) Column(
+                    children: commentList,
+                  ),
+                  if(widget.businessExpanded.business.comments!.isEmpty) Column(
+                    children: <Widget>[
+                      const SizedBox(
+                        height: 10,
                       ),
                       Text(
-                        '¿Qué opinan otros compradores?',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      Column(
-                        children: commentList,
+                        'Aún nadie ha dejado ningún comentario. ¡${(hasCommented == true) ? 'Prueba el producto y sé' : 'Sé'} el primero en comentar tu experiencia!',
+                        style: const TextStyle(
+                          color: Colors.grey, // TODO deshardcodear este estilo
+                        ),
                       ),
                     ],
                   ),

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wefood/blocs/blocs.dart';
+import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/commands/clear_data.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/main.dart';
@@ -38,13 +39,34 @@ class _HomeState extends State<Home> {
   }
 
   void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 20), (timer) async {
       Duration difference = accessTokenExpiresAt!.difference(DateTime.now());
       accessTokenMinutesLeft = difference.inMinutes;
       if(accessTokenMinutesLeft == null || accessTokenMinutesLeft! <= 0) {
-        _timer.cancel();
-        clearData(context);
-        _navigateToMain();
+        UserSecureStorage().read(key: 'username').then((String? storedUser) {
+          UserSecureStorage().read(key: 'password').then((String? storedPass) {
+            if(storedUser != null && storedUser != '' && storedPass != null && storedPass != '') {
+              callRequestWithLoading(
+                context: context,
+                request: () async {
+                  Api.login(context: context, username: storedUser, password: storedPass);
+                },
+                onSuccess: (AuthModel auth) {
+                  UserSecureStorage().writeDateTime(
+                    key: 'accessTokenExpiresAt',
+                    value: DateTime.now().add(Duration(seconds: auth.expiresAt!))
+                  );
+                  UserSecureStorage().write(key: 'accessToken', value: auth.accessToken!);
+                },
+                onError: (error) {
+                  _timer.cancel();
+                  clearData(context);
+                  _navigateToMain();
+                }
+              );
+            }
+          });
+        });
       }
     });
   }

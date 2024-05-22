@@ -50,7 +50,8 @@ class _OrderButtonState extends State<OrderButton> with SingleTickerProviderStat
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => OrderCustomer(
-              id: widget.productExpanded.order.id!,
+              itemId: widget.productExpanded.item.id!,
+              orderId: widget.productExpanded.order.id!,
             )),
           ).whenComplete(() {
             (widget.comebackBehaviour != null) ? widget.comebackBehaviour!() : null;
@@ -83,7 +84,15 @@ class _OrderButtonState extends State<OrderButton> with SingleTickerProviderStat
                             type: widget.productExpanded.product.type,
                             isCapitalized: true,
                           )} de'),
-                          if(widget.productExpanded.item.date != null) Text((widget.productExpanded.item.date!.day == DateTime.now().day) ? '(hoy)' : '(mañana)'),
+                          if(widget.productExpanded.item.date != null) Text((widget.productExpanded.item.date!.day == DateTime.now().day)
+                            ? '(hoy)'
+                            : (widget.productExpanded.item.date!.day == DateTime.now().add(const Duration(days: 1)).day)
+                              ? '(mañana)'
+                              : '(${Utils.dateTimeToString(
+                                date: widget.productExpanded.item.date,
+                                showTime: false,
+                              )})',
+                          ),
                         ],
                       ),
                       Text(

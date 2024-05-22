@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
 import 'package:wefood/models/models.dart';
@@ -103,67 +104,73 @@ class _LoginState extends State<Login> {
             setState(() {
               authenticating = LoadingStatus.loading;
             });
-            Api.login(
+            callRequestWithLoading(
               context: context,
-              username: username,
-              password: password,
-            ).then((AuthModel authModel) {
-              if(authModel.accessToken != null) {
-                UserSecureStorage().writeDateTime(
-                  key: 'accessTokenExpiresAt',
-                  value: DateTime.now().add(Duration(seconds: authModel.expiresAt!))
+              request: () async {
+                return await Api.login(
+                  context: context,
+                  username: username,
+                  password: password,
                 );
-                UserSecureStorage().write(key: 'accessToken', value: authModel.accessToken!);
-                UserSecureStorage().write(key: 'username', value: username);
-                UserSecureStorage().write(key: 'password', value: password);
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Home()),
-                );
-              } else if(authModel.error != null) {
+              },
+              onSuccess: (AuthModel authModel) {
+                if(authModel.accessToken != null) {
+                  UserSecureStorage().writeDateTime(
+                    key: 'accessTokenExpiresAt',
+                    value: DateTime.now().add(Duration(seconds: authModel.expiresAt!))
+                  );
+                  UserSecureStorage().write(key: 'accessToken', value: authModel.accessToken!);
+                  UserSecureStorage().write(key: 'username', value: username);
+                  UserSecureStorage().write(key: 'password', value: password);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const Home()),
+                  );
+                } else if(authModel.error != null) {
+                  setState(() {
+                    authenticating = LoadingStatus.error;
+                  });
+                  String? title = 'Ha ocurrido un error';
+                  String? description = 'Por favor, inténtelo de nuevo más tarde. Si el error persiste, póngase en contacto con soporte.';
+                  if(authModel.error!.toLowerCase().contains('unauthorized')) {
+                    title = 'Usuario o contraseña incorrectos';
+                    description = null;
+                  }
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return WefoodPopup(
+                        context: context,
+                        title: title,
+                        description: description,
+                        cancelButtonTitle: 'OK',
+                      );
+                    }
+                  );
+                }
+              },
+              onError: (error, stackTrace) {
                 setState(() {
                   authenticating = LoadingStatus.error;
                 });
-                String? title = 'Ha ocurrido un error';
-                String? description = 'Por favor, inténtelo de nuevo más tarde. Si el error persiste, póngase en contacto con soporte.';
-                if(authModel.error!.toLowerCase().contains('unauthorized')) {
-                  title = 'Usuario o contraseña incorrectos';
-                  description = null;
-                }
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
                     return WefoodPopup(
                       context: context,
-                      title: title,
-                      description: description,
+                      title: (error.runtimeType == TimeoutException) ? 'No se ha podido conectar con el servidor' : 'Ha ocurrido un error',
+                      description: 'Por favor, inténtelo de nuevo más tarde. Si el error consiste, póngase en contacto con soporte.',
                       cancelButtonTitle: 'OK',
                     );
                   }
                 );
               }
-            }).onError((error, stackTrace) {
-              setState(() {
-                authenticating = LoadingStatus.error;
-              });
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return WefoodPopup(
-                    context: context,
-                    title: (error.runtimeType == TimeoutException) ? 'No se ha podido conectar con el servidor' : 'Ha ocurrido un error',
-                    description: 'Por favor, inténtelo de nuevo más tarde. Si el error consiste, póngase en contacto con soporte.',
-                    cancelButtonTitle: 'OK',
-                  );
-                }
-              );
-            });
+            );
           },
         ),
         if(authenticating != LoadingStatus.loading && (username == '' || password == '')) const BlockedButton(
           text: 'INICIAR SESIÓN',
         ),
-        if(authenticating == LoadingStatus.loading) const CircularProgressIndicator(),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[

@@ -124,7 +124,9 @@ class _ValidatableBusinessesState extends State<ValidatableBusinesses> {
                       ),
                       _ValidatableRow(
                         title: 'Solicitado a fecha',
-                        value: Utils.dateTimeToString(item.business.createdAt),
+                        value: Utils.dateTimeToString(
+                          date: item.business.createdAt,
+                        ),
                       ),
                       const Divider(
                         height: 30,
@@ -171,6 +173,7 @@ class _ValidatableBusinessesState extends State<ValidatableBusinesses> {
                                     title: '¿Aceptar establecimiento?',
                                     actions: <TextButton>[
                                       TextButton(
+                                        child: const Text('SÍ'),
                                         onPressed: () async {
                                           callRequestWithLoading(
                                             closePreviousPopup: true,
@@ -195,7 +198,6 @@ class _ValidatableBusinessesState extends State<ValidatableBusinesses> {
                                             },
                                           );
                                         },
-                                        child: const Text('SÍ'),
                                       ),
                                     ],
                                   );

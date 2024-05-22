@@ -207,8 +207,8 @@ class Api {
   }) async {
     try {
       dynamic response = await Middleware.endpoint(
-          name: 'getProduct/$id',
-          type: HttpType.get,
+        name: 'getProduct/$id',
+        type: HttpType.get,
       );
       ProductExpandedModel product = ProductExpandedModel.fromJson(response);
       return product;
@@ -601,8 +601,9 @@ class Api {
             'amount': amount.toString(),
           }
       );
+      print('RESPONSE DEL ORDER_ITEMS: $response');
       if(response['message'] == null) {
-        throw Exception('ERROR WHILE REFUSING BUSINESS');
+        throw Exception;
       }
     } catch(error) { rethrow; }
   }
@@ -795,6 +796,7 @@ class Api {
         }
       );
       BusinessExpandedModel business = BusinessExpandedModel.fromJson(response);
+      BusinessExpandedModel.printInfo(business);
       return business;
     } catch(error) { rethrow; }
   }

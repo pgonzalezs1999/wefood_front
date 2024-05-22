@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/commands/utils.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
@@ -112,41 +113,41 @@ class _PendingOrdersBusinessState extends State<PendingOrdersBusiness> {
             _toggleCamera(false);
             showDialog(
               context: context,
-              builder: (context) {
+              builder: (_) {
                 return WefoodPopup(
-                  context: context,
+                  context: _,
                   title: '¿Confirmar el pedido ${Utils.numberToHexadecimal(qrOrderId)}',
                   cancelButtonTitle: 'CANCELAR',
                   actions: [
                     TextButton(
                       child: const Text('CONFIRMAR'),
                       onPressed: () {
-                        showDialog(
+                        callRequestWithLoading(
+                          closePreviousPopup: true,
                           context: context,
-                          barrierDismissible: false,
-                          builder: (_) => const WefoodLoadingPopup(),
-                        );
-                        Api.completeOrderBusiness(
-                          idOrder: qrOrderId,
-                        ).then((_) {
-                          _setPendingList(
-                            cubit: pendingOrdersBusinessCubit,
-                          ).then((_) {
-                            Navigator.pop(context);
-                            Navigator.pop(context);
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return WefoodPopup(
-                                  context: context,
-                                  title: '¡Pedido confirmado!',
-                                  description: 'Ya puede entregarle el paquete a su cliente. En los próximos dís recibirá el dinero correspondiente',
-                                  cancelButtonTitle: 'OK',
-                                );
-                              }
+                          request: () async {
+                            return await Api.completeOrderBusiness(
+                              idOrder: qrOrderId,
                             );
-                          });
-                        });
+                          },
+                          onSuccess: (_) {
+                            _setPendingList(
+                              cubit: pendingOrdersBusinessCubit,
+                            ).then((_) {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return WefoodPopup(
+                                    context: context,
+                                    title: '¡Pedido confirmado!',
+                                    description: 'Ya puede entregarle el paquete a su cliente. En los próximos dís recibirá el dinero correspondiente',
+                                    cancelButtonTitle: 'OK',
+                                  );
+                                }
+                              );
+                            });
+                          },
+                        );
                       },
                     ),
                   ],
@@ -254,24 +255,23 @@ class _PendingOrdersBusinessState extends State<PendingOrdersBusiness> {
                       ),
                     ),
                     Container(
-                      margin: EdgeInsets.only(
-                        bottom: MediaQuery.of(context).size.width * 0.025,
-                        right: MediaQuery.of(context).size.width * 0.025,
+                      margin: const EdgeInsets.only(
+                        bottom: 10,
+                        right: 10,
                       ),
                       child: GestureDetector(
-                        child: Container( // TODO deshardcodear este estilo
-                          padding: EdgeInsets.all(
-                            MediaQuery.of(context).size.width * 0.02,
-                          ),
+                        child: Container(
+                          padding: const EdgeInsets.all(5),
                           decoration: BoxDecoration(
                             border: Border.all(
-                              color: Colors.grey.withOpacity(0.5),
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                             borderRadius: BorderRadius.circular(999),
-                            color: Theme.of(context).primaryColor,
+                            color: Theme.of(context).colorScheme.secondary,
                           ),
                           child: const Icon(
                             Icons.close,
+                            size: 15,
                           ),
                         ),
                         onTap: () {

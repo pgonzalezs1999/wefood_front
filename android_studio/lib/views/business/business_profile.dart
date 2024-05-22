@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:wefood/blocs/blocs.dart';
+import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/commands/clear_data.dart';
 import 'package:wefood/commands/contact_support.dart';
 import 'package:wefood/commands/share_app.dart';
@@ -424,21 +425,28 @@ class _BusinessProfileState extends State<BusinessProfile> {
                       title: '¿Seguro que quieres cerrar sesión?',
                       actions: <TextButton>[
                         TextButton(
-                          onPressed: () {
-                            clearData(context);
-                            Api.logout().then((_) {
-                              Navigator.pop(context);
-                              _navigateToMain();
-                            }).onError((Object error, StackTrace stackTrace) {
-                              Navigator.pop(context);
-                              _navigateToMain();
-                            });
+                          onPressed: () async {
+                            callRequestWithLoading(
+                              context: context,
+                              request: () async {
+                                return await Api.logout();
+                              },
+                              closePreviousPopup: true,
+                              onSuccess: () {
+                                clearData(context);
+                                _navigateToMain();
+                              },
+                              onError: (error) {
+                                clearData(context);
+                                _navigateToMain();
+                              },
+                            );
                           },
                           child: const Text('SÍ'),
-                        )
+                        ),
                       ],
                     );
-                  }
+                  },
                 );
               }
             ),

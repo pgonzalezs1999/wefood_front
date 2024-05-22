@@ -81,12 +81,14 @@ class _EditProductState extends State<EditProduct> {
       result = _setError('El campo cantidad es obligatorio');
     } else if(amount! < 1) {
       result = _setError('Cantidad mínima: 1 pack');
-    } else if(Utils.sumTrueBooleans([junk, dessert, vegetarian, mediterranean]) > 2) {
-      result = _setError('Se tiene que seleccionar como máximo 2 categorías');
+    } else if(Utils.sumTrueBooleans([junk, dessert, vegetarian, mediterranean]) > 1) {
+      result = _setError('Se debe seleccionar como máximo 1 categoría');
     } else if(Utils.sumTrueBooleans([mondays, tuesdays, wednesdays, thursdays, fridays, saturdays, sundays]) == 0) {
-      result = _setError('Se tiene que seleccionar al menos 1 día de la semana');
+      result = _setError('Se debe seleccionar al menos 1 día de la semana');
     } else if(endless == false && endDate == null) {
       result = _setError('El campo fecha límite es obligatorio. Si no tiene fecha de fin, marque "Indefinido"');
+    } else if(images[0] == null) {
+      result = _setError('Debe añadirse al menos una imagen');
     } else {
       setState(() {
         error = '';
@@ -149,124 +151,136 @@ class _EditProductState extends State<EditProduct> {
   }
 
   void _safeEditProduct() async {
-    Api.updateProduct(
-      id: widget.productId!,
-      price: price!,
-      amount: amount!,
-      endingDate: Utils.dateTimeToSqlDateTimeString(endDate),
-      startHour: Utils.timeOfDayToSqlTimeString(startTime),
-      endHour: Utils.timeOfDayToSqlTimeString(endTime),
-      vegetarian: Utils.boolToSqlString(vegetarian),
-      mediterranean: Utils.boolToSqlString(mediterranean),
-      junk: Utils.boolToSqlString(junk),
-      dessert: Utils.boolToSqlString(dessert),
-      workingOnMonday: Utils.boolToSqlString(mondays),
-      workingOnTuesday: Utils.boolToSqlString(tuesdays),
-      workingOnWednesday: Utils.boolToSqlString(wednesdays),
-      workingOnThursday: Utils.boolToSqlString(thursdays),
-      workingOnFriday: Utils.boolToSqlString(fridays),
-      workingOnSaturday: Utils.boolToSqlString(saturdays),
-      workingOnSunday: Utils.boolToSqlString(sundays),
-    ).then((ProductModel product) {
-      setState(() {
-        isSubmitting = false;
-      });
-      Navigator.pop(context);
-      String title = '¡Producto modificado correctamente!';
-      String? description;
-      int dayOfWeekToday = DateTime.now().weekday - 1;
-      int dayOfWeekTomorrow = DateTime.now().weekday;
-      if(dayOfWeekTomorrow == 7) {
-        dayOfWeekTomorrow = 0;
-      }
-      List<bool> workingOns = [mondays, tuesdays, wednesdays, thursdays, fridays, saturdays, sundays];
-      if((initialWeekDays[dayOfWeekToday] == true && workingOns[dayOfWeekToday] == false) || (initialWeekDays[dayOfWeekTomorrow] == true && workingOns[dayOfWeekTomorrow] == false)) {
+    callRequestWithLoading(
+      context: context,
+      request: () async {
+        return await Api.updateProduct(
+          id: widget.productId!,
+          price: price!,
+          amount: amount!,
+          endingDate: Utils.dateTimeToSqlDateTimeString(endDate),
+          startHour: Utils.timeOfDayToSqlTimeString(startTime),
+          endHour: Utils.timeOfDayToSqlTimeString(endTime),
+          vegetarian: Utils.boolToSqlString(vegetarian),
+          mediterranean: Utils.boolToSqlString(mediterranean),
+          junk: Utils.boolToSqlString(junk),
+          dessert: Utils.boolToSqlString(dessert),
+          workingOnMonday: Utils.boolToSqlString(mondays),
+          workingOnTuesday: Utils.boolToSqlString(tuesdays),
+          workingOnWednesday: Utils.boolToSqlString(wednesdays),
+          workingOnThursday: Utils.boolToSqlString(thursdays),
+          workingOnFriday: Utils.boolToSqlString(fridays),
+          workingOnSaturday: Utils.boolToSqlString(saturdays),
+          workingOnSunday: Utils.boolToSqlString(sundays),
+        );
+      },
+      onSuccess: (ProductModel product) {
         setState(() {
-          description = 'Se han deslistado productos activos. Si alguien ya ha reservado un pack, tendrá que ofrecérselo igualmente. Revise sus reservas clicando en "RECOGIDAS"';
+          isSubmitting = false;
         });
-      }
-      if((initialWeekDays[dayOfWeekToday] == false && workingOns[dayOfWeekToday] == true) && (initialWeekDays[dayOfWeekTomorrow] == false && workingOns[dayOfWeekTomorrow] == true)) {
-        setState(() {
-          description = 'También se ha activado el producto para hoy y para mañana';
-        });
-      } else {
-        if(initialWeekDays[dayOfWeekToday] == false && workingOns[dayOfWeekToday] == true) {
+        Navigator.pop(context);
+        String title = '¡Producto modificado correctamente!';
+        String? description;
+        int dayOfWeekToday = DateTime.now().weekday - 1;
+        int dayOfWeekTomorrow = DateTime.now().weekday;
+        if(dayOfWeekTomorrow == 7) {
+          dayOfWeekTomorrow = 0;
+        }
+        List<bool> workingOns = [mondays, tuesdays, wednesdays, thursdays, fridays, saturdays, sundays];
+        if((initialWeekDays[dayOfWeekToday] == true && workingOns[dayOfWeekToday] == false) || (initialWeekDays[dayOfWeekTomorrow] == true && workingOns[dayOfWeekTomorrow] == false)) {
           setState(() {
-            description = 'También se ha activado el producto para hoy';
+            description = 'Se han deslistado productos activos. Si alguien ya ha reservado un pack, tendrá que ofrecérselo igualmente. Revise sus reservas clicando en "RECOGIDAS"';
           });
         }
-        if(initialWeekDays[dayOfWeekTomorrow] == false && workingOns[dayOfWeekTomorrow] == true) {
+        if((initialWeekDays[dayOfWeekToday] == false && workingOns[dayOfWeekToday] == true) && (initialWeekDays[dayOfWeekTomorrow] == false && workingOns[dayOfWeekTomorrow] == true)) {
           setState(() {
-            description = 'También se ha activado el producto para mañana';
+            description = 'También se ha activado el producto para hoy y para mañana';
           });
+        } else {
+          if(initialWeekDays[dayOfWeekToday] == false && workingOns[dayOfWeekToday] == true) {
+            setState(() {
+              description = 'También se ha activado el producto para hoy';
+            });
+          }
+          if(initialWeekDays[dayOfWeekTomorrow] == false && workingOns[dayOfWeekTomorrow] == true) {
+            setState(() {
+              description = 'También se ha activado el producto para mañana';
+            });
+          }
         }
-      }
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        useRootNavigator: false,
-        builder: ((BuildContext context) {
-          return WefoodPopup(
-            context: context,
-            title: title,
-            description: description,
-            cancelButtonTitle: 'OK',
-          );
-        }),
-      );
-    });
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          useRootNavigator: false,
+          builder: ((BuildContext context) {
+            return WefoodPopup(
+              context: context,
+              title: title,
+              description: description,
+              cancelButtonTitle: 'OK',
+            );
+          }),
+        );
+      },
+    );
   }
 
   void _safeCreateProduct() async {
-    Api.createProduct(
-      price: price!,
-      amount: amount!,
-      endingDate: Utils.dateTimeToSqlDateTimeString(endDate),
-      startHour: Utils.timeOfDayToSqlTimeString(startTime),
-      endHour: Utils.timeOfDayToSqlTimeString(endTime),
-      vegetarian: Utils.boolToSqlString(vegetarian),
-      mediterranean: Utils.boolToSqlString(mediterranean),
-      junk: Utils.boolToSqlString(junk),
-      dessert: Utils.boolToSqlString(dessert),
-      workingOnMonday: Utils.boolToSqlString(mondays),
-      workingOnTuesday: Utils.boolToSqlString(tuesdays),
-      workingOnWednesday: Utils.boolToSqlString(wednesdays),
-      workingOnThursday: Utils.boolToSqlString(thursdays),
-      workingOnFriday: Utils.boolToSqlString(fridays),
-      workingOnSaturday: Utils.boolToSqlString(saturdays),
-      workingOnSunday: Utils.boolToSqlString(sundays),
-      type: Utils.productTypeToChar(widget.productType),
-    ).then((ProductModel product) {
-      setState(() {
-        isSubmitting = false;
-      });
-      if(widget.productType == ProductType.breakfast) {
+    callRequestWithLoading(
+      context: context,
+      request: () async {
+        return await Api.createProduct(
+          price: price!,
+          amount: amount!,
+          endingDate: Utils.dateTimeToSqlDateTimeString(endDate),
+          startHour: Utils.timeOfDayToSqlTimeString(startTime),
+          endHour: Utils.timeOfDayToSqlTimeString(endTime),
+          vegetarian: Utils.boolToSqlString(vegetarian),
+          mediterranean: Utils.boolToSqlString(mediterranean),
+          junk: Utils.boolToSqlString(junk),
+          dessert: Utils.boolToSqlString(dessert),
+          workingOnMonday: Utils.boolToSqlString(mondays),
+          workingOnTuesday: Utils.boolToSqlString(tuesdays),
+          workingOnWednesday: Utils.boolToSqlString(wednesdays),
+          workingOnThursday: Utils.boolToSqlString(thursdays),
+          workingOnFriday: Utils.boolToSqlString(fridays),
+          workingOnSaturday: Utils.boolToSqlString(saturdays),
+          workingOnSunday: Utils.boolToSqlString(sundays),
+          type: Utils.productTypeToChar(widget.productType),
+        );
+      },
+      onSuccess: (ProductModel product) {
         setState(() {
-          context.read<BusinessBreakfastCubit>().set(product);
+          isSubmitting = false;
         });
-      } else if(widget.productType == ProductType.breakfast) {
-        setState(() {
-          context.read<BusinessBreakfastCubit>().set(product);
-        });
-      } else {
-        setState(() {
-          context.read<BusinessBreakfastCubit>().set(product);
-        });
-      }
-      Navigator.pop(context);
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        useRootNavigator: false,
-        builder: ((BuildContext context) {
-          return WefoodPopup(
-            context: context,
-            title: '¡Producto creado correctamente!',
-            cancelButtonTitle: 'OK',
-          );
-        }),
-      );
-    });
+        if(widget.productType == ProductType.breakfast) {
+          setState(() {
+            context.read<BusinessBreakfastCubit>().set(product);
+          });
+        } else if(widget.productType == ProductType.breakfast) {
+          setState(() {
+            context.read<BusinessBreakfastCubit>().set(product);
+          });
+        } else {
+          setState(() {
+            context.read<BusinessBreakfastCubit>().set(product);
+          });
+        }
+        Navigator.pop(context);
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          useRootNavigator: false,
+          builder: ((BuildContext context) {
+            return WefoodPopup(
+              context: context,
+              title: '¡Producto creado correctamente!',
+              cancelButtonTitle: 'OK',
+            );
+          }),
+        );
+      },
+    );
   }
 
   _manageImageSlot(int current) async {
@@ -397,6 +411,25 @@ class _EditProductState extends State<EditProduct> {
     });
   }
 
+  _setScheduleCreate() {
+    if(widget.productType == ProductType.breakfast) {
+      setState(() {
+        startTime = const TimeOfDay(hour: 11, minute: 45);
+        endTime = const TimeOfDay(hour: 12, minute: 15);
+      });
+    } else if(widget.productType == ProductType.lunch) {
+      setState(() {
+        startTime = const TimeOfDay(hour: 15, minute: 15);
+        endTime = const TimeOfDay(hour: 15, minute: 45);
+      });
+    } else if(widget.productType == ProductType.dinner) {
+      setState(() {
+        startTime = const TimeOfDay(hour: 23, minute: 15);
+        endTime = const TimeOfDay(hour: 23, minute: 45);
+      });
+    }
+  }
+
   void _retrieveImages() async {
     for(int i = 0; i < images.length; i++) {
       try {
@@ -428,6 +461,7 @@ class _EditProductState extends State<EditProduct> {
       _retrieveData();
       _retrieveImages();
     } else { // Is creating a new product
+      _setScheduleCreate();
       setState(() {
         isRetrievingData = false;
       });
@@ -770,7 +804,8 @@ class _EditProductState extends State<EditProduct> {
                     Expanded(
                       child: ImageSlot(
                         image: (images[0] != null) ? images[0] : null,
-                        height: (MediaQuery.of(context).size.width * 0.1 * 2) + 10,
+                        height: (MediaQuery.of(context).size.width * 0.1 * 2) + 10, // Small slot height * 2 + the gap between them
+                        width: double.infinity,
                         i: 1,
                         onTap: () async {
                           _manageImageSlot(0);
@@ -846,6 +881,7 @@ class _EditProductState extends State<EditProduct> {
               children: <Widget>[
                 ElevatedButton(
                   onPressed: () async {
+                    FocusScope.of(context).unfocus();
                     Navigator.pop(context);
                   },
                   child: const Text('CANCELAR'),
@@ -857,6 +893,7 @@ class _EditProductState extends State<EditProduct> {
                 if(isSubmitting == false && isRetrievingData == false) ElevatedButton(
                   child: const Text('GUARDAR'),
                   onPressed: () {
+                    FocusScope.of(context).unfocus();
                     if(_readyToRegister() == true) {
                       setState(() {
                         isSubmitting = true;
@@ -894,12 +931,13 @@ class _EditProductState extends State<EditProduct> {
               child: ElevatedButton(
                 child: const Text('ELIMINAR PRODUCTO'),
                 onPressed: () async {
+                  FocusScope.of(context).unfocus();
                   showDialog(
                     context: context,
                     useRootNavigator: false,
-                    builder: ((BuildContext context) {
+                    builder: ((_) {
                       return WefoodPopup(
-                        context: context,
+                        context: _,
                         title: '¿Eliminar producto?',
                         description: 'No podrás deshacer esta acción',
                         cancelButtonTitle: 'CANCELAR',
@@ -907,30 +945,46 @@ class _EditProductState extends State<EditProduct> {
                           TextButton(
                             child: const Text('OK'),
                             onPressed: () {
-                              try {
-                                Api.deleteProduct(
-                                  type: (widget.productType == ProductType.breakfast) ? 'B'
-                                    : (widget.productType == ProductType.lunch) ? 'L'
-                                    : (widget.productType == ProductType.dinner) ? 'D' : '',
-                                ).then((_) {
-                                  if(widget.productType == ProductType.breakfast) {
+                              callRequestWithLoading(
+                                closePreviousPopup: true,
+                                context: context,
+                                request: () async {
+                                  return await Api.deleteProduct(
+                                    type: (widget.productType == ProductType.breakfast) ? 'B'
+                                      : (widget.productType == ProductType.lunch) ? 'L'
+                                      : (widget.productType == ProductType.dinner) ? 'D' : '',
+                                  );
+                                },
+                                onSuccess: (_) {
+                                  if (widget.productType == ProductType.breakfast) {
                                     context.read<BusinessBreakfastCubit>().set(null);
-                                  } else if(widget.productType == ProductType.lunch) {
+                                  } else if (widget.productType == ProductType.lunch) {
                                     context.read<BusinessLunchCubit>().set(null);
                                   } else {
                                     context.read<BusinessDinnerCubit>().set(null);
                                   }
                                   Navigator.pop(context);
-                                  Navigator.pop(context);
-                                });
-                              } catch(e) {
-                                setState(() {
-                                  error = 'Ha ocurrido un error eliminar el producto. Por favor, inténtelo de nuevo más tarde';
-                                });
-                                scrollToBottom(
-                                  scrollController: scrollController,
-                                );
-                              }
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return WefoodPopup(
+                                        context: context,
+                                        title: 'Producto eliminado correctamente',
+                                        cancelButtonTitle: 'OK',
+                                      );
+                                    }
+                                  );
+                                },
+                                onError: (requestError) {
+                                  setState(() {
+                                    error =
+                                    'Ha ocurrido un error eliminar el producto. Por favor, inténtelo de nuevo más tarde';
+                                  });
+                                  scrollToBottom(
+                                    scrollController: scrollController,
+                                  );
+                                }
+                              );
                             },
                           ),
                         ],

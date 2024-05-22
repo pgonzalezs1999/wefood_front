@@ -331,7 +331,7 @@ class _ItemState extends State<Item> {
                       Text('De ${_parseTime(info!.product.startingHour)} a ${_parseTime(info!.product.endingHour)} h'),
                     ],
                   ),
-                  if(info!.business.rate != null) if(info!.business.rate! > 0) Column(
+                  if(info!.business.rate != null) Column(
                     children: <Widget>[
                       SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                       Row(
@@ -340,9 +340,15 @@ class _ItemState extends State<Item> {
                             'Valoración: ',
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
-                          Text('${info!.business.rate?.toStringAsFixed(1)}  '),
-                          PrintStars(
+                          if(info!.business.rate! > 0) Text('${info!.business.rate?.toStringAsFixed(1)}  '),
+                          if(info!.business.rate! > 0) PrintStars(
                             rate: info!.business.rate!,
+                          ),
+                          if(info!.business.rate! == 0) const Text(
+                            'Aún no hay valoraciones',
+                            style: TextStyle(
+                              color: Colors.grey, // TODO deshardcodear este estilo
+                            ),
                           ),
                         ],
                       ),
@@ -421,7 +427,7 @@ class _ItemState extends State<Item> {
                               context: context,
                               builder: (_) {
                                 return StatefulBuilder(
-                                  builder: (_, setState) {
+                                  builder: (_, privateSetState) {
                                     return WefoodPopup(
                                       context: context,
                                       title: 'Comprar producto',
@@ -439,9 +445,8 @@ class _ItemState extends State<Item> {
                                                 value: selectedAmount,
                                                 items: _amountOptions(info!.available!),
                                                 onChanged: (value) {
-                                                  setState(() {
-                                                    selectedAmount =
-                                                    value!;
+                                                  privateSetState(() {
+                                                    selectedAmount = value!;
                                                   });
                                                 },
                                               ),
@@ -465,10 +470,10 @@ class _ItemState extends State<Item> {
                                               request: () async {
                                                 return await Api.orderItem(
                                                   idItem: info!.item.id!,
-                                                  amount: 99999, // selectedAmount,
+                                                  amount: selectedAmount,
                                                 );
                                               },
-                                              onSuccess: () {
+                                              onSuccess: (_) {
                                                 Navigator.pop(context);
                                                 showDialog(
                                                   context: context,
@@ -479,7 +484,6 @@ class _ItemState extends State<Item> {
                                                       description: 'Esto es todavía un entorno de pruebas. Más adelante, aquí aparecerá la pasarela de pago',
                                                       cancelButtonTitle: 'OK',
                                                       cancelButtonBehaviour: () {
-                                                        Navigator.pop(context);
                                                         Navigator.pop(context);
                                                       },
                                                     );
@@ -500,21 +504,29 @@ class _ItemState extends State<Item> {
                       ],
                     ),
                   ),
+                  const Divider(
+                    height: 50,
+                  ),
+                  Text(
+                    '¿Qué opinan los compradores?',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                   if(info!.business.comments != null && info!.business.comments!.isNotEmpty) Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: info!.business.comments!.map((CommentExpandedModel c) => Comment(
+                      comment: c,
+                      deletable: false,
+                    )).toList(),
+                  ),
+                  if(info!.business.comments == null || (info!.business.comments != null && info!.business.comments!.isEmpty)) const Column(
                     children: <Widget>[
-                      const Divider(
-                        height: 50,
+                      SizedBox(
+                        height: 10,
                       ),
                       Text(
-                        '¿Qué opinan los compradores?',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      Column(
-                        children: info!.business.comments!.map((CommentExpandedModel c) => Comment(
-                          comment: c,
-                          deletable: false,
-                        )).toList(),
+                        'Aún nadie ha dejado ningún comentario. ¡Prueba el producto y sé el primero en comentar tu experiencia!',
+                        style: TextStyle(
+                          color: Colors.grey, // TODO deshardcodear este estilo
+                        ),
                       ),
                     ],
                   ),

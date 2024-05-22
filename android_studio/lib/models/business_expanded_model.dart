@@ -9,6 +9,7 @@ class BusinessExpandedModel {
   bool? isFavourite;
   int? favourites;
   int? totalOrders;
+  bool? requesterHasBought;
 
   BusinessExpandedModel.empty():
     user = UserModel.empty(),
@@ -19,7 +20,8 @@ class BusinessExpandedModel {
     business = (json['business'] != null) ? BusinessModel.fromJson(json['business'] as Map<String, dynamic>) : BusinessModel.empty(),
     isFavourite = ((json['is_favourite'] != null) ? Utils.controlBool(json['is_favourite']) as bool? : null),
     favourites = json['favourites'] as int?,
-    totalOrders = json['total_orders'] as int?;
+    totalOrders = json['total_orders'] as int?,
+    requesterHasBought = Utils.controlBool(json['requester_has_bought']);
 
   BusinessExpandedModel.fromParameters({
     required BusinessModel businessModel,
@@ -36,6 +38,7 @@ class BusinessExpandedModel {
     print('-> isFavourite: ${model.isFavourite}');
     print('-> favourites: ${model.favourites}');
     print('-> totalOrders: ${model.totalOrders}');
+    print('-> requesterHasBought: ${model.requesterHasBought}');
     print('------------------------------');
   }
 }
