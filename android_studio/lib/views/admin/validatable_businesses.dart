@@ -330,12 +330,12 @@ class _ValidatableRowState extends State<_ValidatableRow> {
                 onTap: () async {
                   String subject = 'Solicitud de alta en WeFood';
                   String message = 'Buenas tardes.\n\n'
-                      'Desde WeFood hemos recibido la solicitud de registro para su negocio.\n\n'
-                      'Estamos encantados que de haya elegido nuestra plataforma. Esperamos estar a la altura de sus expectativas.\n\n'
-                      'Para mantener nuestra plataforma libre de estafas y malas experiencias que puedan hacer que nuestros clientes desconfíen de otros negocios, necesitamos que los solicitantes nos aclaren algunas dudas sobre su negocio:\n\n\n\n'
-                      'En cuanto recibamos su respuesta y la verifiquemos, podrá comenzar a ofrecer sus productos, ¡y así ganar un dinero extra mientras lucha contra el desperdicio de alimentos!\n\n'
-                      'Reciba un cordial saludo,\n'
-                      'El equipo de WeFood.';
+                    'Desde WeFood hemos recibido la solicitud de registro para su negocio.\n\n'
+                    'Estamos encantados que de haya elegido nuestra plataforma. Esperamos estar a la altura de sus expectativas.\n\n'
+                    'Para mantener nuestra plataforma libre de estafas y malas experiencias que puedan hacer que nuestros clientes desconfíen de otros negocios, necesitamos que los solicitantes nos aclaren algunas dudas sobre su negocio:\n\n\n\n'
+                    'En cuanto recibamos su respuesta y la verifiquemos, podrá comenzar a ofrecer sus productos, ¡y así ganar un dinero extra mientras lucha contra el desperdicio de alimentos!\n\n'
+                    'Reciba un cordial saludo,\n'
+                    'El equipo de WeFood.';
                   await launchUrl(
                     Uri.parse('mailto:${widget.value}?subject=$subject&body=$message'),
                   );

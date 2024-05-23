@@ -67,7 +67,7 @@ class _HistoryState extends State<History> {
                 vertical: 20,
               ),
               child: const Text(
-                '¡Añade negocios a favoritos para tener acceso a sus productos fácilmente!',
+                'Los pedidos pasados aparecerán aquí. ¡Hoy puede ser un buen día para comenzar a salvar el desperdicio de alimentos!',
                 textAlign: TextAlign.center,
               ),
             ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wefood/components/components.dart';
-import 'package:wefood/components/wefood_popup.dart';
+import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/commands/utils.dart';
 import 'package:wefood/services/auth/api.dart';
@@ -26,36 +25,22 @@ class _OrderHistoryButtonCustomerState extends State<OrderHistoryButtonCustomer>
   void _navigateToBusinessScreen({
     required businessExpanded
   }) {
-    showDialog(
+    callRequestWithLoading(
       context: context,
-      barrierDismissible: false,
-      builder: (_) => const WefoodLoadingPopup(),
+      request: () async {
+        return await Api.getBusiness(
+          idBusiness: widget.productExpanded.business.id!,
+        );
+      },
+      onSuccess: (BusinessExpandedModel businessExpanded) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => BusinessScreen(
+            businessExpanded: businessExpanded,
+          )),
+        );
+      },
     );
-    Api.getBusiness(
-      idBusiness: widget.productExpanded.business.id!,
-    ).then((BusinessExpandedModel businessExpanded) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => BusinessScreen(
-          businessExpanded: businessExpanded,
-        )),
-      ).whenComplete(() {
-        Navigator.pop(context);
-      });
-    }).onError((error, stackTrace) {
-      Navigator.pop(context);
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return WefoodPopup(
-            context: context,
-            title: 'Ha ocurrido un error al cargar el negocio',
-            description: 'Por favor, inténtelo de nuevo más tarde: $error',
-            cancelButtonTitle: 'OK',
-          );
-        }
-      );
-    });
   }
 
   @override
