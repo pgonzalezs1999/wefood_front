@@ -29,6 +29,7 @@ class BlocsProvider extends StatelessWidget {
         BlocProvider(create: (context) => NearbyItemsCubit(), lazy: false),
         BlocProvider(create: (context) => FavouriteItemsCubit(), lazy: false),
         BlocProvider(create: (context) => SearchFiltersCubit(), lazy: false),
+        BlocProvider(create: (context) => OrderHistoryCubit(), lazy: false),
       ],
       child: const MyApp(),
     );

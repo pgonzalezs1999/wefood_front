@@ -35,6 +35,7 @@ class _EditProductState extends State<EditProduct> {
   bool isRetrievingData = true;
   bool isSubmitting = false;
   double? price;
+  double? originalPrice;
   TimeOfDay startTime = const TimeOfDay(
     hour: 0,
     minute: 1
@@ -75,6 +76,10 @@ class _EditProductState extends State<EditProduct> {
       result = _setError('El campo precio es obligatorio');
     } else if(price! < Environment.minimumPrice) {
       result = _setError('El precio debe ser de al menos ${Environment.minimumPrice} S/.');
+    } else if(originalPrice == null) {
+      result = _setError('Por favor, indique el precio al que se vendería este producto normalmente. Puede ser aproximado');
+    } else if(originalPrice! <= price!) {
+      result = _setError('El precio original debe ser mayor que el precio de venta en WeFood');
     } else if(Utils.timesOfDayFirstIsSooner(startTime, endTime) == false) {
       result = _setError('Horario de recogida incorrecto: ¡la fecha de apertura debe ser antes que la fecha de cierre!');
     } else if(amount == null) {
@@ -105,12 +110,6 @@ class _EditProductState extends State<EditProduct> {
       File imageFile;
       if(returnedImage != null) {
         imageFile = File(returnedImage.path);
-        Navigator.pop(context);
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (_) => const WefoodLoadingPopup(),
-        );
         callRequestWithLoading(
           closePreviousPopup: true,
           context: context,
@@ -138,9 +137,6 @@ class _EditProductState extends State<EditProduct> {
                   context: context,
                   title: '¡Foto actualizada correctamente!',
                   cancelButtonTitle: 'OK',
-                  cancelButtonBehaviour: () {
-                    Navigator.pop(context);
-                  },
                 );
               }
             );
@@ -157,6 +153,7 @@ class _EditProductState extends State<EditProduct> {
         return await Api.updateProduct(
           id: widget.productId!,
           price: price!,
+          originalPrice: originalPrice!,
           amount: amount!,
           endingDate: Utils.dateTimeToSqlDateTimeString(endDate),
           startHour: Utils.timeOfDayToSqlTimeString(startTime),
@@ -231,6 +228,7 @@ class _EditProductState extends State<EditProduct> {
       request: () async {
         return await Api.createProduct(
           price: price!,
+          originalPrice: originalPrice!,
           amount: amount!,
           endingDate: Utils.dateTimeToSqlDateTimeString(endDate),
           startHour: Utils.timeOfDayToSqlTimeString(startTime),
@@ -300,7 +298,7 @@ class _EditProductState extends State<EditProduct> {
           content: Column(
             children: <TextButton>[
               TextButton(
-                child: Text('${(current < lastFilled) ? 'CAMBIAR' : 'AÑADIR'} IMAGEN DESDE LA CÁMARA'),
+                child: Text('${(current < lastFilled) ? 'CAMBIAR' : 'AÑADIR'} DESDE LA CÁMARA'),
                 onPressed: () async {
                   _pickImageFrom(
                     source: ImageSource.camera,
@@ -309,7 +307,7 @@ class _EditProductState extends State<EditProduct> {
                 },
               ),
               TextButton(
-                child: Text('${(current < lastFilled) ? 'CAMBIAR' : 'AÑADIR'} IMAGEN DE LA GALERÍA'),
+                child: Text('${(current < lastFilled) ? 'CAMBIAR' : 'AÑADIR'} DE LA GALERÍA'),
                 onPressed: () async {
                   _pickImageFrom(
                     source: ImageSource.gallery,
@@ -384,6 +382,7 @@ class _EditProductState extends State<EditProduct> {
       id: widget.productId!,
     );
     price = response.product.price;
+    originalPrice = response.product.originalPrice;
     startTime = TimeOfDay(
       hour: response.product.startingHour!.hour,
       minute: response.product.startingHour!.minute,
@@ -492,7 +491,7 @@ class _EditProductState extends State<EditProduct> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  'Precio',
+                  'Precio de venta',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(
@@ -522,6 +521,52 @@ class _EditProductState extends State<EditProduct> {
                           message: 'Precio mínimo: ${Environment.minimumPrice} S/.',
                           isError: true,
                         ) : null
+                      : null,
+                  ),
+                ),
+              ],
+            ),
+            if(price != null) Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  '¿A qué precio se vendería esta comida normalmente?',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
+                const Text(
+                  'Esta información es meramente estadística',
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.5,
+                  child: WefoodInput(
+                    initialText: (widget.productId != null) ? originalPrice.toString() : '',
+                    onChanged: (String value) {
+                      double? parsedValue = double.tryParse(value);
+                      setState(() {
+                        if(parsedValue != null && parsedValue < price!) {
+                          _setError('El precio debe ser superior a precio de venta');
+                        } else {
+                          _setError('');
+                        }
+                        error = '';
+                        originalPrice = double.tryParse(value);
+                      });
+                    },
+                    labelText: 'Precio original',
+                    type: InputType.decimal,
+                    feedbackWidget: (originalPrice != null)
+                      ? (originalPrice! < price!)
+                        ? const FeedbackMessage(
+                          message: 'El precio debe ser superior a precio de venta',
+                          isError: true,
+                        )
+                        : null
                       : null,
                   ),
                 ),

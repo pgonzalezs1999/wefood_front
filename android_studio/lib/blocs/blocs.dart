@@ -7,3 +7,5 @@ export './recommended_items_cubit.dart';
 export './nearby_items_cubit.dart';
 export './favourite_items_cubit.dart';
 export './search_filters_cubit.dart';
+export './order_history_cubit.dart';
+

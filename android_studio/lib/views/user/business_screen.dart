@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -92,20 +94,18 @@ class _BusinessScreenState extends State<BusinessScreen> {
   }
 
   void _getProfileImage() async {
-    try {
-      Api.getImage(
-        idUser: widget.businessExpanded.user.id!,
-        meaning: 'profile',
-      ).then((ImageModel imageModel) {
-        setState(() {
-          profileImageRoute = imageModel.route!;
-        });
+    Api.getImage(
+      idUser: widget.businessExpanded.user.id!,
+      meaning: 'profile',
+    ).then((ImageModel imageModel) {
+      setState(() {
+        profileImageRoute = imageModel.route!;
       });
-    } catch(e) {
+    }).onError((error, stackTrace) {
       if(kDebugMode) {
         print('No se ha podido cargar la imagen');
       }
-    }
+    });
   }
 
   @override
@@ -125,103 +125,118 @@ class _BusinessScreenState extends State<BusinessScreen> {
           children: [
             Stack(
               children: <Widget>[
-                if(profileImageRoute != null) SizedBox(
+                Container(
                   height: MediaQuery.of(context).size.height * 0.25,
+                  padding: (profileImageRoute != null) ? null : EdgeInsets.symmetric(
+                      horizontal: MediaQuery.of(context).size.width * 0.1
+                  ),
                   child: (profileImageRoute != null)
                     ? ImageWithLoader.network(
                       route: profileImageRoute!,
                       width: MediaQuery.of(context).size.width,
                       fit: BoxFit.cover,
                     )
-                    : Image.asset(
-                      'assets/images/logo.png',
-                      width: MediaQuery.of(context).size.width,
-                      fit: BoxFit.cover,
+                    : Opacity(
+                      opacity: 0.15,
+                      child: Image.asset(
+                        'assets/images/logo.png',
+                        width: MediaQuery.of(context).size.width,
+                        fit: BoxFit.contain,
+                      ),
                   ),
                 ),
-                Container(
-                  padding: EdgeInsets.only(
-                    top: MediaQuery.of(context).viewPadding.top,
-                  ),
-                  height: MediaQuery.of(context).size.height * 0.25,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Row(
+                ClipRect(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(
+                      sigmaX: (profileImageRoute != null) ? 0 : 2,
+                      sigmaY: (profileImageRoute != null) ? 0 : 2,
+                    ),
+                    child: Container(
+                      color: (profileImageRoute != null) ? null : Theme.of(context).colorScheme.primary.withOpacity(0.25),
+                      padding: EdgeInsets.only(
+                        top: MediaQuery.of(context).viewPadding.top,
+                      ),
+                      height: MediaQuery.of(context).size.height * 0.25,
+                      child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          const BackArrow(
-                            whiteBackground: true,
-                          ),
-                          GestureDetector(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(999),
-                                color: const Color.fromRGBO(255, 255, 255, 0.8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              const BackArrow(
+                                whiteBackground: true,
                               ),
-                              margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
-                              padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
-                              child: (loadingFavourite == LoadingStatus.loading)
-                                ? ReducedLoadingIcon(
-                                  customMargin: MediaQuery.of(context).size.width * 0.016,
-                                )
-                                : (widget.businessExpanded.isFavourite == true)
-                                  ? const Icon(Icons.favorite)
-                                  : const Icon(Icons.favorite_outline),
-                            ),
-                            onTap: () async {
-                              if(loadingFavourite != LoadingStatus.loading) {
-                                setState(() {
-                                  loadingFavourite = LoadingStatus.loading;
-                                });
-                                try {
-                                  if(widget.businessExpanded.isFavourite == true) {
-                                    Api.removeFavourite(idBusiness: widget.businessExpanded.business.id!).then((_) {
-                                      setState(() {
-                                        loadingFavourite = LoadingStatus.successful;
-                                        widget.businessExpanded.isFavourite = false;
-                                      });
+                              GestureDetector(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(999),
+                                    color: const Color.fromRGBO(255, 255, 255, 0.8),
+                                  ),
+                                  margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
+                                  padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
+                                  child: (loadingFavourite == LoadingStatus.loading)
+                                    ? ReducedLoadingIcon(
+                                      customMargin: MediaQuery.of(context).size.width * 0.016,
+                                    )
+                                    : (widget.businessExpanded.isFavourite == true)
+                                      ? const Icon(Icons.favorite)
+                                      : const Icon(Icons.favorite_outline),
+                                ),
+                                onTap: () async {
+                                  if(loadingFavourite != LoadingStatus.loading) {
+                                    setState(() {
+                                      loadingFavourite = LoadingStatus.loading;
                                     });
-                                  } else {
-                                    Api.addFavourite(idBusiness: widget.businessExpanded.business.id!).then((_) {
-                                      setState(() {
-                                        loadingFavourite = LoadingStatus.successful;
-                                        widget.businessExpanded.isFavourite = true;
-                                      });
-                                    });
+                                    try {
+                                      if(widget.businessExpanded.isFavourite == true) {
+                                        Api.removeFavourite(idBusiness: widget.businessExpanded.business.id!).then((_) {
+                                          setState(() {
+                                            loadingFavourite = LoadingStatus.successful;
+                                            widget.businessExpanded.isFavourite = false;
+                                          });
+                                        });
+                                      } else {
+                                        Api.addFavourite(idBusiness: widget.businessExpanded.business.id!).then((_) {
+                                          setState(() {
+                                            loadingFavourite = LoadingStatus.successful;
+                                            widget.businessExpanded.isFavourite = true;
+                                          });
+                                        });
+                                      }
+                                    } catch(e) {
+                                      loadingFavourite = LoadingStatus.error;
+                                    }
                                   }
-                                } catch(e) {
-                                  loadingFavourite = LoadingStatus.error;
-                                }
-                              }
-                            },
+                                },
+                              ),
+                            ],
+                          ),
+                          Container(
+                            decoration: const BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [Colors.transparent, Color.fromRGBO(0, 0, 0, 0.75)],
+                              ),
+                            ),
+                            child: Container(
+                              padding: EdgeInsets.only(
+                                bottom: MediaQuery.of(context).size.height * 0.025,
+                              ),
+                              alignment: Alignment.bottomCenter,
+                              width: double.infinity,
+                              height: MediaQuery.of(context).size.height * 0.1,
+                              child: Text(
+                                widget.businessExpanded.business.name ?? '',
+                                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                  color: Theme.of(context).colorScheme.surface,
+                                )
+                              ),
+                            ),
                           ),
                         ],
                       ),
-                      Container(
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [Colors.transparent, Color.fromRGBO(0, 0, 0, 0.75)],
-                          ),
-                        ),
-                        child: Container(
-                          padding: EdgeInsets.only(
-                            bottom: MediaQuery.of(context).size.height * 0.025,
-                          ),
-                          alignment: Alignment.bottomCenter,
-                          width: double.infinity,
-                          height: MediaQuery.of(context).size.height * 0.1,
-                          child: Text(
-                            widget.businessExpanded.business.name ?? '',
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: Theme.of(context).colorScheme.surface,
-                            )
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ],

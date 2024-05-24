@@ -5,6 +5,7 @@ class ProductModel {
   int? businessId;
   String? type;
   double? price;
+  double? originalPrice;
   int? amount;
   DateTime? endingDate;
   DateTime? startingHour;
@@ -28,6 +29,7 @@ class ProductModel {
     businessId = int.tryParse('${json['id_business']}'),
     type = json['product_type'] as String?,
     price = double.tryParse('${json['price']}'),
+    originalPrice = double.tryParse('${json['original_price']}'),
     amount = int.tryParse('${json['amount']}'),
     endingDate = (json['ending_date'] != null) ? DateTime.parse(json['ending_date']) as DateTime? : null,
     startingHour = _parseTime(json['starting_hour']),
@@ -63,6 +65,7 @@ class ProductModel {
     print('-> businessId: ${product.businessId}');
     print('-> type: ${product.type}');
     print('-> price: ${product.price}');
+    print('-> originalPrice: ${product.originalPrice}');
     print('-> amount: ${product.amount}');
     print('-> endingDate: ${product.endingDate}');
     print('-> startingHour: ${product.startingHour}');

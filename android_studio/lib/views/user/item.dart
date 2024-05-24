@@ -318,7 +318,14 @@ class _ItemState extends State<Item> {
                         'Precio: ',
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
-                      Text('${info!.product.price?.toStringAsFixed(2)} Sol/.'),
+                      Text(
+                        ' ${info!.product.originalPrice?.toStringAsFixed(2)} ',
+                        style: TextStyle(
+                          decoration: TextDecoration.lineThrough,
+                          color: Theme.of(context).colorScheme.secondary,
+                        ),
+                      ),
+                      Text(' ${info!.product.price?.toStringAsFixed(2)} Sol/.'),
                     ],
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.01),

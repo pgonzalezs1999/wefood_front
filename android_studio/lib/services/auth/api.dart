@@ -432,6 +432,7 @@ class Api {
   static Future<ProductModel> updateProduct({
     required int id,
     required double price,
+    required double originalPrice,
     required int amount,
     required String? endingDate,
     required String startHour,
@@ -455,6 +456,7 @@ class Api {
         body: {
           'id': id.toString(),
           'price': price.toString(),
+          'original_price': originalPrice.toString(),
           'amount': amount.toString(),
           'ending_date': endingDate.toString(),
           'starting_hour': startHour.toString(),
@@ -496,6 +498,7 @@ class Api {
 
   static Future<ProductModel> createProduct({
     required double price,
+    required double originalPrice,
     required int amount,
     required String? endingDate,
     required String startHour,
@@ -519,6 +522,7 @@ class Api {
         type: HttpType.post,
         body: {
           'price': price.toString(),
+          'original_price': originalPrice.toString(),
           'amount': amount.toString(),
           'ending_date': endingDate.toString(),
           'starting_hour': startHour.toString(),
@@ -773,7 +777,7 @@ class Api {
     } catch(error) { rethrow; }
   }
 
-  static getOrderHistoryCustomer() async {
+  static Future getOrderHistoryCustomer() async {
     try {
       final response = await Middleware.endpoint(
         name: 'getOrderHistoryCustomer',

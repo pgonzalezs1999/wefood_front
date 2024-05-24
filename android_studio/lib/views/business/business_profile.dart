@@ -431,13 +431,12 @@ class _BusinessProfileState extends State<BusinessProfile> {
                               request: () async {
                                 return await Api.logout();
                               },
-                              closePreviousPopup: true,
-                              onSuccess: () {
-                                clearData(context);
+                              onSuccess: (_) async {
+                                await clearData(context);
                                 _navigateToMain();
                               },
-                              onError: (error) {
-                                clearData(context);
+                              onError: (error) async {
+                                await clearData(context);
                                 _navigateToMain();
                               },
                             );
