@@ -116,6 +116,13 @@ class _OrderCustomerState extends State<OrderCustomer> {
                       ),
                     ],
                   ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  if(Utils.minutesFromNowToDateTime(info.product.endingHour!) < 0 && (info.item.date!.day == DateTime.now().day)) Text(
+                    'Horario de recogida excedido. Recuerde que el negocio no está obligado a entregarle su paquete fuera del horario indicado',
+                    style: Theme.of(context).textTheme.displaySmall,
+                  ),
                   Container(
                     margin: const EdgeInsets.only(
                       top: 20,

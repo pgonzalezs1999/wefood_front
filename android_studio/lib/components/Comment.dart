@@ -70,7 +70,7 @@ class _CommentState extends State<Comment> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      widget.comment.user.username ?? 'Sin nombre',
+                      widget.comment.user.username ?? '[Username]',
                       style: Theme.of(context).textTheme.titleSmall,
                     ),
                     PrintStars(
@@ -78,7 +78,7 @@ class _CommentState extends State<Comment> {
                     ),
                   ],
                 ),
-                Text('${widget.comment.comment.message}'),
+                if(widget.comment.comment.message != null) Text('${widget.comment.comment.message}'),
               ],
             ),
           ),
@@ -130,7 +130,7 @@ class _CommentState extends State<Comment> {
                           )
                         ],
                       );
-                    }
+                    },
                   );
                 },
               ),

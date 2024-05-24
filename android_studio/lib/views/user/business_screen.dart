@@ -29,7 +29,7 @@ class _BusinessScreenState extends State<BusinessScreen> {
   String? profileImageRoute;
   List<Comment> commentList = [];
   String newCommentMessage = '';
-  double selectedRate = 4;
+  double selectedRate = 3;
   bool hasCommented = false;
   LoadingStatus loadingFavourite = LoadingStatus.unset;
 
@@ -127,10 +127,16 @@ class _BusinessScreenState extends State<BusinessScreen> {
               children: <Widget>[
                 if(profileImageRoute != null) SizedBox(
                   height: MediaQuery.of(context).size.height * 0.25,
-                  child: ImageWithLoader.network(
-                    route: profileImageRoute!,
-                    width: MediaQuery.of(context).size.width,
-                    fit: BoxFit.cover,
+                  child: (profileImageRoute != null)
+                    ? ImageWithLoader.network(
+                      route: profileImageRoute!,
+                      width: MediaQuery.of(context).size.width,
+                      fit: BoxFit.cover,
+                    )
+                    : Image.asset(
+                      'assets/images/logo.png',
+                      width: MediaQuery.of(context).size.width,
+                      fit: BoxFit.cover,
                   ),
                 ),
                 Container(
@@ -320,6 +326,12 @@ class _BusinessScreenState extends State<BusinessScreen> {
                         newCommentMessage = value;
                       });
                     },
+                    feedbackWidget: (newCommentMessage.isNotEmpty)
+                      ? FeedbackMessage(
+                        message: '${(newCommentMessage.length > 750) ? 'Demasiado largo:' : ''} ${newCommentMessage.length} / 750',
+                        isError: (newCommentMessage.length > 750),
+                      )
+                      : null,
                   ),
                   if(widget.businessExpanded.requesterHasBought == true && hasCommented == false) const SizedBox(
                     height: 10,
@@ -339,7 +351,7 @@ class _BusinessScreenState extends State<BusinessScreen> {
                       const SizedBox(
                         width: 10,
                       ),
-                      if(newCommentMessage != '') IconButton(
+                      if(newCommentMessage.length <= 750) IconButton(
                         icon: const Icon(
                           Icons.send,
                         ),
@@ -349,7 +361,7 @@ class _BusinessScreenState extends State<BusinessScreen> {
                             request: () async {
                               return await Api.addComment(
                                 idBusiness: widget.businessExpanded.business.id!,
-                                message: newCommentMessage,
+                                message: (newCommentMessage != '') ? newCommentMessage : null,
                                 rate: selectedRate,
                               );
                             },

@@ -796,25 +796,27 @@ class Api {
         }
       );
       BusinessExpandedModel business = BusinessExpandedModel.fromJson(response);
-      BusinessExpandedModel.printInfo(business);
       return business;
     } catch(error) { rethrow; }
   }
 
   static Future addComment({
     required int idBusiness,
-    required String message,
+    required String? message,
     required double rate,
   }) async {
     try {
+      Map<String, dynamic> body = {
+        'id_business': idBusiness.toString(),
+        'rate': rate.toString(),
+      };
+      if(message != null) {
+        body['message'] = message;
+      }
       await Middleware.endpoint(
         name: 'addComment',
         type: HttpType.post,
-        body: {
-          'id_business': idBusiness.toString(),
-          'message': message,
-          'rate': rate.toString(),
-        }
+        body: body,
       );
     } catch(error) { rethrow; }
   }
