@@ -31,6 +31,21 @@ class ProductExpandedModel {
     available = json['available'] as int?,
     image = (json['image'] != null) ? ImageModel.fromJson(json['image'] as Map<String, dynamic>) : ImageModel.empty();
 
+  ProductExpandedModel.fromParameters({
+    required UserModel newUser,
+    required BusinessModel newBusiness,
+    required ProductModel newProduct,
+    required ItemModel newItem,
+    required OrderModel newOrder,
+    required ImageModel newImage,
+  }):
+    user = newUser,
+    business = newBusiness,
+    product = newProduct,
+    item = newItem,
+    order = newOrder,
+    image = newImage;
+
   static void printInfo(ProductExpandedModel product) {
     print('------------------------------');
     ProductModel.printInfo(product.product);

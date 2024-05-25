@@ -25,7 +25,6 @@ class OrderCustomer extends StatefulWidget {
 class _OrderCustomerState extends State<OrderCustomer> {
 
   Widget resultWidget = const LoadingIcon();
-  Widget favouriteIcon = const Icon(Icons.favorite_outline);
   late ProductExpandedModel info;
   int selectedAmount = 1;
 

@@ -27,7 +27,6 @@ class BusinessScreen extends StatefulWidget {
 
 class _BusinessScreenState extends State<BusinessScreen> {
 
-  Widget favouriteIcon = const Icon(Icons.favorite_outline);
   String? profileImageRoute;
   List<Comment> commentList = [];
   String newCommentMessage = '';
@@ -191,6 +190,7 @@ class _BusinessScreenState extends State<BusinessScreen> {
                                       if(widget.businessExpanded.isFavourite == true) {
                                         Api.removeFavourite(idBusiness: widget.businessExpanded.business.id!).then((_) {
                                           setState(() {
+                                            context.read<FavouriteItemsCubit>().needsRefresh = true;
                                             loadingFavourite = LoadingStatus.successful;
                                             widget.businessExpanded.isFavourite = false;
                                           });
@@ -198,6 +198,7 @@ class _BusinessScreenState extends State<BusinessScreen> {
                                       } else {
                                         Api.addFavourite(idBusiness: widget.businessExpanded.business.id!).then((_) {
                                           setState(() {
+                                            context.read<FavouriteItemsCubit>().needsRefresh = true;
                                             loadingFavourite = LoadingStatus.successful;
                                             widget.businessExpanded.isFavourite = true;
                                           });

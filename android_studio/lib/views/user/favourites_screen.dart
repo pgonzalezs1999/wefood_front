@@ -17,17 +17,12 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
 
   LoadingStatus _retrievingFavourites = LoadingStatus.unset;
 
-  int compareByDate(ProductExpandedModel a, ProductExpandedModel b) {
-    return a.item.date!.compareTo(b.item.date!);
-  }
-
   _retrieveFavourites() async {
     setState(() {
       _retrievingFavourites = LoadingStatus.loading;
     });
     try {
       List<ProductExpandedModel> items = await Api.getFavouriteItems();
-      items.sort(compareByDate);
       for(int i=0; i<items.length; i++) {
         items[i].image = await Api.getImage(
           idUser: items[i].user.id!,
@@ -47,7 +42,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
 
   @override
   void initState() {
-    if(context.read<FavouriteItemsCubit>().state.isEmpty) {
+    if(context.read<FavouriteItemsCubit>().state == null || context.read<FavouriteItemsCubit>().needsRefresh == true) {
       _retrieveFavourites();
     }
     super.initState();
@@ -70,7 +65,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
           ),
           child: const Text('Error'),
         ),
-        if(_retrievingFavourites == LoadingStatus.successful && context.read<FavouriteItemsCubit>().state.isEmpty) Align(
+        if(_retrievingFavourites == LoadingStatus.successful && context.read<FavouriteItemsCubit>().state!.isEmpty) Align(
           alignment: Alignment.center,
           child: Card(
             child: Container(
@@ -85,8 +80,8 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
             ),
           ),
         ),
-        if((_retrievingFavourites == LoadingStatus.unset || _retrievingFavourites == LoadingStatus.successful) && context.read<FavouriteItemsCubit>().state.isNotEmpty) Column(
-          children: context.read<FavouriteItemsCubit>().state.map((ProductExpandedModel i) => ItemButton(
+        if((_retrievingFavourites == LoadingStatus.unset || _retrievingFavourites == LoadingStatus.successful) && context.read<FavouriteItemsCubit>().state!.isNotEmpty) Column(
+          children: context.read<FavouriteItemsCubit>().state!.map((ProductExpandedModel i) => ItemButton(
             productExpanded: i,
             comebackBehaviour: () async {
               await _retrieveFavourites();

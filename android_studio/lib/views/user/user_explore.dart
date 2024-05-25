@@ -5,7 +5,6 @@ import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/models/models.dart';
-import 'package:wefood/types.dart';
 import 'package:wefood/views/user/searched_items.dart';
 import 'package:wefood/views/views.dart';
 
@@ -22,8 +21,8 @@ class _UserExploreState extends State<UserExplore> {
   double userLatitude = -12.5; // TODO deshardcodear
   Widget recommendedList = const LoadingIcon();
   Widget nearbyList =  const LoadingIcon();
-  LoadingStatus _retrievingFavourites = LoadingStatus.unset;
   final TextEditingController _searchController = TextEditingController();
+  bool errorOnFavourites = false;
 
   Widget _exploreTitle(String title) {
     return Container(
@@ -125,25 +124,18 @@ class _UserExploreState extends State<UserExplore> {
   }
 
   _retrieveFavourites() async {
-    setState(() {
-      _retrievingFavourites = LoadingStatus.loading;
-    });
-    try {
-      List<ProductExpandedModel> items = await Api.getFavouriteItems();
-      items.sort(compareByDate);
-      setState(() {
-        context.read<FavouriteItemsCubit>().set(items);
-        _retrievingFavourites = LoadingStatus.successful;
-      });
-    } catch(error) {
-      setState(() {
-        _retrievingFavourites = LoadingStatus.error;
-      });
+    if(context.read<FavouriteItemsCubit>().state == null || context.read<FavouriteItemsCubit>().needsRefresh == true) {
+      try {
+        List<ProductExpandedModel> items = await Api.getFavouriteItems();
+        setState(() {
+          context.read<FavouriteItemsCubit>().set(items);
+        });
+      } catch(error) {
+        setState(() {
+          errorOnFavourites = true;
+        });
+      }
     }
-  }
-
-  int compareByDate(ProductExpandedModel a, ProductExpandedModel b) {
-    return a.item.date!.compareTo(b.item.date!);
   }
 
   _navigateToSearchFilters() {
@@ -190,6 +182,10 @@ class _UserExploreState extends State<UserExplore> {
 
   @override
   Widget build(BuildContext context) {
+    if(context.read<FavouriteItemsCubit>().state != null) {
+      print('FAVOURITE_CUBIT LENGTH: ${context.read<FavouriteItemsCubit>().state!.length}');
+    }
+    _retrieveFavourites();
     return WefoodNavigationScreen(
       children: <Widget>[
         Row(
@@ -284,19 +280,19 @@ class _UserExploreState extends State<UserExplore> {
         _exploreTitle('Cerca de tí'),
         nearbyList,
         _exploreTitle('Ofertas de tus favoritos'),
-        if(_retrievingFavourites == LoadingStatus.loading) Container(
+        if(context.read<FavouriteItemsCubit>().state == null) Container(
           margin: const EdgeInsets.only(
             left: 10,
           ),
           child: const LoadingIcon(),
         ),
-        if(_retrievingFavourites == LoadingStatus.error) Container(
+        if(errorOnFavourites == true) Container(
           margin: EdgeInsets.symmetric(
             vertical: MediaQuery.of(context).size.height * 0.05,
           ),
           child: const Text('No se han podido obtener los productos favoritos'),
         ),
-        if(_retrievingFavourites == LoadingStatus.successful && context.read<FavouriteItemsCubit>().state.isEmpty) Align(
+        if(context.read<FavouriteItemsCubit>().state != null && context.read<FavouriteItemsCubit>().state!.isEmpty) Align(
           alignment: Alignment.center,
           child: Card(
             child: Container(
@@ -311,10 +307,10 @@ class _UserExploreState extends State<UserExplore> {
             ),
           ),
         ),
-        if(_retrievingFavourites == LoadingStatus.successful && context.read<FavouriteItemsCubit>().state.isNotEmpty) SingleChildScrollView(
+        if(context.read<FavouriteItemsCubit>().state != null && context.read<FavouriteItemsCubit>().state!.isNotEmpty) SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
-            children: context.read<FavouriteItemsCubit>().state.map((ProductExpandedModel i) => ItemButton(
+            children: context.read<FavouriteItemsCubit>().state!.map((ProductExpandedModel i) => ItemButton(
               horizontalScroll: true,
               productExpanded: i,
               comebackBehaviour: () async {

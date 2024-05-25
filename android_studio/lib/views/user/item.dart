@@ -1,7 +1,9 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:maps_launcher/maps_launcher.dart';
+import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/commands/utils.dart';
 import 'package:wefood/components/components.dart';
@@ -25,7 +27,6 @@ class Item extends StatefulWidget {
 }
 class _ItemState extends State<Item> {
 
-  Widget favouriteIcon = const Icon(Icons.favorite_outline);
   ProductExpandedModel? info;
   int selectedAmount = 1;
   List<String> backgroundImageRoutes = [];
@@ -95,7 +96,18 @@ class _ItemState extends State<Item> {
           MaterialPageRoute(builder: (context) => BusinessScreen(
             businessExpanded: response, // businessExpanded,
           )),
-        );
+        ).whenComplete(() {
+          if(context.read<FavouriteItemsCubit>().needsRefresh == true) {
+            Api.getFavouriteItems().then((List<ProductExpandedModel> items) {
+              context.read<FavouriteItemsCubit>().set(items);
+              setState(() {
+                info!.isFavourite = context.read<FavouriteItemsCubit>().businessIsFavourite(info!.business.id!);
+                context.read<FavouriteItemsCubit>().state;
+              });
+              context.read<FavouriteItemsCubit>().needsRefresh = true;
+            });
+          }
+        });
       },
       onError: (error) {
         showDialog(
@@ -203,6 +215,7 @@ class _ItemState extends State<Item> {
                                   if(info!.isFavourite == true) {
                                     Api.removeFavourite(idBusiness: info!.business.id!).then((_) {
                                       setState(() {
+                                        context.read<FavouriteItemsCubit>().needsRefresh = true;
                                         loadingFavourite = LoadingStatus.successful;
                                         info!.isFavourite = false;
                                       });
@@ -210,6 +223,7 @@ class _ItemState extends State<Item> {
                                   } else {
                                     Api.addFavourite(idBusiness: info!.business.id!).then((_) {
                                       setState(() {
+                                        context.read<FavouriteItemsCubit>().needsRefresh = true;
                                         loadingFavourite = LoadingStatus.successful;
                                         info!.isFavourite = true;
                                       });
