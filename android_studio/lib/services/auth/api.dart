@@ -166,6 +166,24 @@ class Api {
     } catch(error) { rethrow; }
   }
 
+  static Future<List<ProductExpandedModel>> getNearbyBusinesses({
+    required double longitude,
+    required double latitude,
+  }) async {
+    try {
+      dynamic response = await Middleware.endpoint(
+          name: 'getNearbyBusinesses',
+          type: HttpType.post,
+          body: {
+            'longitude': longitude.toString(),
+            'latitude': latitude.toString(),
+          }
+      );
+      List<ProductExpandedModel> products = (response['items'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();
+      return products;
+    } catch(error) { rethrow; }
+  }
+
   static Future<List<ProductExpandedModel>> getNearbyItems({
     required double longitude,
     required double latitude,

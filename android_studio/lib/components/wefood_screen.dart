@@ -14,6 +14,7 @@ class WefoodScreen extends StatefulWidget {
   final MainAxisAlignment bodyMainAxisAlignment;
   final CrossAxisAlignment bodyCrossAxisAlignment;
   final ScrollController? controller;
+  final bool preventScrolling;
 
   const WefoodScreen({
     super.key,
@@ -27,6 +28,7 @@ class WefoodScreen extends StatefulWidget {
     this.bodyMainAxisAlignment = MainAxisAlignment.start,
     this.bodyCrossAxisAlignment = CrossAxisAlignment.start,
     this.controller,
+    this.preventScrolling = false,
   });
 
   @override
@@ -64,6 +66,33 @@ class _WefoodScreenState extends State<WefoodScreen> {
 
   @override
   Widget build(BuildContext context) {
+
+    Widget content = Column(
+      mainAxisAlignment: widget.bodyMainAxisAlignment,
+      crossAxisAlignment: widget.bodyCrossAxisAlignment,
+      children: <Widget>[
+        if(widget.title != null) Row(
+          children: <Widget>[
+            if(widget.ignoreHorizontalPadding == true) const SizedBox(
+              width: 20,
+            ),
+            Expanded(
+              child: BackUpBar(
+                title: widget.title!,
+              ),
+            ),
+          ],
+        ),
+        if(widget.title != null) const SizedBox(
+          height: 20,
+        ),
+      ]+ widget.body +[
+        SizedBox(
+          height: (widget.ignoreVerticalPadding == true) ? 0 : 25,
+        ),
+      ],
+    );
+
     return PopScope(
       onPopInvoked: _onPopInvoked,
       canPop: widget.canPop ?? true,
@@ -77,26 +106,13 @@ class _WefoodScreenState extends State<WefoodScreen> {
             left: widget.ignoreHorizontalPadding ? 0 : MediaQuery.of(context).size.width * Environment.defaultHorizontalMargin,
             right: widget.ignoreHorizontalPadding ? 0 : MediaQuery.of(context).size.width * Environment.defaultHorizontalMargin,
           ),
-          child: SingleChildScrollView(
-            controller: widget.controller,
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Column(
-              mainAxisAlignment: widget.bodyMainAxisAlignment,
-              crossAxisAlignment: widget.bodyCrossAxisAlignment,
-              children: <Widget>[
-                if(widget.title != null) BackUpBar(
-                  title: widget.title!,
-                ),
-                if(widget.title != null) const SizedBox(
-                  height: 20,
-                ),
-              ]+ widget.body +[
-                const SizedBox(
-                  height: 25,
-                ),
-              ],
+          child: (widget.preventScrolling == true)
+            ? content
+            : SingleChildScrollView(
+              controller: widget.controller,
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: content
             ),
-          ),
         ),
         bottomNavigationBar: widget.bottomNavigationBar,
       ),

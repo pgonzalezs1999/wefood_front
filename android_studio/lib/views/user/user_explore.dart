@@ -138,6 +138,17 @@ class _UserExploreState extends State<UserExplore> {
     }
   }
 
+  _navigateToMapScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const MapSearchScreen()),
+    ).whenComplete(() {
+      setState(() {
+        context.read<SearchFiltersCubit>().state;
+      });
+    });
+  }
+
   _navigateToSearchFilters() {
     Navigator.push(
       context,
@@ -182,15 +193,23 @@ class _UserExploreState extends State<UserExplore> {
 
   @override
   Widget build(BuildContext context) {
-    if(context.read<FavouriteItemsCubit>().state != null) {
-      print('FAVOURITE_CUBIT LENGTH: ${context.read<FavouriteItemsCubit>().state!.length}');
-    }
     _retrieveFavourites();
     return WefoodNavigationScreen(
       children: <Widget>[
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            GestureDetector(
+              child: const Icon(
+                Icons.map,
+              ),
+              onTap: () {
+                _navigateToMapScreen();
+              },
+            ),
+            const SizedBox(
+              width: 15,
+            ),
             Expanded(
               child: TextFormField(
                 controller: _searchController,
