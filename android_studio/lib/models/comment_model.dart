@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 class CommentModel {
   int? id;
   int? idUser;
@@ -16,11 +18,13 @@ class CommentModel {
   }
 
   static void printInfo(CommentModel comment) {
-    print('IMPRIMIENDO COMMENT CON ID: ${comment.id}');
-    print('-> idUser: ${comment.idUser}');
-    print('-> rate: ${comment.rate}');
-    print('-> message: ${comment.message}');
-    print('-> idBusiness: ${comment.idBusiness}');
+    if(kDebugMode) {
+      print('IMPRIMIENDO COMMENT CON ID: ${comment.id}');
+      print('-> idUser: ${comment.idUser}');
+      print('-> rate: ${comment.rate}');
+      print('-> message: ${comment.message}');
+      print('-> idBusiness: ${comment.idBusiness}');
+    }
   }
 
   double? _toDouble(dynamic value) {

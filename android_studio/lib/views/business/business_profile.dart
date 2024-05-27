@@ -400,8 +400,8 @@ class _BusinessProfileState extends State<BusinessProfile> {
             SettingsElement(
               iconData: Icons.support_agent,
               title: 'Contáctanos',
-              onTap: () async {
-                await launchWhatsapp(
+              onTap: () {
+                launchWhatsapp(
                   context: context,
                 );
               },

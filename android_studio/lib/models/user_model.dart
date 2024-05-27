@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 class UserModel {
   int? id;
   String? realName;
@@ -35,20 +37,22 @@ class UserModel {
     businessVerified = json['business_verified'] as int?;
 
   static void printInfo(UserModel user) {
-    print('IMPRIMIENDO USER CON ID: ${user.id}');
-    print('-> realName: ${user.realName}');
-    print('-> realSurname: ${user.realSurname}');
-    print('-> username: ${user.username}');
-    print('-> email: ${user.email}');
-    print('-> emailVerified: ${user.emailVerified}');
-    print('-> isAdmin: ${user.isAdmin}');
-    print('-> phone: ${user.phone}');
-    print('-> phonePrefix: ${user.phonePrefix}');
-    print('-> sex: ${user.sex}');
-    print('-> lastLongitude: ${user.lastLongitude}');
-    print('-> lastLatitude: ${user.lastLatitude}');
-    print('-> lastLoginDate: ${user.lastLoginDate}');
-    print('-> idBusiness: ${user.idBusiness}');
-    print('-> businessVerified: ${user.businessVerified}');
+    if(kDebugMode) {
+      print('IMPRIMIENDO USER CON ID: ${user.id}');
+      print('-> realName: ${user.realName}');
+      print('-> realSurname: ${user.realSurname}');
+      print('-> username: ${user.username}');
+      print('-> email: ${user.email}');
+      print('-> emailVerified: ${user.emailVerified}');
+      print('-> isAdmin: ${user.isAdmin}');
+      print('-> phone: ${user.phone}');
+      print('-> phonePrefix: ${user.phonePrefix}');
+      print('-> sex: ${user.sex}');
+      print('-> lastLongitude: ${user.lastLongitude}');
+      print('-> lastLatitude: ${user.lastLatitude}');
+      print('-> lastLoginDate: ${user.lastLoginDate}');
+      print('-> idBusiness: ${user.idBusiness}');
+      print('-> businessVerified: ${user.businessVerified}');
+    }
   }
 }

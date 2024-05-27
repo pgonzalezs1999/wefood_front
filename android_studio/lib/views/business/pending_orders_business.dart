@@ -20,6 +20,8 @@ class _PendingOrdersBusinessState extends State<PendingOrdersBusiness> {
 
   MobileScannerController? cameraController;
   bool _openCamera = false;
+  List<int> orderIds = [];
+  List<int> pendingOrderIds = [];
 
   _toggleCamera(bool newState) {
     if(newState == true) {
@@ -33,6 +35,30 @@ class _PendingOrdersBusinessState extends State<PendingOrdersBusiness> {
         _openCamera = false;
       });
     }
+  }
+
+  bool _orderIsFromThisBusiness(int orderId) {
+    bool result = false;
+    for(int i = 0; i < orderIds.length; i++) {
+      print('COMPARACIÓN ${orderIds[i]} == $orderId');
+      if(orderIds[i] == orderId) {
+        result = true;
+      }
+    }
+    print('RESULTADO = $result');
+    return result;
+  }
+
+  bool _orderIsPending(int orderId) {
+    bool result = false;
+    for(int i = 0; i < pendingOrderIds.length; i++) {
+      print('COMPARACIÓN ${pendingOrderIds[i]} == $orderId');
+      if(pendingOrderIds[i] == orderId) {
+        result = true;
+      }
+    }
+    print('RESULTADO = $result');
+    return result;
   }
 
   Future<void> _setPendingList({
@@ -65,6 +91,10 @@ class _PendingOrdersBusinessState extends State<PendingOrdersBusiness> {
             resultWidgetPendingList = SingleChildScrollView(
               child: Column(
                 children: cubit.state.map((OrderModel order) {
+                  orderIds.add(order.id!);
+                  if(order.receptionDate == null && order.receptionMethod == null) {
+                    pendingOrderIds.add(order.id!);
+                  }
                   i = i + 1;
                   return PendingOrderBusiness(
                     id: order.id!,
@@ -74,6 +104,7 @@ class _PendingOrdersBusinessState extends State<PendingOrdersBusiness> {
                 }).toList(),
               ),
             );
+            print(pendingOrderIds);
           });
         }
       });
@@ -108,79 +139,81 @@ class _PendingOrdersBusinessState extends State<PendingOrdersBusiness> {
       if(_openCamera == true) {
         String qrContent = barcode.rawValue ?? '';
         int? qrOrderId = int.tryParse(qrContent);
-        if(qrOrderId != null) {
-          setState(() {
-            _toggleCamera(false);
-            showDialog(
-              context: context,
-              builder: (_) {
-                return WefoodPopup(
-                  context: _,
-                  title: '¿Confirmar el pedido ${Utils.numberToHexadecimal(qrOrderId)}',
-                  cancelButtonTitle: 'CANCELAR',
-                  actions: [
-                    TextButton(
-                      child: const Text('CONFIRMAR'),
-                      onPressed: () {
-                        callRequestWithLoading(
-                          closePreviousPopup: true,
-                          context: context,
-                          request: () async {
-                            return await Api.completeOrderBusiness(
-                              idOrder: qrOrderId,
-                            );
-                          },
-                          onSuccess: (_) {
-                            _setPendingList(
-                              cubit: pendingOrdersBusinessCubit,
-                            ).then((_) {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return WefoodPopup(
-                                    context: context,
-                                    title: '¡Pedido confirmado!',
-                                    description: 'Ya puede entregarle el paquete a su cliente. En los próximos dís recibirá el dinero correspondiente',
-                                    cancelButtonTitle: 'OK',
-                                  );
-                                }
+        if(qrOrderId != null && _orderIsFromThisBusiness(qrOrderId) == true) {
+          if(_orderIsPending(qrOrderId) == true) {
+            setState(() {
+              _toggleCamera(false);
+              showDialog(
+                context: context,
+                builder: (_) {
+                  return WefoodPopup(
+                    context: _,
+                    title: '¿Confirmar el pedido ${Utils.numberToHexadecimal(qrOrderId)}',
+                    cancelButtonTitle: 'CANCELAR',
+                    actions: [
+                      TextButton(
+                        child: const Text('CONFIRMAR'),
+                        onPressed: () {
+                          callRequestWithLoading(
+                            closePreviousPopup: true,
+                            context: context,
+                            request: () async {
+                              return await Api.completeOrderBusiness(
+                                idOrder: qrOrderId,
                               );
-                            });
-                          },
-                        );
-                      },
-                    ),
-                  ],
-                );
-              },
-            );
-          });
+                            },
+                            onSuccess: (_) {
+                              _setPendingList(
+                                cubit: pendingOrdersBusinessCubit,
+                              ).then((_) {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return WefoodPopup(
+                                      context: context,
+                                      title: '¡Pedido confirmado!',
+                                      description: 'Ya puede entregarle el paquete a su cliente. En los próximos dís recibirá el dinero correspondiente',
+                                      cancelButtonTitle: 'OK',
+                                    );
+                                  }
+                                );
+                              });
+                            },
+                          );
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
+            });
+          } else {
+            setState(() {
+              _toggleCamera(false);
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return WefoodPopup(
+                    context: context,
+                    title: 'Producto ya confirmado',
+                    description: 'El pedido escaneado ya ha sido confirmado.',
+                    cancelButtonTitle: 'OK',
+                  );
+                },
+              );
+            });
+          }
         } else {
           setState(() {
             _toggleCamera(false);
             showDialog(
               context: context,
               builder: (context) {
-                return StatefulBuilder(
-                  builder: (context, setState) {
-                    return AlertDialog(
-                      title: const Text('Código incorrecto'),
-                      content: const Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Text('Parece que el QR leído no pertenece a WeFood. Si el error persiste, pídale al cliente que valide él mismo su pedido'),
-                        ],
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text('OK'),
-                        ),
-                      ],
-                    );
-                  },
+                return WefoodPopup(
+                  context: context,
+                  title: 'Código incorrecto',
+                  description: 'Parece que el QR leído no corresponde a su negocio. Si se trata de un error, por favor, pídale a su cliente que confirme la recogida desde su cuenta.',
+                  cancelButtonTitle: 'OK',
                 );
               },
             );

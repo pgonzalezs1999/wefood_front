@@ -46,7 +46,7 @@ class _PendingOrderBusinessState extends State<PendingOrderBusiness> {
                   fontWeight: FontWeight.w900, // TODO deshardcodear estilo
                 ),
               ),
-              const Text(':'),
+              Text(' (${widget.id}):'),
             ],
           ),
           Text(

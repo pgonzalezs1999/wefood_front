@@ -59,39 +59,41 @@ class _MapSearchScreenState extends State<MapSearchScreen> {
     items = newItems;
     markers.clear();
     lastSearchCameraPosition = cameraPosition;
-    markers.addAll(
-      newItems.map((it) => Marker(
-        markerId: MarkerId(it.item.id.toString()),
-        icon: BitmapDescriptor.defaultMarkerWithHue(
-          (it.business.name! == chosenBusinessName) ? BitmapDescriptor.hueViolet : BitmapDescriptor.hueRed,
-        ),
-        position: LatLng(
-          it.business.latitude!,
-          it.business.longitude!,
-        ),
-        onTap: () {
-          setState(() {
-            chosenBusinessName = it.business.name!;
-          });
-          List<ItemButton> newItemButtons = [];
-          itemButtons = [];
-          for(int i = 0; i < newItems.length; i++) {
-            if(newItems[i].business.id == it.business.id) {
-              newItemButtons.add(
-                ItemButton(
-                  productExpanded: newItems[i],
-                  horizontalScroll: true,
-                ),
-              );
+    setState(() {
+      markers.addAll(
+        newItems.map((it) => Marker(
+          markerId: MarkerId(it.item.id.toString()),
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+            (it.business.name! == chosenBusinessName) ? BitmapDescriptor.hueViolet : BitmapDescriptor.hueRed,
+          ),
+          position: LatLng(
+            it.business.latitude!,
+            it.business.longitude!,
+          ),
+          onTap: () {
+            setState(() {
+              chosenBusinessName = it.business.name!;
+            });
+            List<ItemButton> newItemButtons = [];
+            itemButtons = [];
+            for(int i = 0; i < newItems.length; i++) {
+              if(newItems[i].business.id == it.business.id) {
+                newItemButtons.add(
+                  ItemButton(
+                    productExpanded: newItems[i],
+                    horizontalScroll: true,
+                  ),
+                );
+              }
             }
+            setState(() {
+              itemButtons = newItemButtons;
+              _updateMarkers(newItems);
+            });
           }
-          setState(() {
-            itemButtons = newItemButtons;
-            _updateMarkers(newItems);
-          });
-        }
-      )),
-    );
+        )),
+      );
+    });
   }
 
   bool _canRefreshItems() {

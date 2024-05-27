@@ -42,20 +42,15 @@ class _WefoodScreenState extends State<WefoodScreen> {
       showDialog(
         context: context,
         builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('¿Cerrar WeFood?'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('No'),
-              ),
+          return WefoodPopup(
+            context: context,
+            title: '¿Cerrar WeFood?',
+            actions: <TextButton>[
               TextButton(
                 onPressed: () {
                   SystemChannels.platform.invokeMethod('SystemNavigator.pop');
                 },
-                child: const Text('Sí'),
+                child: const Text('SÍ'),
               ),
             ],
           );

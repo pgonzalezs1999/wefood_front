@@ -623,7 +623,6 @@ class Api {
             'amount': amount.toString(),
           }
       );
-      print('RESPONSE DEL ORDER_ITEMS: $response');
       if(response['message'] == null) {
         throw Exception;
       }
@@ -687,7 +686,7 @@ class Api {
           }
       );
       if(response['message'] == null) {
-        throw Exception('ERROR WHILE GETTING PENDING ITEMS');
+        throw Exception();
       }
     } catch(error) { rethrow; }
   }

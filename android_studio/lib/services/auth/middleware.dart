@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:wefood/environment.dart';
 import 'package:wefood/services/secure_storage.dart';
@@ -77,14 +78,14 @@ class Middleware {
     try {
       switch(type) {
         case HttpType.get:
-          print('HACIENDO GET DE: $uri');
+          if(kDebugMode) { print('HACIENDO GET DE: $uri'); }
           response = await get(
             url: uri,
             auth: auth,
           );
           return jsonDecode(utf8.decode(response.bodyBytes));
         case HttpType.post:
-          print('HACIENDO POST DE: $uri CON BODY: $body');
+          if(kDebugMode) { print('HACIENDO POST DE: $uri CON BODY: $body'); }
           response = await post(
             url: uri,
             body: body,
@@ -92,7 +93,7 @@ class Middleware {
           );
           return jsonDecode(utf8.decode(response.bodyBytes));
         case HttpType.multipartPost:
-          print('HACIENDO MULTIPART_POST DE: $fullUrl CON BODY: $body');
+          if(kDebugMode) { print('HACIENDO MULTIPART_POST DE: $fullUrl CON BODY: $body'); }
           response = await multipartPost(
             url: fullUrl,
             body: body,

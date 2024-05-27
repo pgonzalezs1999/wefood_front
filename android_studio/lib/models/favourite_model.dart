@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 class FavouriteModel {
   int? id;
   int? idUser;
@@ -11,8 +13,10 @@ class FavouriteModel {
     idBusiness = json['id_business'] as int?;
 
   static void printInfo(FavouriteModel favourite) {
-    print('IMPRIMIENDO FAVOURITE CON ID: ${favourite.id}');
-    print('-> idUser: ${favourite.idUser}');
-    print('-> idBusiness: ${favourite.idBusiness}');
+    if(kDebugMode) {
+      print('IMPRIMIENDO FAVOURITE CON ID: ${favourite.id}');
+      print('-> idUser: ${favourite.idUser}');
+      print('-> idBusiness: ${favourite.idBusiness}');
+    }
   }
 }

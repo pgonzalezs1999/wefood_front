@@ -577,8 +577,8 @@ class _UserProfileState extends State<UserProfile> {
             SettingsElement(
               iconData: Icons.support_agent,
               title: 'Contáctanos',
-              onTap: () async {
-                await launchWhatsapp(
+              onTap: () {
+                launchWhatsapp(
                   context: context,
                 );
               },
