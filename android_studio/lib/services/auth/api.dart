@@ -610,25 +610,6 @@ class Api {
     } catch(error) { rethrow; }
   }
 
-  static Future<void> orderItem({
-    required int idItem,
-    required int amount,
-  }) async {
-    try {
-      final response = await Middleware.endpoint(
-          name: 'orderItem',
-          type: HttpType.post,
-          body: {
-            'id_item': idItem.toString(),
-            'amount': amount.toString(),
-          }
-      );
-      if(response['message'] == null) {
-        throw Exception;
-      }
-    } catch(error) { rethrow; }
-  }
-
   static Future<List<ProductExpandedModel>> getPendingOrdersCustomer() async {
     try {
       final response = await Middleware.endpoint(
@@ -870,5 +851,47 @@ class Api {
         }
       );
     } catch(error) { rethrow; }
+  }
+
+  static Future<String> openpayPayment({
+    required int idItem,
+    required double price,
+    required int amount,
+    required String holderName,
+    required int cardNumber,
+    required int expirationYear,
+    required int expirationMonth,
+    required int cvv2,
+  }) async {
+    try {
+      dynamic response = await Middleware.endpoint(
+        name: 'openpayPayment',
+        type: HttpType.post,
+        body: {
+          'price': price.toString(),
+          'holder_name': holderName,
+          'card_number': cardNumber.toString(),
+          'expiration_year': expirationYear.toString(),
+          'expiration_month': expirationMonth.toString(),
+          'cvv2': cvv2.toString(),
+          'id_item': idItem.toString(),
+          'amount': amount.toString(),
+        },
+      );
+      String status = '';
+      print('------------ RESPONSE DEL API.PAYMENT: ---------------');
+      print(response);
+      print('------------------------------------------------------');
+      if(response['status'] != null) {
+        status = response['status'];
+      } else if(response['description'] == 'Request not allowed') {
+        status = 'Los datos enviados han sido rechazados por la entidad bancaria. Por favor, revise los datos e inténtelo de nuevo';
+      } else {
+        status = response['description'];
+      }
+      return status;
+    } catch(error) {
+      rethrow;
+    }
   }
 }

@@ -484,33 +484,15 @@ class _ItemState extends State<Item> {
                                       actions: [
                                         TextButton(
                                           child: const Text('COMPRAR'),
-                                          onPressed: () async {
-                                            callRequestWithLoading(
-                                              closePreviousPopup: true,
-                                              context: context,
-                                              request: () async {
-                                                return await Api.orderItem(
-                                                  idItem: info!.item.id!,
-                                                  amount: selectedAmount,
-                                                );
-                                              },
-                                              onSuccess: (_) {
-                                                Navigator.pop(context);
-                                                showDialog(
-                                                  context: context,
-                                                  builder: (BuildContext context) {
-                                                    return WefoodPopup(
-                                                      context: context,
-                                                      title: '¡Producto comprado!',
-                                                      description: 'Esto es todavía un entorno de pruebas. Más adelante, aquí aparecerá la pasarela de pago',
-                                                      cancelButtonTitle: 'OK',
-                                                      cancelButtonBehaviour: () {
-                                                        Navigator.pop(context);
-                                                      },
-                                                    );
-                                                  }
-                                                );
-                                              },
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(builder: (context) => PaymentScreen(
+                                                price: info!.product.price! * selectedAmount,
+                                                itemId: widget.productExpanded.item.id!,
+                                                amount: selectedAmount,
+                                              )),
                                             );
                                           },
                                         ),

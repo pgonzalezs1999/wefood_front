@@ -44,3 +44,9 @@ enum OrderReceptionMethod {
   pm, // picked up manually
   normal,
 }
+
+enum PaymentOption {
+  creditCard,
+  bankApp,
+  agents,
+}

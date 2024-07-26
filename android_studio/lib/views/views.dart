@@ -18,6 +18,7 @@ export 'package:wefood/views/user/history.dart';
 export 'package:wefood/views/user/map_search_screen.dart';
 export 'package:wefood/views/user/item.dart';
 export 'package:wefood/views/user/order_customer.dart';
+export 'package:wefood/views/user/payment_screen.dart';
 export 'package:wefood/views/terms_and_conditions.dart';
 export 'package:wefood/views/home.dart';
 export 'package:wefood/views/loading_screen.dart';
