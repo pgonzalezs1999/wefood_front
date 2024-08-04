@@ -1,9 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/models/models.dart';
@@ -28,14 +30,23 @@ class _MapSearchScreenState extends State<MapSearchScreen> {
   String chosenBusinessName = '';
 
   _getUserLocation() async {
-    PermissionStatus permissionStatus = await Permission.location.request();
-    if(permissionStatus.isGranted) {
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.best,
-      );
+    if(context.read<UserLocationCubit>().state != null) {
       setState(() {
-        // cameraPosition = LatLng(position.latitude, position.longitude);
-        cameraPosition = const LatLng(-12.1, -77); // TODO descomentar linea anterior y borrar esta
+        cameraPosition = context.read<UserLocationCubit>().state!;
+      });
+    } else {
+      Permission.location.request().then((PermissionStatus permissionStatus) {
+        if(permissionStatus.isGranted) {
+          Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.best,
+          ).then((Position position) {
+             setState(() {
+               cameraPosition = LatLng(position.latitude, position.longitude);
+             });
+          });
+        } else {
+          cameraPosition = const LatLng(-12.1, -77);
+        }
       });
     }
   }

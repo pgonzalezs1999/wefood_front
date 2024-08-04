@@ -425,7 +425,7 @@ class _ItemState extends State<Item> {
                       Row(
                         children: <Widget>[
                           if(info!.product.vegetarian == true) const ProductTag(title: 'Vegetariano'),
-                          if(info!.product.mediterranean == true) const ProductTag(title: 'Mediterráneo'),
+                          if(info!.product.mediterranean == true) const ProductTag(title: 'Restaurante'),
                           if(info!.product.junk == true) const ProductTag(title: 'C. rápida'),
                           if(info!.product.dessert == true) const ProductTag(title: 'Postres'),
                         ],

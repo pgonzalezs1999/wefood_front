@@ -46,6 +46,23 @@ class _LoginState extends State<Login> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _popUntilFirst();
+    });
+  }
+
+  void _popUntilFirst() {
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _popUntilFirst();
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return WefoodScreen(
       canPop: false,

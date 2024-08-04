@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/components/components.dart';
@@ -17,8 +20,7 @@ class UserExplore extends StatefulWidget {
 
 class _UserExploreState extends State<UserExplore> {
 
-  double userLongitude = -77; // TODO deshardcodear
-  double userLatitude = -12.5; // TODO deshardcodear
+  LatLng userLocation = const LatLng(-12.5, -77);
   Widget recommendedList = const LoadingIcon();
   Widget nearbyList =  const LoadingIcon();
   final TextEditingController _searchController = TextEditingController();
@@ -36,27 +38,80 @@ class _UserExploreState extends State<UserExplore> {
     );
   }
 
+  _getUserLocation() {
+    if(context.read<UserLocationCubit>().state == null) {
+      Permission.location.request().then((PermissionStatus permissionStatus) {
+        if (permissionStatus.isGranted) {
+          Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.best,
+          ).then((Position position) {
+            context.read<UserLocationCubit>().set(
+                location: LatLng(position.latitude, position.longitude)
+            );
+            setState(() {
+              userLocation = LatLng(position.latitude, position.longitude);
+            });
+            _refreshData();
+          });
+        }
+      });
+    } else {
+      setState(() {
+        userLocation = context.read<UserLocationCubit>().state!;
+      });
+      _refreshData();
+    }
+  }
+
+  _refreshData() async {
+    setState(() {
+      context.read<NearbyItemsCubit>().set(List<ProductExpandedModel>.empty());
+      context.read<RecommendedItemsCubit>().set(List<ProductExpandedModel>.empty());
+    });
+    _retrieveRecommended();
+    _retrieveNearby();
+  }
+
   _retrieveRecommended() async {
     try {
       if(context.read<RecommendedItemsCubit>().state.isEmpty) {
-        List<ProductExpandedModel> items = await Api.getRecommendedItems(
-          longitude: userLongitude,
-          latitude: userLatitude,
-        );
-        setState(() {
-          context.read<RecommendedItemsCubit>().set(items);
+        Api.getRecommendedItems(
+          longitude: userLocation.longitude,
+          latitude: userLocation.latitude,
+        ).then((List<ProductExpandedModel> items) {
+          if(items.isEmpty) {
+            setState(() {
+              recommendedList = Align(
+                alignment: Alignment.center,
+                child: Card(
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: MediaQuery.of(context).size.width * 0.05,
+                      vertical: MediaQuery.of(context).size.width * 0.025,
+                    ),
+                    child: const Text(
+                      'Solo recomendamos ofertas cercanas',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              );
+            });
+          } else {
+            setState(() {
+              recommendedList = Column(
+                children: context.read<RecommendedItemsCubit>().state.map((ProductExpandedModel product) => ItemButton(
+                  productExpanded: product,
+                  comebackBehaviour: () async {
+                    await _retrieveFavourites();
+                  },
+                )).toList(),
+              );
+            });
+            context.read<RecommendedItemsCubit>().set(items);
+          }
         });
       }
-      setState(() {
-        recommendedList = Column(
-          children: context.read<RecommendedItemsCubit>().state.map((ProductExpandedModel product) => ItemButton(
-            productExpanded: product,
-            comebackBehaviour: () async {
-              await _retrieveFavourites();
-            },
-          )).toList(),
-        );
-      });
     } catch(error) {
       setState(() {
         recommendedList = Container(
@@ -72,30 +127,35 @@ class _UserExploreState extends State<UserExplore> {
   _retrieveNearby() async {
     try {
       if(context.read<NearbyItemsCubit>().state.isEmpty) {
-        List<ProductExpandedModel> items = await Api.getNearbyItems(
-          longitude: userLongitude,
-          latitude: userLatitude,
-        );
-        if(items.isEmpty) {
-          setState(() {
-            nearbyList = Align(
-              alignment: Alignment.center,
-              child: Card(
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: MediaQuery.of(context).size.width * 0.05,
-                    vertical: MediaQuery.of(context).size.width * 0.025,
+        Api.getNearbyItems(
+          longitude: userLocation.longitude,
+          latitude: userLocation.latitude,
+        ).then((List<ProductExpandedModel> items){
+          if(items.isEmpty) {
+            setState(() {
+              nearbyList = Align(
+                alignment: Alignment.center,
+                child: Card(
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: MediaQuery.of(context).size.width * 0.05,
+                      vertical: MediaQuery.of(context).size.width * 0.05,
+                    ),
+                    child: const Text(
+                      'No hemos encontrado ofertas cerca.\n'
+                      'Pruebe a buscar en el mapa, o por nombre desde el buscador',
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-                  child: const Text('No hemos encontrado ofertas cerca...'),
                 ),
-              ),
-            );
-          });
-        } else {
-          setState(() {
-            context.read<NearbyItemsCubit>().set(items);
-          });
-        }
+              );
+            });
+          } else {
+            setState(() {
+              context.read<NearbyItemsCubit>().set(items);
+            });
+          }
+        });
       }
       setState(() {
         nearbyList = SingleChildScrollView(
@@ -167,8 +227,8 @@ class _UserExploreState extends State<UserExplore> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => SearchedItems(
-        text: text,
-        items: items
+          text: text,
+          items: items
       )),
     ).whenComplete(() {
       setState(() {
@@ -185,9 +245,7 @@ class _UserExploreState extends State<UserExplore> {
 
   @override
   void initState() {
-    _retrieveRecommended();
-    _retrieveNearby();
-    _retrieveFavourites();
+    _getUserLocation();
     super.initState();
   }
 
@@ -224,6 +282,9 @@ class _UserExploreState extends State<UserExplore> {
                     horizontal: 20,
                   ),
                   hintText: 'Busca tu próxima comida',
+                  hintStyle: TextStyle(
+                    color: Theme.of(context).primaryColor.withOpacity(0.5),
+                  ),
                   border: OutlineInputBorder(
                     borderSide: BorderSide(
                       color: Theme.of(context).primaryColor,

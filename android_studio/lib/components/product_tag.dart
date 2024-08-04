@@ -24,10 +24,10 @@ class _ProductTagState extends State<ProductTag> {
   Widget build(BuildContext context) {
 
     IconData icon = Icons.hide_source;
-    switch(widget.title) { // TODO poner iconos con mas sentido
+    switch(widget.title) {
       case 'Vegetariano': icon = Icons.nature;
       break;
-      case 'Mediterráneo': icon = Icons.sunny;
+      case 'Restaurante': icon = Icons.restaurant;
       break;
       case 'C. rápida': icon = Icons.fastfood;
       break;

@@ -24,6 +24,7 @@ class BlocsProvider extends StatelessWidget {
         BlocProvider(create: (context) => BusinessLunchCubit(), lazy: false),
         BlocProvider(create: (context) => BusinessDinnerCubit(), lazy: false),
         BlocProvider(create: (context) => UserInfoCubit(), lazy: false),
+        BlocProvider(create: (context) => UserLocationCubit(), lazy: false),
         BlocProvider(create: (context) => PendingOrdersBusinessCubit(), lazy: false),
         BlocProvider(create: (context) => RecommendedItemsCubit(), lazy: false),
         BlocProvider(create: (context) => NearbyItemsCubit(), lazy: false),

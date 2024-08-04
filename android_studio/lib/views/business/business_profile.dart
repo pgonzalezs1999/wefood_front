@@ -56,6 +56,13 @@ class _BusinessProfileState extends State<BusinessProfile> {
     );
   }
 
+  void _navigateToRetributions() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const BusinessRetributions()),
+    );
+  }
+
   void _getProfileImage() {
     Api.getImage(
       idUser: context.read<UserInfoCubit>().state.user.id!,
@@ -408,9 +415,9 @@ class _BusinessProfileState extends State<BusinessProfile> {
             ),
             SettingsElement(
               iconData: Icons.credit_card_outlined,
-              title: 'Cobros - FALTA',
+              title: 'Cobros',
               onTap: () {
-                // TODO falta por hacer
+                _navigateToRetributions();
               },
             ),
             SettingsElement(

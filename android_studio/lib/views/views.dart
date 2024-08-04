@@ -3,6 +3,7 @@ export 'package:wefood/views/admin/admin_management.dart';
 export 'package:wefood/views/admin/admin_profile.dart';
 export 'package:wefood/views/business/business_edit_directions.dart';
 export 'package:wefood/views/business/business_management.dart';
+export 'package:wefood/views/business/business_retributions.dart';
 export 'package:wefood/views/business/business_profile.dart';
 export 'package:wefood/views/business/edit_product.dart';
 export 'package:wefood/views/business/pending_orders_business.dart';

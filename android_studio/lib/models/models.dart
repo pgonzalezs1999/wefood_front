@@ -14,3 +14,4 @@ export 'package:wefood/models/order_model.dart';
 export 'package:wefood/models/product_expanded_model.dart';
 export 'package:wefood/models/product_model.dart';
 export 'package:wefood/models/user_model.dart';
+export 'package:wefood/models/retribution_model.dart';

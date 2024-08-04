@@ -141,7 +141,7 @@ class _SearchFiltersState extends State<SearchFilters> {
                     }
                 ),
                 CheckBoxRow(
-                    title: 'Mediterráneo',
+                    title: 'Restaurante',
                     value: context.read<SearchFiltersCubit>().state.mediterranean,
                     onChanged: () {
                       setState(() {

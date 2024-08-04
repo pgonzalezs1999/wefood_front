@@ -894,4 +894,29 @@ class Api {
       rethrow;
     }
   }
+
+  static Future<RetributionModel> createRetribution() async {
+    try {
+      final response = await Middleware.endpoint(
+        name: 'createRetribution',
+        type: HttpType.post,
+      );
+      RetributionModel result = RetributionModel.fromJson(response['retribution']);
+      return result;
+    } catch(error) { rethrow; }
+  }
+
+  static Future<List<RetributionModel>> getRetributionsFromBusiness({
+    required int id,
+  }) async {
+    try {
+      final response = await Middleware.endpoint(
+        name: 'getRetributionsFromBusiness/$id',
+        type: HttpType.get,
+      );
+      print(response['retributions']);
+      List<RetributionModel> result = (response['retributions'] as List<dynamic>).map((ret) => RetributionModel.fromJson(ret)).toList();
+      return result;
+    } catch(error) { rethrow; }
+  }
 }

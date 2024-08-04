@@ -530,7 +530,7 @@ class _EditProductState extends State<EditProduct> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  '¿A qué precio se vendería esta comida normalmente?',
+                  '¿A qué precio se vende esta comida normalmente?',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(
@@ -676,7 +676,7 @@ class _EditProductState extends State<EditProduct> {
                           }
                         ),
                         CheckBoxRow(
-                          title: 'Mediterráneo',
+                          title: 'Restaurante',
                           value: mediterranean,
                           onChanged: () {
                             setState(() {
@@ -688,8 +688,8 @@ class _EditProductState extends State<EditProduct> {
                     )
                   ],
                 ),
-                if(Utils.sumTrueBooleans([junk, dessert, vegetarian, mediterranean]) > 2) const FeedbackMessage(
-                  message: 'Máximo 2 categorías',
+                if(Utils.sumTrueBooleans([junk, dessert, vegetarian, mediterranean]) > 1) const FeedbackMessage(
+                  message: 'Máximo 1 categoría',
                   isError: true
                 ),
               ],
