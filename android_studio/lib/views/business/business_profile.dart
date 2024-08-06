@@ -385,7 +385,7 @@ class _BusinessProfileState extends State<BusinessProfile> {
             ),
             SettingsElement(
               iconData: Icons.history,
-              title: 'Historial de pedidos - FALTA',
+              title: 'Historial de pedidos (próximamente)',
               onTap: () {
                 // TODO falta esto
               },
@@ -408,7 +408,7 @@ class _BusinessProfileState extends State<BusinessProfile> {
               iconData: Icons.support_agent,
               title: 'Contáctanos',
               onTap: () {
-                launchWhatsapp(
+                launchContact(
                   context: context,
                 );
               },

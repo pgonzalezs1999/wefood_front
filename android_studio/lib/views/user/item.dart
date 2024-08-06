@@ -126,6 +126,9 @@ class _ItemState extends State<Item> {
   }
 
   _retrieveData() {
+    setState(() {
+      info = null;
+    });
     Api.getItem(
       id: widget.productExpanded.item.id!,
     ).then((ProductExpandedModel response) {
@@ -493,7 +496,9 @@ class _ItemState extends State<Item> {
                                                 itemId: widget.productExpanded.item.id!,
                                                 amount: selectedAmount,
                                               )),
-                                            );
+                                            ).whenComplete(() {
+                                              _retrieveData();
+                                            });
                                           },
                                         ),
                                       ],

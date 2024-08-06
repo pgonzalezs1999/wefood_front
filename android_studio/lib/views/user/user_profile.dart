@@ -578,7 +578,7 @@ class _UserProfileState extends State<UserProfile> {
               iconData: Icons.support_agent,
               title: 'Contáctanos',
               onTap: () {
-                launchWhatsapp(
+                launchContact(
                   context: context,
                 );
               },

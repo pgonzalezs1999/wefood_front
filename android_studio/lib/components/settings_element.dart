@@ -45,9 +45,21 @@ class _SettingsElementState extends State<SettingsElement> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Icon(widget.iconData),
+              Icon(
+                widget.iconData,
+                color: (widget.title.contains('próximamente'))
+                  ? Colors.black.withOpacity(0.4)
+                  : Theme.of(context).primaryColor,
+              ),
               const SizedBox(width: 10),
-              Text(widget.title),
+              Text(
+                widget.title,
+                style: TextStyle(
+                  color: (widget.title.contains('próximamente'))
+                    ? Colors.black.withOpacity(0.4)
+                    : Theme.of(context).primaryColor,
+                ),
+              ),
             ],
           ),
         ),

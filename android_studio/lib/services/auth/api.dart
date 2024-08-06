@@ -883,11 +883,13 @@ class Api {
       print(response);
       print('------------------------------------------------------');
       if(response['status'] != null) {
-        status = response['status'];
-      } else if(response['description'] == 'Request not allowed') {
-        status = 'Los datos enviados han sido rechazados por la entidad bancaria. Por favor, revise los datos e inténtelo de nuevo';
+        status = response['status'].toString();
+      } else if(response['error'] != null) {
+        status = response['details']['description'].toString();
+      } else if(response['error_code'] != null) {
+        status = response['error_code'].toString();
       } else {
-        status = response['description'];
+        status = response['non-existing-field-just-to-throw-an-error'];
       }
       return status;
     } catch(error) {

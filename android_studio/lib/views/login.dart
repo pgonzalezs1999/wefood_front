@@ -24,6 +24,13 @@ class _LoginState extends State<Login> {
   String username = '';
   String password = '';
 
+  void _navigateToRecoverPassword() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ChangePasswordAskScreen()),
+    );
+  }
+
   void _navigateToRegisterUser() {
     Navigator.push(
       context,
@@ -69,7 +76,7 @@ class _LoginState extends State<Login> {
       bodyCrossAxisAlignment: CrossAxisAlignment.center,
       body: [
         SizedBox(
-          height: MediaQuery.of(context).size.height * 0.333,
+          height: MediaQuery.of(context).size.height * 0.25,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -92,9 +99,8 @@ class _LoginState extends State<Login> {
           margin: EdgeInsets.symmetric(
             vertical: MediaQuery.of(context).size.height * 0.025,
           ),
-          child: Wrap(
-            runSpacing: MediaQuery.of(context).size.height * 0.025,
-            children: <WefoodInput>[
+          child: Column(
+            children: <Widget>[
               WefoodInput(
                 labelText: 'Nombre de usuario o email',
                 onChanged: (value) {
@@ -102,6 +108,9 @@ class _LoginState extends State<Login> {
                     username = value;
                   });
                 },
+              ),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.025,
               ),
               WefoodInput(
                 labelText: 'Contraseña',
@@ -112,6 +121,15 @@ class _LoginState extends State<Login> {
                   });
                 },
               ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                    onPressed: () {
+                      _navigateToRecoverPassword();
+                    },
+                    child: const Text('¿Contraseña olvidada?')
+                ),
+              )
             ],
           ),
         ),

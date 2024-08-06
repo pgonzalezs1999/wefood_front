@@ -36,41 +36,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
   int expirationYear = 0;
   int securityCode = 0;
 
-  void _showCenterMessage(String message) {
-    final overlay = Overlay.of(context);
-    final overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        left: 0,
-        right: 0,
-        top: MediaQuery.of(context).size.height * 0.75,
-        child: Center(
-          child: Material(
-            color: Colors.transparent,
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 100),
-              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.5),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                message,
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white, fontSize: 16),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-
-    overlay.insert(overlayEntry);
-
-    Future.delayed(const Duration(seconds: 2), () {
-      overlayEntry.remove();
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -135,7 +100,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   const SizedBox(
                     height: 20,
                   ),
-                  Row(
+                  /* Row(
                     children: <Widget>[
                       Expanded(
                         child: PaymentOptionCard(
@@ -162,7 +127,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         ),
                       ),
                     ],
-                  ),
+                  ), */
                   SizedBox(
                     height: MediaQuery.of(context).size.height * 0.02,
                   ),
@@ -172,6 +137,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       horizontal: MediaQuery.of(context).size.width * 0.05,
                     ),
                     decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: const Color(0xFFD7D7D6),
@@ -447,7 +413,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                               setState(() {
                                 error = 'Año de expiración no válido';
                               });
-                            } else if(securityCode < 0 || securityCode > 999) {
+                            } else if(securityCode < 0 || securityCode > 9999) {
                               setState(() {
                                 error = 'Código de seguridad no válido';
                               });
@@ -484,18 +450,29 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                         }
                                       );
                                     } else {
-                                      error = status;
+                                      Navigator.pop(context);
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return WefoodPopup(
+                                            context: context,
+                                            title: 'La entidad bancaria ha rechazado el pago',
+                                            cancelButtonTitle: 'OK',
+                                          );
+                                        }
+                                      );
                                     }
                                   });
                                 },
                                 onError: (error) {
+                                  Navigator.pop(context);
                                   showDialog(
                                     context: context,
                                     builder: (BuildContext context) {
                                       return WefoodPopup(
                                         context: context,
-                                        title: 'Ha ocurrido un error',
-                                        description: '$error',
+                                        title: 'Ha ocurrido un error al realizar el pago',
+                                        description: 'Por favor, inténtelo de nuevo más tarde: $error',
                                         cancelButtonTitle: 'OK',
                                       );
                                     }
