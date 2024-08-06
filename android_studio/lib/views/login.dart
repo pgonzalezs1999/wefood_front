@@ -103,6 +103,7 @@ class _LoginState extends State<Login> {
             children: <Widget>[
               WefoodInput(
                 labelText: 'Nombre de usuario o email',
+                type: InputType.email,
                 onChanged: (value) {
                   setState(() {
                     username = value;

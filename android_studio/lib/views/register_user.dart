@@ -211,6 +211,7 @@ class _RegisterUserState extends State<RegisterUser> {
               ),
               WefoodInput(
                 labelText: 'Correo electrónico',
+                type: InputType.email,
                 onChanged: (value) => _handleEmailChange(value),
                 feedbackWidget: (searchingEmailAvailability == LoadingStatus.loading)
                 ? const ReducedLoadingIcon()

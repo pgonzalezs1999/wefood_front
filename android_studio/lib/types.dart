@@ -18,6 +18,7 @@ enum InputType {
   integer,
   decimal,
   date,
+  email,
 }
 
 enum HttpType {

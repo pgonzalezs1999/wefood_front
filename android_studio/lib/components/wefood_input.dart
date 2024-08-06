@@ -59,6 +59,19 @@ class WefoodInputState extends State<WefoodInput> {
     );
   }
 
+  TextInputType _chooseKeyboardType(InputType inputType) {
+    switch(inputType) {
+      case InputType.integer:
+        return TextInputType.number;
+      case InputType.decimal:
+        return TextInputType.number;
+      case InputType.email:
+        return TextInputType.emailAddress;
+      default:
+        return TextInputType.visiblePassword;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -81,7 +94,7 @@ class WefoodInputState extends State<WefoodInput> {
           height: 10,
         ),
         TextFormField(
-          keyboardType: (widget.type == InputType.integer || widget.type == InputType.decimal) ? TextInputType.number : TextInputType.visiblePassword,
+          keyboardType: _chooseKeyboardType(widget.type),
           textInputAction: TextInputAction.next,
           inputFormatters: (_inputFormatter != null) ? [ _inputFormatter! ] : null,
           obscureText: _obscureText,

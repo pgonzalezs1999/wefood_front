@@ -261,6 +261,7 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
               upperTitle: '¿A qué email pueden contactar sus clientes?',
               upperDescription: 'Será también el que use para iniciar sesión',
               labelText: 'Correo electrónico',
+              type: InputType.email,
               onChanged: (value) => _handleEmailChange(value),
               feedbackWidget: (searchingEmailAvailability == LoadingStatus.loading)
                 ? const ReducedLoadingIcon()
