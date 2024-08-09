@@ -139,11 +139,14 @@ class _ItemButtonState extends State<ItemButton> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: <Text>[
-                                  Text('${Utils.productTypeCharToString(
+                                  Text('${(widget.productExpanded.item.date != null)
+                                      ? (widget.productExpanded.item.date!.day == DateTime.now().day) ? 'Hoy' : 'Mañana'
+                                      : ''
+                                    } - ${Utils.productTypeCharToString(
                                     type: widget.productExpanded.product.type,
+                                    isPlural: false,
                                     isCapitalized: true,
                                   )} de'),
-                                  if(widget.productExpanded.item.date != null) Text((widget.productExpanded.item.date!.day == DateTime.now().day) ? '(hoy)' : '(mañana)'),
                                 ],
                               ),
                               Text(

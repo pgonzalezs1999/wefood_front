@@ -12,7 +12,10 @@ import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/views/views.dart';
 
 class Home extends StatefulWidget {
-  const Home({super.key});
+
+  const Home({
+    super.key
+  });
 
   @override
   State<Home> createState() => _HomeState();

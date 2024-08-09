@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -5,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/models/models.dart';
+import 'package:wefood/services/app_links/app_links_subscription.dart';
 import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/views/views.dart';
@@ -37,8 +39,48 @@ class BlocsProvider extends StatelessWidget {
   }
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+
+  void _navigateToChangePasswordSetScreen({
+    required Uri appLink,
+  }) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => ChangePasswordSetScreen(
+        appLink: appLink,
+      )),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    AppLinksSubscription.setOnAppLinkReceivedCallback((uri) {
+      _handleAppLink(uri);
+    });
+    AppLinksSubscription.start();
+  }
+
+  void _handleAppLink(Uri uri) {
+    if(uri.path.contains('changePassword')) {
+      _navigateToChangePasswordSetScreen(
+        appLink: uri,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    AppLinksSubscription.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -128,6 +170,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
+      debugShowCheckedModeBanner: false,
       home: const MyHomePage(title: 'Inicio'),
     );
   }
@@ -147,7 +190,9 @@ class _MyHomePageState extends State<MyHomePage> {
   void _navigateToLogin() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const Login()),
+      MaterialPageRoute(builder: (context) => Login(
+        appLink: AppLinksSubscription.getUri(),
+      )),
     );
   }
 
@@ -159,6 +204,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _getAccessToken() {
+    debugPrint('ENTRA EN GET_ACCESS_TOKEN');
     UserSecureStorage().read(key: 'accessToken').then((String? accessToken) {
       UserSecureStorage().readDateTime(key: 'accessTokenExpiresAt').then((DateTime? expiresAt) {
         UserSecureStorage().read(key: 'username').then((String? username) {

@@ -5,13 +5,20 @@ import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
 import 'package:wefood/models/models.dart';
+import 'package:wefood/services/app_links/app_links_subscription.dart';
 import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/types.dart';
 import 'package:wefood/views/views.dart';
 
 class Login extends StatefulWidget {
-  const Login({super.key});
+
+  final Uri? appLink;
+
+  const Login({
+    super.key,
+    this.appLink,
+  });
 
   @override
   State<Login> createState() => _LoginState();
@@ -24,7 +31,7 @@ class _LoginState extends State<Login> {
   String username = '';
   String password = '';
 
-  void _navigateToRecoverPassword() {
+  void _navigateToChangePasswordAskScreen() {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const ChangePasswordAskScreen()),
@@ -52,11 +59,18 @@ class _LoginState extends State<Login> {
     );
   }
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _popUntilFirst();
+  void _navigateToChangePasswordSetScreen({
+    required Uri appLink,
+  }) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => ChangePasswordSetScreen(
+        appLink: appLink,
+      )),
+    ).whenComplete(() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _popUntilFirst();
+      });
     });
   }
 
@@ -67,6 +81,33 @@ class _LoginState extends State<Login> {
         _popUntilFirst();
       });
     }
+  }
+
+  @override
+  void initState() {
+    debugPrint('HA LLEGADO A LOGIN()');
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _popUntilFirst();
+    });
+    super.initState();
+    AppLinksSubscription.setOnAppLinkReceivedCallback((uri) {
+      _handleAppLink(uri);
+    });
+    AppLinksSubscription.start();
+  }
+
+  void _handleAppLink(Uri uri) {
+    if(uri.path.contains('changePassword')) {
+      _navigateToChangePasswordSetScreen(
+        appLink: uri,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    AppLinksSubscription.cancel();
+    super.dispose();
   }
 
   @override
@@ -96,8 +137,8 @@ class _LoginState extends State<Login> {
           ),
         ) ,
         Container(
-          margin: EdgeInsets.symmetric(
-            vertical: MediaQuery.of(context).size.height * 0.025,
+          margin: EdgeInsets.only(
+            bottom: MediaQuery.of(context).size.height * 0.025,
           ),
           child: Column(
             children: <Widget>[
@@ -126,11 +167,11 @@ class _LoginState extends State<Login> {
                 alignment: Alignment.centerRight,
                 child: TextButton(
                     onPressed: () {
-                      _navigateToRecoverPassword();
+                      _navigateToChangePasswordAskScreen();
                     },
                     child: const Text('¿Contraseña olvidada?')
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -207,8 +248,8 @@ class _LoginState extends State<Login> {
         if(authenticating != LoadingStatus.loading && (username == '' || password == '')) const BlockedButton(
           text: 'INICIAR SESIÓN',
         ),
-        const SizedBox(
-          height: 50,
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.05,
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,

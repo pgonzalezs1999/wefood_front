@@ -456,7 +456,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                         builder: (BuildContext context) {
                                           return WefoodPopup(
                                             context: context,
-                                            title: 'La entidad bancaria ha rechazado el pago',
+                                            title: 'Pago rechazado',
                                             cancelButtonTitle: 'OK',
                                           );
                                         }

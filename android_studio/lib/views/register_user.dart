@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/models/models.dart';
+import 'package:wefood/services/app_links/app_links_subscription.dart';
 import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/types.dart';
@@ -160,6 +161,47 @@ class _RegisterUserState extends State<RegisterUser> {
       });
     }
     return result;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    AppLinksSubscription.setOnAppLinkReceivedCallback((uri) {
+      _handleAppLink(uri);
+    });
+    AppLinksSubscription.start();
+  }
+
+  void _handleAppLink(Uri uri) {
+    if(uri.path.contains('changePassword')) {
+      _navigateToChangePasswordSetScreen(
+        appLink: uri,
+      );
+    }
+  }
+
+  void _navigateToChangePasswordSetScreen({
+    required Uri appLink,
+  }) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => ChangePasswordSetScreen(
+        appLink: appLink,
+      )),
+    ).whenComplete(() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _popUntilFirst();
+      });
+    });
+  }
+
+  void _popUntilFirst() {
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _popUntilFirst();
+      });
+    }
   }
 
   @override

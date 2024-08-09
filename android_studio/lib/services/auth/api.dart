@@ -879,9 +879,6 @@ class Api {
         },
       );
       String status = '';
-      print('------------ RESPONSE DEL API.PAYMENT: ---------------');
-      print(response);
-      print('------------------------------------------------------');
       if(response['status'] != null) {
         status = response['status'].toString();
       } else if(response['error'] != null) {
@@ -919,6 +916,44 @@ class Api {
       print(response['retributions']);
       List<RetributionModel> result = (response['retributions'] as List<dynamic>).map((ret) => RetributionModel.fromJson(ret)).toList();
       return result;
+    } catch(error) { rethrow; }
+  }
+
+  static Future<String> emailChangePassword({
+    required String part1,
+    required String part2,
+    required String part3,
+  }) async {
+    try {
+      final response = await Middleware.endpoint(
+        name: 'emailChangePassword/$part1/$part2/$part3',
+        type: HttpType.get,
+        needsAccessToken: false,
+      );
+      return response['message'];
+    } catch(error) { rethrow; }
+  }
+
+  static Future<String> updatePassword({
+    required String id,
+    required String verificationCode,
+    required String password,
+  }) async {
+    try {
+      final response = await Middleware.endpoint(
+        name: 'updatePassword',
+        type: HttpType.post,
+        needsAccessToken: false,
+        body: {
+          'id': id.toString(),
+          'verification_code': verificationCode.toString(),
+          'password': password.toString(),
+        },
+      );
+      print('----------------------------------------------');
+      print('RESPONSE DEL API.UPDATE_PASSWORD: $response');
+      print('----------------------------------------------');
+      return response['message'];
     } catch(error) { rethrow; }
   }
 }
