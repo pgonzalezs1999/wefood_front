@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/wefood.iml" filepath="$PROJECT_DIR$/.idea/wefood.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/wefood_front_2.iml" filepath="$PROJECT_DIR$/.idea/wefood_front_2.iml" />
     </modules>
   </component>
 </project>
