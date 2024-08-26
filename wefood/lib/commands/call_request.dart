@@ -26,7 +26,7 @@ callRequestWithLoading({
           return WefoodPopup(
             context: context,
             title: 'Ha ocurrido un error',
-            description: 'Por favor, inténtelo de nuevo más tarde. Si el error persiste, contacte con soporte.\n\n$error',
+            description: 'Por favor, inténtelo de nuevo más tarde. Si el error persiste, contacte con soporte.\n\n', // $error',
             cancelButtonTitle: 'OK',
           );
         }

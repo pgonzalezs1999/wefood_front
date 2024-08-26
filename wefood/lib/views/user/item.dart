@@ -2,6 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 // import 'package:maps_launcher/maps_launcher.dart';
 import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/commands/call_request.dart';
@@ -407,8 +408,23 @@ class _ItemState extends State<Item> {
                           padding: const EdgeInsets.all(10),
                           child: GestureDetector(
                             child: const Icon(Icons.location_pin),
-                            onTap: () {
-                              // MapsLauncher.launchQuery(info!.business.directions ?? '');
+                            onTap: () async {
+                              String address = 'Calle Sierra de Ronda 1, escalera 7 bajo B';
+                              final Uri url = Uri.parse('https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(address)}');
+                              if(await canLaunchUrl(url)) {
+                                await launchUrl(url);
+                              } else {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return WefoodPopup(
+                                      context: context,
+                                      title: 'No se ha podido abrir Google Maps',
+                                      cancelButtonTitle: 'OK',
+                                    );
+                                  }
+                                );
+                              }
                             },
                           ),
                         ),

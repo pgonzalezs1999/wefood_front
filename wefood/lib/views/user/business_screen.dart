@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wefood/blocs/blocs.dart';
-// import 'package:maps_launcher/maps_launcher.dart';
 import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
@@ -124,9 +123,9 @@ class _BusinessScreenState extends State<BusinessScreen> {
             Stack(
               children: <Widget>[
                 Container(
-                  height: MediaQuery.of(context).size.height * 0.25,
+                  height: MediaQuery.of(context).size.width,
                   padding: (profileImageRoute != null) ? null : EdgeInsets.symmetric(
-                      horizontal: MediaQuery.of(context).size.width * 0.1
+                    horizontal: MediaQuery.of(context).size.width * 0.1
                   ),
                   child: (profileImageRoute != null)
                     ? ImageWithLoader.network(
@@ -154,7 +153,7 @@ class _BusinessScreenState extends State<BusinessScreen> {
                       padding: EdgeInsets.only(
                         top: MediaQuery.of(context).viewPadding.top,
                       ),
-                      height: MediaQuery.of(context).size.height * 0.25,
+                      height: MediaQuery.of(context).size.width,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[

@@ -43,10 +43,12 @@ class _UserExploreState extends State<UserExplore> {
       Permission.location.request().then((PermissionStatus permissionStatus) {
         if (permissionStatus.isGranted) {
           Geolocator.getCurrentPosition(
-            desiredAccuracy: LocationAccuracy.best,
+            locationSettings: const LocationSettings(
+              accuracy: LocationAccuracy.best,
+            ),
           ).then((Position position) {
             context.read<UserLocationCubit>().set(
-                location: LatLng(position.latitude, position.longitude)
+              location: LatLng(position.latitude, position.longitude)
             );
             setState(() {
               userLocation = LatLng(position.latitude, position.longitude);
@@ -99,6 +101,7 @@ class _UserExploreState extends State<UserExplore> {
             });
           } else {
             setState(() {
+            context.read<RecommendedItemsCubit>().set(items);
               recommendedList = Column(
                 children: context.read<RecommendedItemsCubit>().state.map((ProductExpandedModel product) => ItemButton(
                   productExpanded: product,
@@ -108,7 +111,6 @@ class _UserExploreState extends State<UserExplore> {
                 )).toList(),
               );
             });
-            context.read<RecommendedItemsCubit>().set(items);
           }
         });
       }
@@ -130,7 +132,7 @@ class _UserExploreState extends State<UserExplore> {
         Api.getNearbyItems(
           longitude: userLocation.longitude,
           latitude: userLocation.latitude,
-        ).then((List<ProductExpandedModel> items){
+        ).then((List<ProductExpandedModel> items) {
           if(items.isEmpty) {
             setState(() {
               nearbyList = Align(
@@ -154,23 +156,38 @@ class _UserExploreState extends State<UserExplore> {
             setState(() {
               context.read<NearbyItemsCubit>().set(items);
             });
+            setState(() {
+              nearbyList = SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: context.read<NearbyItemsCubit>().state.map((ProductExpandedModel i) => ItemButton(
+                    horizontalScroll: true,
+                    productExpanded: i,
+                    comebackBehaviour: () async {
+                      await _retrieveFavourites();
+                    },
+                  )).toList(),
+                ),
+              );
+            });
           }
         });
+      } else {
+        setState(() {
+          nearbyList = SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: context.read<NearbyItemsCubit>().state.map((ProductExpandedModel i) => ItemButton(
+                horizontalScroll: true,
+                productExpanded: i,
+                comebackBehaviour: () async {
+                  await _retrieveFavourites();
+                },
+              )).toList(),
+            ),
+          );
+        });
       }
-      setState(() {
-        nearbyList = SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: context.read<NearbyItemsCubit>().state.map((ProductExpandedModel i) => ItemButton(
-              horizontalScroll: true,
-              productExpanded: i,
-              comebackBehaviour: () async {
-                await _retrieveFavourites();
-              },
-            )).toList(),
-          ),
-        );
-      });
     } catch(error) {
       setState(() {
         nearbyList = Container(

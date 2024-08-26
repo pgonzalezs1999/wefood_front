@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/components/components.dart';
@@ -222,8 +223,8 @@ class _SearchFiltersState extends State<SearchFilters> {
                     request: () async {
                       Filters filters = context.read<SearchFiltersCubit>().state;
                       return await Api.searchItemsByFilters(
-                        longitude: -77, // TODO deshardcodear
-                        latitude: -12.5, // TODO deshardcodear
+                        longitude: context.read<UserLocationCubit>().state?.longitude ?? -77,
+                        latitude: context.read<UserLocationCubit>().state?.latitude ?? -77,
                         distance: 99999, // TODO deshardcodear
                         filters: filters,
                       );

@@ -215,6 +215,9 @@ class Api {
             'latitude': latitude.toString(),
           }
       );
+      print('---------------------------------------------------------');
+      print('RESPONSE DEL API.RECOMMENDED: $response');
+      print('---------------------------------------------------------');
       List<ProductExpandedModel> products = (response['items'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();
       return products;
     } catch(error) { rethrow; }
@@ -913,7 +916,6 @@ class Api {
         name: 'getRetributionsFromBusiness/$id',
         type: HttpType.get,
       );
-      print(response['retributions']);
       List<RetributionModel> result = (response['retributions'] as List<dynamic>).map((ret) => RetributionModel.fromJson(ret)).toList();
       return result;
     } catch(error) { rethrow; }
