@@ -215,9 +215,6 @@ class Api {
             'latitude': latitude.toString(),
           }
       );
-      print('---------------------------------------------------------');
-      print('RESPONSE DEL API.RECOMMENDED: $response');
-      print('---------------------------------------------------------');
       List<ProductExpandedModel> products = (response['items'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();
       return products;
     } catch(error) { rethrow; }
@@ -865,6 +862,7 @@ class Api {
     required int expirationYear,
     required int expirationMonth,
     required int cvv2,
+    required String deviceSessionId,
   }) async {
     try {
       dynamic response = await Middleware.endpoint(
@@ -879,8 +877,12 @@ class Api {
           'cvv2': cvv2.toString(),
           'id_item': idItem.toString(),
           'amount': amount.toString(),
+          'device_session_id': deviceSessionId,
         },
       );
+      print('--------------------------------------------------------');
+      print('RESPONSE DEL API.OPENPAY_PAYMENT: $response');
+      print('--------------------------------------------------------');
       String status = '';
       if(response['status'] != null) {
         status = response['status'].toString();
@@ -952,9 +954,6 @@ class Api {
           'password': password.toString(),
         },
       );
-      print('----------------------------------------------');
-      print('RESPONSE DEL API.UPDATE_PASSWORD: $response');
-      print('----------------------------------------------');
       return response['message'];
     } catch(error) { rethrow; }
   }

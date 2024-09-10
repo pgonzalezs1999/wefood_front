@@ -10,5 +10,8 @@ class Environment {
   static const String supportPhone = '+51912051667';
   static const String supportEmail = 'info@wefoodcompany.com';
 
+  static const String openpayMerchantId = 'mg1ippvpuekjrkszeuxc';
+  static const String openpayPublicKey = 'pk_540273ba143943b999db84f432e85aa3';
+
   static const double minimumPrice = 5;
 }

@@ -4,8 +4,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/commands/scroll_to_bottom.dart';
 import 'package:wefood/components/components.dart';
+import 'package:wefood/environment.dart';
 import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/types.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class PaymentScreen extends StatefulWidget {
 
@@ -26,6 +28,9 @@ class PaymentScreen extends StatefulWidget {
 
 class _PaymentScreenState extends State<PaymentScreen> {
 
+  String deviceSessionId = "";
+  late final WebViewController _controller = WebViewController();
+
   final ScrollController scrollController = ScrollController();
   PaymentOption chosenOption = PaymentOption.creditCard;
   String error = '';
@@ -35,6 +40,61 @@ class _PaymentScreenState extends State<PaymentScreen> {
   int expirationMonth = 0;
   int expirationYear = 0;
   int securityCode = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeWebView();
+  }
+
+  void _initializeWebView() {
+    _controller.setJavaScriptMode(JavaScriptMode.unrestricted);
+    _controller.setNavigationDelegate(
+      NavigationDelegate(
+        onPageFinished: (String url) {
+          _controller.runJavaScriptReturningResult('''
+            OpenPay.setId('mg1ippvpuekjrkszeuxc');
+            OpenPay.setApiKey('pk_540273ba143943b999db84f432e85aa3');
+            OpenPay.setSandboxMode(false);
+            var deviceDataId = OpenPay.deviceData.setup();
+            deviceDataId;
+          ''').then((result) {
+            setState(() {
+              deviceSessionId = result.toString().replaceAll('"', '');
+              print('EL NUEVO DEVICE_SESSION_ID ES: $deviceSessionId');
+            });
+          });
+        },
+      ),
+    );
+    _controller.loadRequest(
+      Uri.dataFromString(
+        '''
+          <!DOCTYPE html>
+          <html lang="es">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Obtener Device Session ID</title>
+            <script type="text/javascript" src="https://resources.openpay.mx/lib/openpay-js/1.2.38/openpay.v1.min.js"></script>
+            <script type="text/javascript" src="https://resources.openpay.mx/lib/openpay-data-js/1.2.38/openpay-data.v1.min.js"></script>
+          </head>
+          <body>
+            <p id="deviceSessionId">Cargando...</p>
+            <script type="text/javascript">
+              OpenPay.setId('${Environment.openpayMerchantId}');
+              OpenPay.setApiKey('${Environment.openpayPublicKey}');
+              OpenPay.setSandboxMode(false);
+              var deviceDataId = OpenPay.deviceData.setup();
+              document.getElementById('deviceSessionId').textContent = deviceDataId;
+            </script>
+          </body>
+          </html>
+        ''',
+        mimeType: 'text/html',
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,34 +160,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   const SizedBox(
                     height: 20,
                   ),
-                  /* Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: PaymentOptionCard(
-                          title: 'Tarjeta de crédito o débito',
-                          image: 'assets/images/openpay/tarjeta.svg',
-                          option: PaymentOption.creditCard,
-                          isSelected: chosenOption == PaymentOption.creditCard,
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 20,
-                      ),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            _showCenterMessage('Esta funcionalidad aún no está disponible');
-                          },
-                          child: PaymentOptionCard(
-                            title: 'Pago digital a través de la App o Web de tu banco',
-                            image: 'assets/images/openpay/digital.svg',
-                            option: PaymentOption.bankApp,
-                            isSelected: chosenOption == PaymentOption.bankApp,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ), */
                   SizedBox(
                     height: MediaQuery.of(context).size.height * 0.02,
                   ),
@@ -430,6 +462,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                     expirationMonth: expirationMonth,
                                     expirationYear: expirationYear,
                                     cvv2: securityCode,
+                                    deviceSessionId: deviceSessionId,
                                   );
                                 },
                                 onSuccess: (String status) {
@@ -490,65 +523,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     ),
                   ),
                 ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class PaymentOptionCard extends StatefulWidget {
-
-  final String title;
-  final String image;
-  final PaymentOption option;
-  final bool isSelected;
-
-  const PaymentOptionCard({
-    required this.title,
-    required this.image,
-    required this.option,
-    this.isSelected = false,
-    super.key,
-  });
-
-  @override
-  State<PaymentOptionCard> createState() => _PaymentOptionCardState();
-}
-
-class _PaymentOptionCardState extends State<PaymentOptionCard> {
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      color: const Color(0xFFE9F7FF),
-      child: Container(
-        padding: const EdgeInsets.all(30),
-        decoration: widget.isSelected == false ? null : BoxDecoration(
-          border: Border.all(
-            color: const Color(0xFF004181),
-            width: 4,
-          ),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Column(
-          children: <Widget>[
-            SvgPicture.asset(
-              widget.image,
-              height: MediaQuery.of(context).size.width * 0.2,
-              width: MediaQuery.of(context).size.width * 0.2,
-            ),
-            const SizedBox(
-              height: 30,
-            ),
-            Text(
-              widget.title,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 12,
-                color: Color(0xFF004181),
-                fontWeight: FontWeight.w900,
               ),
             ),
           ],
