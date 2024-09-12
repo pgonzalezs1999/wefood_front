@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:wefood/commands/clear_data.dart';
 import 'package:wefood/commands/utils.dart';
+import 'package:wefood/environment.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/middleware.dart';
 import 'package:wefood/types.dart';
@@ -955,6 +956,17 @@ class Api {
         },
       );
       return response['message'];
+    } catch(error) { rethrow; }
+  }
+
+  static Future<int> checkForUpdates() async {
+    try {
+      final response = await Middleware.endpoint(
+        name: 'checkForUpdates/${Environment.appVersion}',
+        type: HttpType.get,
+        needsAccessToken: false,
+      ); // 0 = error; 1 = OK; 2 = optional update; 3 = needed update
+      return int.tryParse(response['message']) ?? 0;
     } catch(error) { rethrow; }
   }
 }

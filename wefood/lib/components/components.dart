@@ -27,3 +27,7 @@ export 'package:wefood/components/print_stars.dart';
 export 'package:wefood/components/blocked_button.dart';
 export 'package:wefood/components/wefood_loading_popup.dart';
 export 'package:wefood/components/retribution.dart';
+
+export 'package:wefood/components/skeletons/skeleton_item_button_list.dart';
+export 'package:wefood/components/skeletons/skeleton_item_button.dart';
+export 'package:wefood/components/skeletons/skeleton_text.dart';

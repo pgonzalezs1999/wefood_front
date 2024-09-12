@@ -1,4 +1,6 @@
 class Environment {
+  static const int appVersion = 1;
+
   static const String serverUrl = 'https://api.wefoodcompany.com';
   static const String apiUrl = '$serverUrl/api/auth/';
   static const String storageUrl = '$serverUrl/storage/';

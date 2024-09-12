@@ -21,8 +21,10 @@ class UserExplore extends StatefulWidget {
 class _UserExploreState extends State<UserExplore> {
 
   LatLng userLocation = const LatLng(-12.5, -77);
-  Widget recommendedList = const LoadingIcon();
-  Widget nearbyList =  const LoadingIcon();
+  Widget recommendedList = const SkeletonItemButtonList();
+  Widget nearbyList =  const SkeletonItemButtonList(
+    horizontalScroll: true,
+  );
   final TextEditingController _searchController = TextEditingController();
   bool errorOnFavourites = false;
 
@@ -381,7 +383,9 @@ class _UserExploreState extends State<UserExplore> {
           margin: const EdgeInsets.only(
             left: 10,
           ),
-          child: const LoadingIcon(),
+          child: const SkeletonItemButtonList(
+            horizontalScroll: true,
+          ),
         ),
         if(errorOnFavourites == true) Container(
           margin: EdgeInsets.symmetric(

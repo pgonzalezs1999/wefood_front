@@ -171,21 +171,29 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
       debugShowCheckedModeBanner: false,
-      home: const MyHomePage(title: 'Inicio'),
+      home: const MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+  const MyHomePage({super.key});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
+  int totalActions = 2;
+  int completedActions = 0;
+  bool optionalUpdateAvailable = false;
+
+  List<String> feedback = [
+    'Comprobando actualizaciones...',
+    'Buscando última sesión...',
+    '¡Listo!',
+  ];
 
   void _navigateToLogin() {
     Navigator.pushReplacement(
@@ -201,6 +209,39 @@ class _MyHomePageState extends State<MyHomePage> {
       context,
       MaterialPageRoute(builder: (context) => const Home()),
     );
+  }
+
+  void _navigateToUpdateRequired() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const UpdateRequired()),
+    );
+  }
+
+  void _checkForUpdates() {
+    Api.checkForUpdates().then((int response) {
+      switch(response) {
+        case 1:
+          setState(() {
+            completedActions++;
+          });
+          _getAccessToken();
+          break;
+        case 2:
+          optionalUpdateAvailable = true;
+          setState(() {
+            completedActions++;
+          });
+          _getAccessToken();
+          break;
+        case 3:
+          _navigateToUpdateRequired();
+        default:
+          // TODO Pantalla de ha ocurrido un error: intentarlo de nuevo
+          // TODO Poner solo un texto que lo explique, y un boton para volver a ejecutar el Main();
+          break;
+      }
+    });
   }
 
   void _getAccessToken() {
@@ -262,11 +303,43 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    _getAccessToken();
+    _checkForUpdates();
   }
 
   @override
   Widget build(BuildContext context) {
-    return const LoadingScreen();
+    return Scaffold(
+      body: Center(
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width * 0.8,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Image.asset(
+                'assets/images/logo.png',
+                fit: BoxFit.fitWidth,
+                width: MediaQuery.of(context).size.width * 0.5,
+              ),
+              const SizedBox(
+                height: 50,
+              ),
+              Text(
+                feedback[completedActions],
+              ),
+              const SizedBox(
+                height: 15,
+              ),
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.75,
+                child: LinearProgressIndicator(
+                  value: completedActions / totalActions,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
