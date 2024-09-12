@@ -1,7 +1,7 @@
-import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/components/components.dart';
@@ -133,108 +133,103 @@ class _BusinessScreenState extends State<BusinessScreen> {
                       width: MediaQuery.of(context).size.width,
                       fit: BoxFit.cover,
                     )
-                    : Opacity(
-                      opacity: 0.15,
-                      child: Image.asset(
-                        'assets/images/logo.png',
-                        width: MediaQuery.of(context).size.width,
-                        fit: BoxFit.contain,
+                    : Center(
+                      child: Opacity(
+                        opacity: 0.15,
+                        child: Icon(
+                          Icons.business,
+                          size: MediaQuery.of(context).size.width * 0.25,
+                        ),
                       ),
-                  ),
+                    ),
                 ),
                 ClipRect(
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(
-                      sigmaX: (profileImageRoute != null) ? 0 : 2,
-                      sigmaY: (profileImageRoute != null) ? 0 : 2,
+                  child: Container(
+                    color: (profileImageRoute != null) ? null : Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                    padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).viewPadding.top,
                     ),
-                    child: Container(
-                      color: (profileImageRoute != null) ? null : Theme.of(context).colorScheme.primary.withOpacity(0.25),
-                      padding: EdgeInsets.only(
-                        top: MediaQuery.of(context).viewPadding.top,
-                      ),
-                      height: MediaQuery.of(context).size.width,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              const BackArrow(
-                                whiteBackground: true,
-                              ),
-                              GestureDetector(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(999),
-                                    color: const Color.fromRGBO(255, 255, 255, 0.8),
-                                  ),
-                                  margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
-                                  padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
-                                  child: (loadingFavourite == LoadingStatus.loading)
-                                    ? ReducedLoadingIcon(
-                                      customMargin: MediaQuery.of(context).size.width * 0.016,
-                                    )
-                                    : (widget.businessExpanded.isFavourite == true)
-                                      ? const Icon(Icons.favorite)
-                                      : const Icon(Icons.favorite_outline),
+                    height: MediaQuery.of(context).size.width,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            const BackArrow(
+                              whiteBackground: true,
+                            ),
+                            GestureDetector(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(999),
+                                  color: const Color.fromRGBO(255, 255, 255, 0.8),
                                 ),
-                                onTap: () async {
-                                  if(loadingFavourite != LoadingStatus.loading) {
-                                    setState(() {
-                                      loadingFavourite = LoadingStatus.loading;
-                                    });
-                                    try {
-                                      if(widget.businessExpanded.isFavourite == true) {
-                                        Api.removeFavourite(idBusiness: widget.businessExpanded.business.id!).then((_) {
-                                          setState(() {
-                                            context.read<FavouriteItemsCubit>().needsRefresh = true;
-                                            loadingFavourite = LoadingStatus.successful;
-                                            widget.businessExpanded.isFavourite = false;
-                                          });
+                                margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
+                                padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
+                                child: (loadingFavourite == LoadingStatus.loading)
+                                  ? ReducedLoadingIcon(
+                                    customMargin: MediaQuery.of(context).size.width * 0.016,
+                                  )
+                                  : (widget.businessExpanded.isFavourite == true)
+                                    ? const Icon(Icons.favorite)
+                                    : const Icon(Icons.favorite_outline),
+                              ),
+                              onTap: () async {
+                                if(loadingFavourite != LoadingStatus.loading) {
+                                  setState(() {
+                                    loadingFavourite = LoadingStatus.loading;
+                                  });
+                                  try {
+                                    if(widget.businessExpanded.isFavourite == true) {
+                                      Api.removeFavourite(idBusiness: widget.businessExpanded.business.id!).then((_) {
+                                        setState(() {
+                                          context.read<FavouriteItemsCubit>().needsRefresh = true;
+                                          loadingFavourite = LoadingStatus.successful;
+                                          widget.businessExpanded.isFavourite = false;
                                         });
-                                      } else {
-                                        Api.addFavourite(idBusiness: widget.businessExpanded.business.id!).then((_) {
-                                          setState(() {
-                                            context.read<FavouriteItemsCubit>().needsRefresh = true;
-                                            loadingFavourite = LoadingStatus.successful;
-                                            widget.businessExpanded.isFavourite = true;
-                                          });
+                                      });
+                                    } else {
+                                      Api.addFavourite(idBusiness: widget.businessExpanded.business.id!).then((_) {
+                                        setState(() {
+                                          context.read<FavouriteItemsCubit>().needsRefresh = true;
+                                          loadingFavourite = LoadingStatus.successful;
+                                          widget.businessExpanded.isFavourite = true;
                                         });
-                                      }
-                                    } catch(e) {
-                                      loadingFavourite = LoadingStatus.error;
+                                      });
                                     }
+                                  } catch(e) {
+                                    loadingFavourite = LoadingStatus.error;
                                   }
-                                },
-                              ),
-                            ],
-                          ),
-                          Container(
-                            decoration: const BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [Colors.transparent, Color.fromRGBO(0, 0, 0, 0.75)],
-                              ),
+                                }
+                              },
                             ),
-                            child: Container(
-                              padding: EdgeInsets.only(
-                                bottom: MediaQuery.of(context).size.height * 0.025,
-                              ),
-                              alignment: Alignment.bottomCenter,
-                              width: double.infinity,
-                              height: MediaQuery.of(context).size.height * 0.1,
-                              child: Text(
-                                widget.businessExpanded.business.name ?? '',
-                                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                  color: Theme.of(context).colorScheme.surface,
-                                )
-                              ),
+                          ],
+                        ),
+                        Container(
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [Colors.transparent, Color.fromRGBO(0, 0, 0, 0.75)],
                             ),
                           ),
-                        ],
-                      ),
+                          child: Container(
+                            padding: EdgeInsets.only(
+                              bottom: MediaQuery.of(context).size.height * 0.025,
+                            ),
+                            alignment: Alignment.bottomCenter,
+                            width: double.infinity,
+                            height: MediaQuery.of(context).size.height * 0.1,
+                            child: Text(
+                              widget.businessExpanded.business.name ?? '',
+                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                color: Theme.of(context).colorScheme.surface,
+                              )
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -314,8 +309,23 @@ class _BusinessScreenState extends State<BusinessScreen> {
                           padding: const EdgeInsets.all(10),
                           child: GestureDetector(
                             child: const Icon(Icons.location_pin),
-                            onTap: () {
-                              // MapsLauncher.launchQuery(widget.businessExpanded.business.directions ?? '');
+                            onTap: () async {
+                              String address = '${widget.businessExpanded.business.directions}';
+                              final Uri url = Uri.parse('https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(address)}');
+                              if(await canLaunchUrl(url)) {
+                                await launchUrl(url);
+                              } else {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return WefoodPopup(
+                                      context: context,
+                                      title: 'No se ha podido abrir Google Maps',
+                                      cancelButtonTitle: 'OK',
+                                    );
+                                  }
+                                );
+                              }
                             },
                           ),
                         ),
