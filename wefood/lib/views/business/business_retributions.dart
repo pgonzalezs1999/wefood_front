@@ -5,6 +5,7 @@ import 'package:wefood/components/components.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/types.dart';
+import 'package:wefood/views/business/business_bank_data.dart';
 
 class BusinessRetributions extends StatefulWidget {
   const BusinessRetributions({super.key});
@@ -40,6 +41,13 @@ class _BusinessRetributionsState extends State<BusinessRetributions> {
         loadingRetributions = LoadingStatus.error;
       });
     });
+  }
+
+  void _navigateToBusinessBankData() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const BusinessBankData()),
+    );
   }
 
   @override
@@ -96,7 +104,7 @@ class _BusinessRetributionsState extends State<BusinessRetributions> {
       ],
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-
+          _navigateToBusinessBankData();
         },
         label: const Text('DATOS BANCARIOS'),
         icon: const Icon(
