@@ -10,7 +10,6 @@ import 'package:wefood/commands/clear_data.dart';
 import 'package:wefood/commands/contact_support.dart';
 import 'package:wefood/commands/share_app.dart';
 import 'package:wefood/components/components.dart';
-import 'package:wefood/main.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/views/views.dart';
@@ -398,6 +397,13 @@ class _BusinessProfileState extends State<BusinessProfile> {
               },
             ),
             SettingsElement(
+              iconData: Icons.credit_card_outlined,
+              title: 'Cobros',
+              onTap: () {
+                _navigateToRetributions();
+              },
+            ),
+            SettingsElement(
               iconData: Icons.share,
               title: 'Comparte la app',
               onTap: () async {
@@ -411,13 +417,6 @@ class _BusinessProfileState extends State<BusinessProfile> {
                 launchContact(
                   context: context,
                 );
-              },
-            ),
-            SettingsElement(
-              iconData: Icons.credit_card_outlined,
-              title: 'Cobros',
-              onTap: () {
-                _navigateToRetributions();
               },
             ),
             SettingsElement(

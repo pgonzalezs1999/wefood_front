@@ -51,6 +51,7 @@ class _BusinessRetributionsState extends State<BusinessRetributions> {
   @override
   Widget build(BuildContext context) {
     return WefoodScreen(
+      bodyCrossAxisAlignment: CrossAxisAlignment.center,
       body: <Widget>[
         const BackUpBar(
           title: 'Cobros',
@@ -89,7 +90,19 @@ class _BusinessRetributionsState extends State<BusinessRetributions> {
             ),
           ),
         ),
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.075,
+        ),
       ],
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+
+        },
+        label: const Text('DATOS BANCARIOS'),
+        icon: const Icon(
+          Icons.credit_card,
+        ),
+      ),
     );
   }
 }
