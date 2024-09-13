@@ -173,14 +173,15 @@ class _BusinessProfileState extends State<BusinessProfile> {
     if(context.read<UserInfoCubit>().state.business.id == null) {
       Api.getSessionBusiness().then((BusinessExpandedModel data) {
         setState(() {
+          context.read<UserInfoCubit>().setBusiness(data.business);
           context.read<UserInfoCubit>().setBusinessName(data.business.name);
           context.read<UserInfoCubit>().setBusinessDescription(data.business.description);
           context.read<UserInfoCubit>().setBusinessDirections(data.business.directions);
           context.read<UserInfoCubit>().setBusinessLatLng(
-              LatLng(
-                data.business.latitude ?? 0,
-                data.business.longitude ?? 0,
-              )
+            LatLng(
+              data.business.latitude ?? 0,
+              data.business.longitude ?? 0,
+            )
           );
         });
         setState(() {

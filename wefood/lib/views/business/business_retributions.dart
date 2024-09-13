@@ -53,6 +53,7 @@ class _BusinessRetributionsState extends State<BusinessRetributions> {
   @override
   void initState() {
     _retrieveData();
+    BusinessModel.printInfo(context.read<UserInfoCubit>().state.business);
     super.initState();
   }
 

@@ -72,6 +72,22 @@ class UserInfoCubit extends Cubit<BusinessExpandedModel> {
     emit(updatedState);
   }
 
+  void setBankInfo({
+    required String bankName,
+    required String bankAccountType,
+    required String bankAccount,
+    required String bankOwnerName,
+    required String interbankAccount,
+  }) {
+    BusinessExpandedModel updatedState = state;
+    updatedState.business.bankName = bankName;
+    updatedState.business.bankAccountType = bankAccountType;
+    updatedState.business.bankAccount = bankAccount;
+    updatedState.business.bankOwnerName = bankOwnerName;
+    updatedState.business.interbankAccount = interbankAccount;
+    emit(updatedState);
+  }
+
   void delete() {
     emit(BusinessExpandedModel.empty());
   }

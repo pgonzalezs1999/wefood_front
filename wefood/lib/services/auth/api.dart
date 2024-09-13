@@ -969,4 +969,30 @@ class Api {
       return int.tryParse(response['message']) ?? 0;
     } catch(error) { rethrow; }
   }
+
+  static Future<String> updateBankInfo({
+    required int idBusiness,
+    required String bankName,
+    required String bankAccountType,
+    required String bankAccount,
+    required String bankOwnerName,
+    required String interbankAccount,
+  }) async {
+    try {
+      final response = await Middleware.endpoint(
+        name: 'updateBankInfo',
+        type: HttpType.post,
+        body: {
+          'id_business': idBusiness.toString(),
+          'bank_name': bankName.toString(),
+          'bank_account_type': bankAccountType.toString(),
+          'bank_account': bankAccount.toString(),
+          'bank_owner_name': bankOwnerName.toString(),
+          'interbank_account': interbankAccount.toString(),
+        },
+      );
+      print('RESPONSE DEL API_UPDATE_BANK_INFO: $response');
+      return response['message'];
+    } catch(error) { rethrow; }
+  }
 }

@@ -245,4 +245,14 @@ class Utils {
   static String completeImageUrl(String url) {
     return '${Environment.storageUrl}$url';
   }
+
+  static int countCharacterRepetitionsInText(String text, String character) {
+    int resultado = 0;
+    for(int i = 0; i < text.length; i++) {
+      if(text[i] == character) {
+        resultado++;
+      }
+    }
+    return resultado;
+  }
 }
