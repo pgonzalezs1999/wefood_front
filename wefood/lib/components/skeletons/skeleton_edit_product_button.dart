@@ -11,77 +11,89 @@ class SkeletonEditProductButton extends StatefulWidget {
   State<SkeletonEditProductButton> createState() => _SkeletonEditProductButtonState();
 }
 
-class _SkeletonEditProductButtonState extends State<SkeletonEditProductButton> {
+class _SkeletonEditProductButtonState extends State<SkeletonEditProductButton> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<Color?> _colorAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    )..repeat(reverse: true);
+
+    _colorAnimation = ColorTween(
+      begin: Colors.grey[50],
+      end: Colors.grey[200],
+    ).animate(_controller);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 150,
-      width: MediaQuery.of(context).size.width,
-      child: Card(
-        elevation: 3,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: Stack(
-            alignment: Alignment.center,
-            children: <Widget>[
-              /*Container(
-                color: Theme.of(context).colorScheme.surfaceContainer,
-                width: double.infinity,
-                height: 100,
-                // height: double.infinity,
-              ),*/
-              Image.asset(
-                'assets/images/logo.png',
-                fit: BoxFit.fitWidth,
-                width: MediaQuery.of(context).size.width * 0.5,
-              ),
-              Container(
-                color: Colors.white.withOpacity(0.9),
-                width: double.infinity,
-                height: double.infinity,
-              ),
-              ClipRect(
-                child: Container(
-                  height: double.infinity,
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 35,
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return SizedBox(
+          height: 150,
+          width: MediaQuery.of(context).size.width,
+          child: Card(
+            elevation: 3,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Stack(
+                alignment: Alignment.center,
+                children: <Widget>[
+                  Container(
+                    color: _colorAnimation.value,
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      const Expanded(
-                        child: SkeletonText()
+                  ClipRect(
+                    child: Container(
+                      height: double.infinity,
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 35,
                       ),
-                      const SizedBox(
-                        width: 50,
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Theme.of(context).colorScheme.primary,
-                            width: 0.5,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          SkeletonText(
+                            width: MediaQuery.of(context).size.width * 0.333,
                           ),
-                          borderRadius: BorderRadius.circular(9999999),
-                          color: Theme.of(context).colorScheme.surface.withOpacity(0.75),
-                        ),
-                        height: 80,
-                        width: 80,
-                        child: const Icon(
-                          Icons.edit,
-                        ),
+                          Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Theme.of(context).colorScheme.primary,
+                                width: 0.5,
+                              ),
+                              borderRadius: BorderRadius.circular(9999999),
+                              color: Theme.of(context).colorScheme.surface.withOpacity(0.333),
+                            ),
+                            height: 80,
+                            width: 80,
+                            child: const Icon(
+                              Icons.hourglass_empty,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-              )
-            ],
+                    ),
+                  )
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      }
     );
   }
 }

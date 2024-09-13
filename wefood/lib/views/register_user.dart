@@ -46,10 +46,10 @@ class _RegisterUserState extends State<RegisterUser> {
     );
   }
 
-  void _navigateToHome() {
+  void _navigateToMain() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const Home()),
+      MaterialPageRoute(builder: (context) => const MyApp()),
     );
   }
 
@@ -373,7 +373,7 @@ class _RegisterUserState extends State<RegisterUser> {
                         UserSecureStorage().write(key: 'password', value: password);
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => const Home()),
+                          MaterialPageRoute(builder: (context) => const MyApp()),
                         );
                       } else if(authModel.error != null) {
                         setState(() {
@@ -398,7 +398,7 @@ class _RegisterUserState extends State<RegisterUser> {
                         );
                       }
                       authenticating = LoadingStatus.successful;
-                      _navigateToHome();
+                      _navigateToMain();
                     });
                   });
                 }

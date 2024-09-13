@@ -63,7 +63,27 @@ class _BusinessManagementState extends State<BusinessManagement> {
           ),
           child: const Text('Error'),
         ),
-        if(retrievingResumeError == false && isRetrieving == true) const LoadingIcon(),
+        if(retrievingResumeError == false && isRetrieving == true) Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              'Gestionar productos',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const _BusinessManagementTitle(
+              isLoading: true,
+            ),
+            const SkeletonEditProductButton(),
+            const _BusinessManagementTitle(
+              isLoading: true,
+            ),
+            const SkeletonEditProductButton(),
+            const _BusinessManagementTitle(
+              isLoading: true,
+            ),
+            const SkeletonEditProductButton(),
+          ],
+        ),
         if(retrievingResumeError == false && isRetrieving == false) Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -76,49 +96,23 @@ class _BusinessManagementState extends State<BusinessManagement> {
                 top: MediaQuery.of(context).size.height * 0.025,
                 bottom: MediaQuery.of(context).size.height * 0.01,
               ),
-              child: Text(
-                'Skeleton de prueba:',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
             ),
-            const SkeletonEditProductButton(),
-            Container(
-              margin: EdgeInsets.only(
-                top: 20,
-                bottom: MediaQuery.of(context).size.height * 0.01,
-              ),
-              child: Text(
-                'Desayunos:',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
+            const _BusinessManagementTitle(
+              title: 'Desayunos',
             ),
             EditProductButton(
               product: businessBreakfastCubit.state,
               productType: ProductType.breakfast,
             ),
-            Container(
-              margin: EdgeInsets.only(
-                top: MediaQuery.of(context).size.height * 0.025,
-                bottom: MediaQuery.of(context).size.height * 0.01,
-              ),
-              child: Text(
-                'Almuerzos:',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
+            const _BusinessManagementTitle(
+              title: 'Almuerzos',
             ),
             EditProductButton(
               product: businessLunchCubit.state,
               productType: ProductType.lunch,
             ),
-            Container(
-              margin: EdgeInsets.only(
-                top: MediaQuery.of(context).size.height * 0.025,
-                bottom: MediaQuery.of(context).size.height * 0.01,
-              ),
-              child: Text(
-                'Cenas:',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
+            const _BusinessManagementTitle(
+              title: 'Cenas',
             ),
             EditProductButton(
               product: businessDinnerCubit.state,
@@ -139,5 +133,45 @@ class _BusinessManagementState extends State<BusinessManagement> {
         ),
       ],
     );
+  }
+}
+
+class _BusinessManagementTitle extends StatefulWidget {
+
+  final String title;
+  final bool isLoading;
+
+  const _BusinessManagementTitle({
+    super.key,
+    this.title = 'Not set',
+    this.isLoading = false,
+  });
+
+  @override
+  State<_BusinessManagementTitle> createState() => _BusinessManagementTitleState();
+}
+
+class _BusinessManagementTitleState extends State<_BusinessManagementTitle> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(
+        top: MediaQuery.of(context).size.height * 0.025,
+        bottom: MediaQuery.of(context).size.height * 0.01,
+      ),
+      child: (widget.isLoading)
+        ? Container(
+          margin: const EdgeInsets.only(
+            top: 20,
+          ),
+          child: SkeletonText(
+            width: MediaQuery.of(context).size.width * 0.25,
+          ),
+        )
+        : Text(
+          widget.title,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+      );
   }
 }

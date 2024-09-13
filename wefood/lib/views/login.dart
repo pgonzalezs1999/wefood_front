@@ -201,7 +201,7 @@ class _LoginState extends State<Login> {
                   UserSecureStorage().write(key: 'password', value: password);
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => const Home()),
+                    MaterialPageRoute(builder: (context) => const MyApp()),
                   );
                 } else if(authModel.error != null) {
                   setState(() {

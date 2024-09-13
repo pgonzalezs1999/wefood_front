@@ -64,7 +64,7 @@ class _WaitingVerificationState extends State<WaitingVerification> {
                 _timer.cancel();
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const Home()),
+                  MaterialPageRoute(builder: (context) => const MyApp()),
                 );
               });
             }

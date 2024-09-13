@@ -10,17 +10,17 @@ import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/views/views.dart';
 
-class Home extends StatefulWidget {
+class HomeLegacy extends StatefulWidget {
 
-  const Home({
+  const HomeLegacy({
     super.key
   });
 
   @override
-  State<Home> createState() => _HomeState();
+  State<HomeLegacy> createState() => _HomeLegacyState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeLegacyState extends State<HomeLegacy> {
   String? accessToken;
   DateTime? accessTokenExpiresAt;
   int? accessTokenMinutesLeft;
@@ -79,7 +79,7 @@ class _HomeState extends State<Home> {
     super.dispose();
   }
 
-  void _getAccessToken() {
+  void _checkAccessTokenExpiry() {
     UserSecureStorage().read(key: 'accessToken').then((String? token) {
       accessToken = (token != null) ? token : '';
       UserSecureStorage().readDateTime(key: 'accessTokenExpiresAt').then((DateTime? expirationDate) {
@@ -118,7 +118,7 @@ class _HomeState extends State<Home> {
 
   @override
   void initState() {
-    _getAccessToken();
+    _checkAccessTokenExpiry();
     _retrieveDate();
     super.initState();
   }
