@@ -169,7 +169,7 @@ class _BusinessProfileState extends State<BusinessProfile> {
     });
   }
 
-  _retrieveData() {
+  _retrieveBusinessData() {
     if(context.read<UserInfoCubit>().state.business.id == null) {
       Api.getSessionBusiness().then((BusinessExpandedModel data) {
         setState(() {
@@ -183,8 +183,6 @@ class _BusinessProfileState extends State<BusinessProfile> {
               data.business.longitude ?? 0,
             )
           );
-        });
-        setState(() {
           isRetrievingData = false;
         });
       }).onError((error, stackTrace) {
@@ -192,6 +190,10 @@ class _BusinessProfileState extends State<BusinessProfile> {
           isRetrievingData = false;
           retrievingDataError = true;
         });
+      });
+    } else {
+      setState(() {
+        isRetrievingData = false;
       });
     }
   }
@@ -201,7 +203,7 @@ class _BusinessProfileState extends State<BusinessProfile> {
     if(context.read<UserInfoCubit>().state.image == null) {
       _getProfileImage();
     }
-    _retrieveData();
+    _retrieveBusinessData();
     super.initState();
   }
 
@@ -213,6 +215,8 @@ class _BusinessProfileState extends State<BusinessProfile> {
 
   @override
   Widget build(BuildContext context) {
+    print('isRetrievingData: $isRetrievingData');
+    print('retrievingDataError: $retrievingDataError');
     return WefoodNavigationScreen(
       children: [
         Container(
@@ -221,7 +225,56 @@ class _BusinessProfileState extends State<BusinessProfile> {
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
+            children: (isRetrievingData)
+            ? <Widget>[
+              Container(
+                margin: EdgeInsets.only(
+                  right: MediaQuery.of(context).size.width * 0.05,
+                ),
+                child: Container(
+                  padding: EdgeInsets.only(
+                    right: MediaQuery.of(context).size.width * 0.025,
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(1000),
+                    child: SizedBox.fromSize(
+                      size: Size.fromRadius(MediaQuery.of(context).size.width * 0.1),
+                      child: Container(
+                        color: Colors.grey.withOpacity(0.25),
+                        child: Icon(
+                          Icons.person,
+                          size: MediaQuery.of(context).size.width * 0.1,
+                          color: Colors.black.withOpacity(0.5),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  Container(
+                    margin: EdgeInsets.symmetric(
+                      vertical: MediaQuery.of(context).size.width * 0.01,
+                    ),
+                    child: SkeletonText(
+                      width: MediaQuery.of(context).size.width * 0.5,
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.symmetric(
+                      vertical: MediaQuery.of(context).size.width * 0.01,
+                    ),
+                    child: SkeletonText(
+                      width: MediaQuery.of(context).size.width * 0.5,
+                    ),
+                  ),
+                ],
+              ),
+            ]
+            : <Widget>[
               GestureDetector(
                 onTap: () async {
                   showDialog(
@@ -308,7 +361,7 @@ class _BusinessProfileState extends State<BusinessProfile> {
                     ],
                   ),
                 ),
-              ),
+              ), // Profile picture
               if(isRetrievingData == true) const LoadingIcon(),
               if(isRetrievingData == false && retrievingDataError == true) Container(
                 margin: EdgeInsets.symmetric(
@@ -361,25 +414,40 @@ class _BusinessProfileState extends State<BusinessProfile> {
           ),
         ),
         Column(
+          mainAxisSize: MainAxisSize.max,
           children: <Widget>[
-            GestureDetector(
-              onTap: () async {
-                _navigateToBusinessEditDirections();
-              },
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text('Ubicación: ${context.read<UserInfoCubit>().state.business.directions}'),
+            (isRetrievingData == true)
+              ? Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  SkeletonText(
+                    width: MediaQuery.of(context).size.width * 0.75,
                   ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  const Icon(
-                    Icons.edit
+                  SkeletonText(
+                    width: MediaQuery.of(context).size.width * 0.5,
                   ),
                 ],
+              )
+              : GestureDetector(
+                onTap: () async {
+                  _navigateToBusinessEditDirections();
+                },
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text('Ubicación: ${context.read<UserInfoCubit>().state.business.directions}'),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    const Icon(
+                      Icons.edit
+                    ),
+                  ],
+                ),
               ),
-            ),
             const SizedBox(
               height: 20,
             ),
