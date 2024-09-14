@@ -28,18 +28,24 @@ class _BusinessManagementState extends State<BusinessManagement> {
   }
 
   void _retrieveData() async {
-    await Api.getBusinessProductsResume().then((BusinessProductsResumeModel value) {
-      context.read<BusinessBreakfastCubit>().set(value.breakfast);
-      context.read<BusinessLunchCubit>().set(value.lunch);
-      context.read<BusinessDinnerCubit>().set(value.dinner);
-    }).onError((error, stackTrace) {
-      setState(() {
-        retrievingResumeError = true;
+    if(context.read<BusinessBreakfastCubit>().state?.id == null && context.read<BusinessLunchCubit>().state?.id == null && context.read<BusinessDinnerCubit>().state?.id == null) {
+      await Api.getBusinessProductsResume().then((BusinessProductsResumeModel value) {
+        context.read<BusinessBreakfastCubit>().set(value.breakfast);
+        context.read<BusinessLunchCubit>().set(value.lunch);
+        context.read<BusinessDinnerCubit>().set(value.dinner);
+      }).onError((error, stackTrace) {
+        setState(() {
+          retrievingResumeError = true;
+        });
       });
-    });
-    setState(() {
-      isRetrieving = false;
-    });
+      setState(() {
+        isRetrieving = false;
+      });
+    } else {
+      setState(() {
+        isRetrieving = false;
+      });
+    }
   }
 
   @override

@@ -26,16 +26,18 @@ class EditProductButton extends StatefulWidget {
 class _EditProductButtonState extends State<EditProductButton> {
 
   void _retrieveImage() async {
-    Api.getImage(
-      idUser: context.read<UserInfoCubit>().state.user.id!,
-      meaning: '${Utils.productTypeToChar(widget.productType)}1',
-    ).then((ImageModel? imageModel) {
-      if(imageModel?.route != null) {
-        setState(() {
-          imageRoute = imageModel!.route!;
-        });
-      }
-    });
+    if(_product?.id != null) {
+      Api.getImage(
+        idUser: context.read<UserInfoCubit>().state.user.id!,
+        meaning: '${Utils.productTypeToChar(widget.productType)}1',
+      ).then((ImageModel? imageModel) {
+        if(imageModel?.route != null) {
+          setState(() {
+            imageRoute = imageModel!.route!;
+          });
+        }
+      });
+    }
   }
 
   @override

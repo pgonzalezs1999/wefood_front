@@ -215,8 +215,6 @@ class _BusinessProfileState extends State<BusinessProfile> {
 
   @override
   Widget build(BuildContext context) {
-    print('isRetrievingData: $isRetrievingData');
-    print('retrievingDataError: $retrievingDataError');
     return WefoodNavigationScreen(
       children: [
         Container(
