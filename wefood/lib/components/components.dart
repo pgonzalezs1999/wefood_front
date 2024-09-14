@@ -32,3 +32,4 @@ export 'package:wefood/components/skeletons/skeleton_item_button_list.dart';
 export 'package:wefood/components/skeletons/skeleton_item_button.dart';
 export 'package:wefood/components/skeletons/skeleton_text.dart';
 export 'package:wefood/components/skeletons/skeleton_edit_product_button.dart';
+export 'package:wefood/components/skeletons/skeleton_retribution.dart';

@@ -11,7 +11,6 @@ import 'package:wefood/services/app_links/app_links_subscription.dart';
 import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/views/views.dart';
-
 import 'commands/call_request.dart';
 
 void main() {

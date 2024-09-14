@@ -83,7 +83,15 @@ class _BusinessRetributionsState extends State<BusinessRetributions> {
             ),
           ),
         ),
-        if(loadingRetributions == LoadingStatus.loading) const LoadingIcon(),
+        if(loadingRetributions == LoadingStatus.loading) const Column(
+          children: <SkeletonRetribution>[
+            SkeletonRetribution(
+              isFirst: true,
+            ),
+            SkeletonRetribution(),
+            // SkeletonRetribution(),
+          ],
+        ),
         if(loadingRetributions == LoadingStatus.error) Align(
           alignment: Alignment.center,
           child: Card(
@@ -103,15 +111,17 @@ class _BusinessRetributionsState extends State<BusinessRetributions> {
           height: MediaQuery.of(context).size.height * 0.075,
         ),
       ],
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          _navigateToBusinessBankData();
-        },
-        label: const Text('DATOS BANCARIOS'),
-        icon: const Icon(
-          Icons.credit_card,
-        ),
-      ),
+      floatingActionButton: (loadingRetributions == LoadingStatus.successful)
+        ? FloatingActionButton.extended(
+          onPressed: () {
+            _navigateToBusinessBankData();
+          },
+          label: const Text('DATOS BANCARIOS'),
+          icon: const Icon(
+            Icons.credit_card,
+          ),
+        )
+        : null,
     );
   }
 }
