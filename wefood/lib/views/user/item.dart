@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
-// import 'package:maps_launcher/maps_launcher.dart';
 import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/commands/utils.dart';
@@ -26,6 +25,7 @@ class Item extends StatefulWidget {
   @override
   State<Item> createState() => _ItemState();
 }
+
 class _ItemState extends State<Item> {
 
   ProductExpandedModel? info;
@@ -158,11 +158,119 @@ class _ItemState extends State<Item> {
       ignoreHorizontalPadding: true,
       ignoreVerticalPadding: true,
       body: [
-        if(info == null) const SizedBox(
-          height: 500,
-          child: Center(
-              child: LoadingIcon()
-          ),
+        if(info == null) Column(
+          children: [
+            Stack(
+              children: <Widget>[
+                if(backgroundImageRoutes.isNotEmpty) Container(
+                  color: Theme.of(context).colorScheme.surfaceContainer,
+                ),
+                Container(
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).viewPadding.top,
+                  ),
+                  height: MediaQuery.of(context).size.height * 0.25,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          BackArrow(
+                            whiteBackground: true,
+                          ),
+                        ],
+                      ),
+                      Container(
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [Colors.transparent, Color.fromRGBO(0, 0, 0, 0.75)],
+                          ),
+                        ),
+                        child: Row(
+                          children: <Widget>[
+                            GestureDetector(
+                              child: Container(
+                                padding: const EdgeInsets.all(2),
+                                margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(999),
+                                  child: SizedBox.fromSize(
+                                    size: Size.fromRadius(MediaQuery.of(context).size.width * 0.05),
+                                    child: const Icon(
+                                      Icons.business,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                SkeletonText(
+                                  width: MediaQuery.of(context).size.width * 0.2,
+                                ),
+                                SkeletonText(
+                                  width: MediaQuery.of(context).size.width * 0.4,
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width * Environment.defaultHorizontalMargin,
+                vertical: MediaQuery.of(context).size.width * Environment.defaultHorizontalMargin,
+              ),
+              width: double.infinity,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  SkeletonText(
+                    width: MediaQuery.of(context).size.width * 0.2,
+                  ),
+                  SkeletonText(
+                    width: MediaQuery.of(context).size.width * 0.4,
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+                  SkeletonText(
+                    width: MediaQuery.of(context).size.width * 0.4,
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                  SkeletonText(
+                    width: MediaQuery.of(context).size.width * 0.6,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  SkeletonText(
+                    width: MediaQuery.of(context).size.width * 0.6,
+                  ),
+                  const Divider(
+                    height: 50,
+                  ),
+                  const Align(
+                    child: Text('Cargando...'),
+                  ),
+                  const Divider(
+                    height: 50,
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
         if(info != null) Column(
           children: [
@@ -409,7 +517,7 @@ class _ItemState extends State<Item> {
                           child: GestureDetector(
                             child: const Icon(Icons.location_pin),
                             onTap: () async {
-                              String address = 'Calle Sierra de Ronda 1, escalera 7 bajo B';
+                              String address = '${info!.business.directions}';
                               final Uri url = Uri.parse('https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(address)}');
                               if(await canLaunchUrl(url)) {
                                 await launchUrl(url);

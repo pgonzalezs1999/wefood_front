@@ -10,7 +10,6 @@ import 'package:wefood/commands/clear_data.dart';
 import 'package:wefood/commands/contact_support.dart';
 import 'package:wefood/commands/share_app.dart';
 import 'package:wefood/components/components.dart';
-import 'package:wefood/main.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/views/views.dart';
@@ -174,14 +173,15 @@ class _BusinessProfileState extends State<BusinessProfile> {
     if(context.read<UserInfoCubit>().state.business.id == null) {
       Api.getSessionBusiness().then((BusinessExpandedModel data) {
         setState(() {
+          context.read<UserInfoCubit>().setBusiness(data.business);
           context.read<UserInfoCubit>().setBusinessName(data.business.name);
           context.read<UserInfoCubit>().setBusinessDescription(data.business.description);
           context.read<UserInfoCubit>().setBusinessDirections(data.business.directions);
           context.read<UserInfoCubit>().setBusinessLatLng(
-              LatLng(
-                data.business.latitude ?? 0,
-                data.business.longitude ?? 0,
-              )
+            LatLng(
+              data.business.latitude ?? 0,
+              data.business.longitude ?? 0,
+            )
           );
         });
         setState(() {
@@ -398,6 +398,13 @@ class _BusinessProfileState extends State<BusinessProfile> {
               },
             ),
             SettingsElement(
+              iconData: Icons.credit_card_outlined,
+              title: 'Cobros',
+              onTap: () {
+                _navigateToRetributions();
+              },
+            ),
+            SettingsElement(
               iconData: Icons.share,
               title: 'Comparte la app',
               onTap: () async {
@@ -411,13 +418,6 @@ class _BusinessProfileState extends State<BusinessProfile> {
                 launchContact(
                   context: context,
                 );
-              },
-            ),
-            SettingsElement(
-              iconData: Icons.credit_card_outlined,
-              title: 'Cobros',
-              onTap: () {
-                _navigateToRetributions();
               },
             ),
             SettingsElement(

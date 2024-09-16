@@ -8,6 +8,7 @@ export 'package:wefood/views/business/business_profile.dart';
 export 'package:wefood/views/business/edit_product.dart';
 export 'package:wefood/views/business/pending_orders_business.dart';
 export 'package:wefood/views/business/waiting_verification.dart';
+export 'package:wefood/views/business/business_bank_data.dart';
 export 'package:wefood/views/business/business_comments.dart';
 export 'package:wefood/views/user/favourites_screen.dart';
 export 'package:wefood/views/user/pending_orders_customer.dart';

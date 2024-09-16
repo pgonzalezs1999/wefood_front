@@ -5,6 +5,7 @@ import 'package:wefood/components/components.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/types.dart';
+import 'package:wefood/views/business/business_bank_data.dart';
 
 class BusinessRetributions extends StatefulWidget {
   const BusinessRetributions({super.key});
@@ -42,15 +43,24 @@ class _BusinessRetributionsState extends State<BusinessRetributions> {
     });
   }
 
+  void _navigateToBusinessBankData() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const BusinessBankData()),
+    );
+  }
+
   @override
   void initState() {
     _retrieveData();
+    BusinessModel.printInfo(context.read<UserInfoCubit>().state.business);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return WefoodScreen(
+      bodyCrossAxisAlignment: CrossAxisAlignment.center,
       body: <Widget>[
         const BackUpBar(
           title: 'Cobros',
@@ -89,7 +99,19 @@ class _BusinessRetributionsState extends State<BusinessRetributions> {
             ),
           ),
         ),
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.075,
+        ),
       ],
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          _navigateToBusinessBankData();
+        },
+        label: const Text('DATOS BANCARIOS'),
+        icon: const Icon(
+          Icons.credit_card,
+        ),
+      ),
     );
   }
 }

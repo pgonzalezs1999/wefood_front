@@ -15,7 +15,7 @@ class SkeletonItemButtonList extends StatelessWidget {
     return (horizontalScroll == true)
     ? const SkeletonItemButton()
     : const Column(
-      children: [
+      children: <SkeletonItemButton>[
         SkeletonItemButton(),
         SkeletonItemButton(),
         SkeletonItemButton(),

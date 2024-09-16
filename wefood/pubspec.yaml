@@ -30,7 +30,7 @@ dependencies:
   # syncfusion_flutter_charts: ^26.2.10
   syncfusion_flutter_pdfviewer: ^26.2.10
   url_launcher: ^6.3.0
-  webview_flutter: ^4.9.0
+  webview_flutter: ^4.9.0  
 
 dev_dependencies:
   flutter_test:

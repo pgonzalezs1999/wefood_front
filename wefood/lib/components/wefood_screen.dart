@@ -15,6 +15,7 @@ class WefoodScreen extends StatefulWidget {
   final CrossAxisAlignment bodyCrossAxisAlignment;
   final ScrollController? controller;
   final bool preventScrolling;
+  final Widget? floatingActionButton;
 
   const WefoodScreen({
     super.key,
@@ -29,6 +30,7 @@ class WefoodScreen extends StatefulWidget {
     this.bodyCrossAxisAlignment = CrossAxisAlignment.start,
     this.controller,
     this.preventScrolling = false,
+    this.floatingActionButton,
   });
 
   @override
@@ -61,7 +63,6 @@ class _WefoodScreenState extends State<WefoodScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     Widget content = Column(
       mainAxisAlignment: widget.bodyMainAxisAlignment,
       crossAxisAlignment: widget.bodyCrossAxisAlignment,
@@ -110,6 +111,7 @@ class _WefoodScreenState extends State<WefoodScreen> {
             ),
         ),
         bottomNavigationBar: widget.bottomNavigationBar,
+        floatingActionButton: widget.floatingActionButton,
       ),
     );
   }

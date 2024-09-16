@@ -73,6 +73,17 @@ class _BusinessManagementState extends State<BusinessManagement> {
             ),
             Container(
               margin: EdgeInsets.only(
+                top: MediaQuery.of(context).size.height * 0.025,
+                bottom: MediaQuery.of(context).size.height * 0.01,
+              ),
+              child: Text(
+                'Skeleton de prueba:',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ),
+            const SkeletonEditProductButton(),
+            Container(
+              margin: EdgeInsets.only(
                 top: 20,
                 bottom: MediaQuery.of(context).size.height * 0.01,
               ),

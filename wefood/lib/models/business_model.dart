@@ -14,8 +14,13 @@ class BusinessModel {
   String? directions;
   int? isValidated;
   double? rate;
-  DateTime? createdAt;
+  String? bankOwnerName;
+  String? bankName;
+  String? bankAccountType;
+  String? bankAccount;
+  String? interbankAccount;
   List<CommentExpandedModel>? comments;
+  DateTime? createdAt;
   String? deletedAt;
 
   BusinessModel.empty();
@@ -34,10 +39,15 @@ class BusinessModel {
     directions = json['directions'] as String?,
     isValidated = json['is_validated'] as int?,
     rate = (json['rate'])?.toDouble(),
-    createdAt = (json['created_at'] != null) ? DateTime.parse(json['created_at']) as DateTime? : null,
+    bankOwnerName = json['bank_owner_name'] as String?,
+    bankName = json['bank_name'] as String?,
+    bankAccountType = json['bank_account_type'] as String?,
+    bankAccount = json['bank_account'] as String?,
+    interbankAccount = json['interbank_account'] as String?,
     comments = json['comments'] != null
       ? List<CommentExpandedModel>.from((json['comments'] as List<dynamic>).map((comment) => CommentExpandedModel.fromJson(comment as Map<String, dynamic>)))
       : null,
+    createdAt = (json['created_at'] != null) ? DateTime.parse(json['created_at']) as DateTime? : null,
     deletedAt = json['deleted_at'] as String?;
 
   static void printInfo(BusinessModel business) {
@@ -54,8 +64,13 @@ class BusinessModel {
     print('-> directions: ${business.directions}');
     print('-> isValidated: ${business.isValidated}');
     print('-> rate: ${business.rate}');
-    print('-> createdAt: ${business.createdAt}');
+    print('-> bankOwnerName: ${business.bankOwnerName}');
+    print('-> bankName: ${business.bankName}');
+    print('-> bankAccountType: ${business.bankAccountType}');
+    print('-> bankAccount: ${business.bankAccount}');
+    print('-> interbankAccount: ${business.interbankAccount}');
     print('-> comments: ${business.comments}');
+    print('-> createdAt: ${business.createdAt}');
     print('-> deletedAt: ${business.comments}');
   }
 }
