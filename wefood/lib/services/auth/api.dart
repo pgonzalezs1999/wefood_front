@@ -880,13 +880,13 @@ class Api {
           'id_item': idItem.toString(),
           'amount': amount.toString(),
           'device_session_id': deviceSessionId,
-          'token': token,
+          'token': token.toString(),
         },
       );
       print('--------------------------------------------------------');
       print('RESPONSE DEL API.OPENPAY_PAYMENT: $response');
       print('--------------------------------------------------------');
-      String status = '';
+      /*String status = '';
       if(response['status'] != null) {
         status = response['status'].toString();
       } else if(response['error'] != null) {
@@ -896,7 +896,8 @@ class Api {
       } else {
         status = response['non-existing-field-just-to-throw-an-error'];
       }
-      return status;
+      return status;*/
+      return response;
     } catch(error) {
       rethrow;
     }

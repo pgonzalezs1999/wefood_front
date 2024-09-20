@@ -4,7 +4,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/commands/scroll_to_bottom.dart';
 import 'package:wefood/components/components.dart';
-import 'package:wefood/environment.dart';
 import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/types.dart';
 import 'dart:convert';
@@ -30,7 +29,7 @@ class PaymentScreen extends StatefulWidget {
 class _PaymentScreenState extends State<PaymentScreen> {
   String deviceSessionId = '';
   String tokenOpenPay = '';
-  late WebViewController _controller;
+  late final WebViewController _controller = WebViewController();
   final ScrollController scrollController = ScrollController();
 
   PaymentOption chosenOption = PaymentOption.creditCard;
@@ -41,114 +40,105 @@ class _PaymentScreenState extends State<PaymentScreen> {
   String expirationYear = '';
   String securityCode = '';
 
+  TextEditingController ownerController = TextEditingController();
+  TextEditingController cardNumberController = TextEditingController();
+  TextEditingController monthExpirationController = TextEditingController();
+  TextEditingController yearExpirationController = TextEditingController();
+  TextEditingController cvvController = TextEditingController();
+
   @override
   void initState() {
     super.initState();    
     _initializeWebView();
+    ownerName = 'Matthew Daniel Herrera Ortega';
+    cardNumber = '4213550175102531';
+    expirationMonth = '05';
+    expirationYear = '29';
+    securityCode = '232';
+    ownerController.text = ownerName;
+    cardNumberController.text = cardNumber;
+    monthExpirationController.text = expirationMonth;
+    yearExpirationController.text = expirationYear;
+    cvvController.text = securityCode;
+    getOpenpayToken();
   }
 
-  // Método para cargar una WebView que genere el deviceSessionId
   void _initializeWebView() {
-    _controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onPageFinished: (String url) async {
-            const String jsCode = '''
-              OpenPay.setId('mg1ippvpuekjrkszeuxc');
-              OpenPay.setApiKey('pk_540273ba143943b999db84f432e85aa3');
-              OpenPay.setSandboxMode(false);
-              var deviceDataId = OpenPay.deviceData.setup();
-              return deviceDataId;
-            ''';
-
-            final deviceId = await _controller.runJavaScriptReturningResult(jsCode);
+    _controller.setJavaScriptMode(JavaScriptMode.unrestricted);
+    _controller.setNavigationDelegate(
+      NavigationDelegate(
+        onPageFinished: (String url) async {
+          _controller.runJavaScriptReturningResult('''
+            OpenPay.setId('mg1ippvpuekjrkszeuxc');
+            OpenPay.setApiKey('pk_540273ba143943b999db84f432e85aa3');
+            OpenPay.setSandboxMode(false);
+            var deviceDataId = OpenPay.deviceData.setup();
+            deviceDataId;
+          ''').then((result) {
             setState(() {
-                
-              deviceSessionId = deviceId.toString().replaceAll('"', '').substring(0, 32);
-              if (deviceSessionId.length > 32) {
-                deviceSessionId = deviceSessionId.substring(0, 32);
-              }
-              print('Device Session ID: $deviceSessionId');
-                    
-              setupOpenPay();
+              deviceSessionId = result.toString().replaceAll('"', '');
+              print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Device Session ID: $deviceSessionId');
+              // setupOpenPay();
             });
-          },
-        ),
+          });
+        }
       )
-      ..loadRequest(
-        Uri.dataFromString(
-          '''
-          <!DOCTYPE html>
+    );
+    _controller.loadRequest(
+      Uri.dataFromString('''
+        <!DOCTYPE html>
           <html>
           <head>
-            <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-            <script type="text/javascript" src="https://js.openpay.pe/openpay.v1.min.js"></script>
-            <script type='text/javascript'src="https://js.openpay.pe/openpay-data.v1.min.js"></script>
-            <!--<script type="text/javascript" src="https://resources.openpay.mx/lib/openpay-js/1.2.38/openpay.v1.min.js"></script>
-            <script type="text/javascript" src="https://resources.openpay.mx/lib/openpay-data-js/1.2.38/openpay-data.v1.min.js"></script> -->           
+              <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+              <script type="text/javascript" src="https://js.openpay.pe/openpay.v1.min.js"></script>
+              <script type="text/javascript" src="https://js.openpay.pe/openpay-data.v1.min.js"></script>
           </head>
-          <body>
-            <h1>Generar Device Session ID</h1>
-          </body>
           </html>
-          ''',
-          mimeType: 'text/html',
-        ),
-      );
+        ''',
+        mimeType: 'text/html',
+      )
+    );
   }
 
-  // Método para interactuar con la API de OpenPay y generar un token
-  Future<void> setupOpenPay() async {
-    // final String apiUrl = "https://sandbox-api.openpay.pe/v1/mg1ippvpuekjrkszeuxc/tokens";
-    final String apiUrl = "https://api.openpay.pe/v1/mg1ippvpuekjrkszeuxc/tokens";    
-
-    // Datos de la tarjeta y dirección
+  Future<void> getOpenpayToken() async {
+    const String apiUrl = "https://api.openpay.pe/v1/mg1ippvpuekjrkszeuxc/tokens";
     Map<String, dynamic> cardData = {
-      "card_number": cardNumber,
       "holder_name": ownerName,
-      "expiration_year": expirationYear,
-      "expiration_month": expirationMonth,
+      "card_number": cardNumber,
       "cvv2": securityCode,
-      "address": {
+      "expiration_month": expirationMonth,
+      "expiration_year": expirationYear,
+      /*"address": {
         "city": "Lima",
         "postal_code": "00051",
         "country_code": "PE",
         "state": "La Victoria",
         "line1": "URB. APOLO",
-      }
+      }*/
     };
-
     try {
-      // Realiza la petición HTTP para generar el token
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Basic ' + base64Encode(utf8.encode('pk_540273ba143943b999db84f432e85aa3:')),
+          'Authorization': 'Basic ${base64Encode(utf8.encode('pk_540273ba143943b999db84f432e85aa3:'))}',
         },
         body: jsonEncode(cardData),
       );
-
       // Procesa la respuesta
-      if (response.statusCode == 201) {
+      if(response.statusCode == 201) {
         final responseData = jsonDecode(response.body);
-        tokenOpenPay = responseData['id'];  // Guarda el token
-        print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Token OpenPay: $tokenOpenPay");
-        
-        // Obtener el deviceSessionId del WebView si no lo has hecho aún
+        tokenOpenPay = responseData['id'];
         deviceSessionId = await _controller.runJavaScriptReturningResult('OpenPay.deviceData.setup()') as String;
-        print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Device Session ID: $deviceSessionId');
-        
+        print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Token: $tokenOpenPay');
       } else {
-        print('Error en el response: ${response.statusCode}');
-        print('Respuesta del servidor: ${response.body}');
+        print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Error en el response: ${response.statusCode}');
+        print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Respuesta del servidor: ${response.body}');
       }
     } catch (error) {
-      print('Error al generar el token: $error');
+      print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Error al generar el token: $error');
     }
   }  
-
 
  @override
   Widget build(BuildContext context) {
@@ -157,12 +147,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
         controller: scrollController,
         child: Stack(
           children: <Widget>[
-
              // WebView que genera el deviceSessionId
-          Positioned.fill(
-            child: WebViewWidget(controller: _controller),
-          ),
-
+            Positioned.fill(
+              child: WebViewWidget(controller: _controller),
+            ),
             Positioned.fill(
               child: Align(
                 alignment: Alignment.topRight,
@@ -287,6 +275,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             ),
                           ),
                           child: TextField(
+                            controller: ownerController,
                             textAlign: TextAlign.center,
                             decoration: const InputDecoration(
                               hintText: 'Nombre del Titular',
@@ -315,6 +304,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             ),
                           ),
                           child: TextField(
+                            controller: cardNumberController,
                             inputFormatters: [ FilteringTextInputFormatter.digitsOnly ],
                             keyboardType: TextInputType.number,
                             textAlign: TextAlign.center,
@@ -356,6 +346,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                   ),
                                 ),
                                 child: TextField(
+                                  controller: monthExpirationController,
                                   inputFormatters: [ FilteringTextInputFormatter.digitsOnly ],
                                   keyboardType: TextInputType.number,
                                   textAlign: TextAlign.center,
@@ -396,6 +387,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                   ),
                                 ),
                                 child: TextField(
+                                  controller: yearExpirationController,
                                   inputFormatters: [ FilteringTextInputFormatter.digitsOnly ],
                                   keyboardType: TextInputType.number,
                                   textAlign: TextAlign.center,
@@ -437,6 +429,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             ),
                           ),
                           child: TextField(
+                            controller: cvvController,
                             inputFormatters: [ FilteringTextInputFormatter.digitsOnly ],
                             keyboardType: TextInputType.number,
                             textAlign: TextAlign.center,
@@ -481,7 +474,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                          onPressed: () async {
+                          onPressed: () {
                             FocusScope.of(context).unfocus();
                             scrollToBottom(
                               scrollController: scrollController,
@@ -510,13 +503,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 error = 'Código de seguridad no válido';
                               });*/
                             } else {
-
                               try {
                                 // Llamada a setupOpenPay para obtener el token
-                                await setupOpenPay();
-                                  // Si el token y el deviceSessionId están disponibles, procede con la solicitud de pago
-                                  if (deviceSessionId.isNotEmpty && tokenOpenPay.isNotEmpty) {
-                                    print("FUNCIONOOOOOOOOOOOOOOOOOOOOOOOOOO");
+                                getOpenpayToken().then((value) {
+                                  print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> TOKEN OPENPAY: $tokenOpenPay');
+                                  if(deviceSessionId.isNotEmpty && tokenOpenPay.isNotEmpty) {
+                                    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> D_S_I Y TOKEN AMBOS RELLENOS");
                                     callRequestWithLoading(
                                       context: context,
                                       request: () async {
@@ -530,7 +522,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                           expirationYear: expirationYear,
                                           cvv2: securityCode,
                                           deviceSessionId: deviceSessionId,
-                                          token: tokenOpenPay,     
+                                          token: tokenOpenPay,
                                         );
                                       },
                                       onSuccess: (String status) {
@@ -581,17 +573,16 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                       }
                                     );
                                   } else {
-                                  setState(() {
-                                    error = 'No se pudo generar el token o el deviceSessionId';
-                                  });
-                                }
-
-                              } catch (e) {
-                              setState(() {
-                                error = 'Error al procesar el pago: $e';
-                              });
-                            }
-
+                                    setState(() {
+                                      error = 'No se pudo generar el token o el deviceSessionId';
+                                    });
+                                  }
+                                });
+                              } catch(e) {
+                                setState(() {
+                                  error = 'Error al procesar el pago: $e';
+                                });
+                              }
                             }
                           },
                           child: const Text('Pagar'),
@@ -607,8 +598,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
             ),
           ],
         ),
-      
-        
       ),
     );
   }
