@@ -47,7 +47,8 @@ enum OrderReceptionMethod {
 }
 
 enum PaymentOption {
-  creditCard,
+  creditCardNew,
+  creditCardSaved,
   bankApp,
   agents,
 }

@@ -612,7 +612,7 @@ class _ItemState extends State<Item> {
                                         TextButton(
                                           child: const Text('COMPRAR'),
                                           onPressed: () {
-                                            Navigator.pop(context);
+                                            Navigator.pop;
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(builder: (context) => PaymentScreen(

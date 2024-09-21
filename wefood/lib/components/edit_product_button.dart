@@ -116,7 +116,7 @@ class _EditProductButtonState extends State<EditProductButton> {
                   width: MediaQuery.of(context).size.width * 0.5,
                 ),
                 Container(
-                  color: Colors.white.withOpacity((widget.product?.id != null) ? 0.85 : 0.9),
+                  color: Colors.white.withOpacity((widget.product?.id != null) ? 0.85 : 0.925),
                   width: double.infinity,
                   height: double.infinity,
                 ),
@@ -158,9 +158,13 @@ class _EditProductButtonState extends State<EditProductButton> {
                             ),
                             height: 80,
                             width: 80,
-                            child: const Icon(
-                              Icons.edit,
-                            ),
+                            child: (widget.product?.id != null)
+                              ? const Icon(
+                                Icons.edit,
+                              )
+                              : const Icon(
+                                Icons.add,
+                              ),
                           ),
                         ],
                       ),

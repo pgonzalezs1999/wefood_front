@@ -19,7 +19,6 @@ class UserExplore extends StatefulWidget {
 }
 
 class _UserExploreState extends State<UserExplore> {
-
   LatLng userLocation = const LatLng(-12.5, -77);
   Widget recommendedList = const SkeletonItemButtonList();
   Widget nearbyList =  const SkeletonItemButtonList(
@@ -43,20 +42,30 @@ class _UserExploreState extends State<UserExplore> {
   _getUserLocation() {
     if(context.read<UserLocationCubit>().state == null) {
       Permission.location.request().then((PermissionStatus permissionStatus) {
-        if (permissionStatus.isGranted) {
+        if(permissionStatus.isGranted) {
           Geolocator.getCurrentPosition(
             locationSettings: const LocationSettings(
               accuracy: LocationAccuracy.best,
             ),
           ).then((Position position) {
+            LatLng newPosition = LatLng(position.latitude, position.longitude);
             context.read<UserLocationCubit>().set(
-              location: LatLng(position.latitude, position.longitude)
+              location: newPosition,
             );
             setState(() {
-              userLocation = LatLng(position.latitude, position.longitude);
+              userLocation = newPosition;
             });
             _refreshData();
           });
+        } else {
+          LatLng newPosition = const LatLng(-12.1, -77);
+          context.read<UserLocationCubit>().set(
+            location: newPosition,
+          );
+          setState(() {
+            userLocation = newPosition;
+          });
+          _refreshData();
         }
       });
     } else {
@@ -255,7 +264,7 @@ class _UserExploreState extends State<UserExplore> {
       });
     });
   }
-
+  
   @override
   void dispose() {
     _searchController.dispose();

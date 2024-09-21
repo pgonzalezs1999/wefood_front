@@ -8,6 +8,7 @@ import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/middleware.dart';
 import 'package:wefood/types.dart';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class Api {
   static Future<AuthModel> login({
@@ -854,47 +855,62 @@ class Api {
     } catch(error) { rethrow; }
   }
 
+  static Future<String> openpayGetToken({
+    required String ownerName,
+    required int cardNumber,
+    required int expirationMonth,
+    required int expirationYear,
+    required String securityCode,
+  }) async {
+    try {
+      Uri uri = Uri.parse('${Environment.openpayApiUrl}tokens');
+      dynamic body = json.encode({
+        'holder_name': ownerName,
+        'card_number': cardNumber.toString(),
+        'expiration_month': expirationMonth,
+        'expiration_year': expirationYear,
+        'cvv2': securityCode.toString()
+      });
+      print('HACIENDO POST DE: $uri CON BODY: $body');
+      http.Response response = await http.post(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Basic ${base64Encode(utf8.encode('${Environment.openpaySecretKey}:'))}',
+        },
+        body: body,
+      );
+      String formattedRespose = jsonDecode(utf8.decode(response.bodyBytes))['id'];
+      print('RESPONSE DE $uri: $formattedRespose');
+      return formattedRespose;
+    } catch(error) {
+      rethrow;
+    }
+  }
+
   static Future<String> openpayPayment({
     required int idItem,
     required double price,
     required int amount,
-    required String holderName,
-    required int cardNumber,
-    required int expirationYear,
-    required int expirationMonth,
-    required int cvv2,
     required String deviceSessionId,
+    required String token,
   }) async {
     try {
       dynamic response = await Middleware.endpoint(
         name: 'openpayPayment',
         type: HttpType.post,
         body: {
-          'price': price.toString(),
-          'holder_name': holderName,
-          'card_number': cardNumber.toString(),
-          'expiration_year': expirationYear.toString(),
-          'expiration_month': expirationMonth.toString(),
-          'cvv2': cvv2.toString(),
-          'id_item': idItem.toString(),
-          'amount': amount.toString(),
-          'device_session_id': deviceSessionId,
+          /* WeFood */ 'id_item': idItem.toString(),
+          /* WeFood */ 'amount': amount.toString(),
+          /* Both */ 'price': price.toString(),
+          /* OpenPay */ 'device_session_id': deviceSessionId.toString(),
+          /* OpenPay */ 'token': token.toString(),
         },
       );
-      print('--------------------------------------------------------');
       print('RESPONSE DEL API.OPENPAY_PAYMENT: $response');
-      print('--------------------------------------------------------');
-      String status = '';
-      if(response['status'] != null) {
-        status = response['status'].toString();
-      } else if(response['error'] != null) {
-        status = response['details']['description'].toString();
-      } else if(response['error_code'] != null) {
-        status = response['error_code'].toString();
-      } else {
-        status = response['non-existing-field-just-to-throw-an-error'];
-      }
-      return status;
+      return (response['status'] != null)
+        ? response['status']
+        : response['details']['description'];
     } catch(error) {
       rethrow;
     }

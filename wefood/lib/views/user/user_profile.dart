@@ -10,7 +10,6 @@ import 'package:wefood/commands/clear_data.dart';
 import 'package:wefood/commands/contact_support.dart';
 import 'package:wefood/commands/share_app.dart';
 import 'package:wefood/components/components.dart';
-import 'package:wefood/main.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/types.dart';
@@ -95,7 +94,7 @@ class _UserProfileState extends State<UserProfile> {
     }
   }
 
-  _pickImageFromGalleryFrom({
+  _pickImageFrom({
     required ImageSource imageSource
   }) {
     ImagePicker().pickImage(source: imageSource).then((XFile? returnedImage) {
@@ -186,14 +185,14 @@ class _UserProfileState extends State<UserProfile> {
                             TextButton(
                               child: const Text('ESCOGER FOTO DE LA GALERÍA'),
                               onPressed: () async {
-                                _pickImageFromGalleryFrom(
+                                _pickImageFrom(
                                   imageSource: ImageSource.gallery,
                                 );
                               },
                             ),
                             TextButton(
                               onPressed: () async {
-                                _pickImageFromGalleryFrom(
+                                _pickImageFrom(
                                   imageSource: ImageSource.camera,
                                 );
                               },
@@ -278,6 +277,8 @@ class _UserProfileState extends State<UserProfile> {
               ),
               Expanded(
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     GestureDetector(
                       child: Row(
@@ -546,6 +547,29 @@ class _UserProfileState extends State<UserProfile> {
         ),
         Column(
           children: <Widget>[
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    '${context.read<UserInfoCubit>().state.user.email}',
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                if(context.read<UserInfoCubit>().state.user.emailVerified == true) const Row(
+                  children: [
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Icon(
+                      Icons.verified,
+                    ),
+                  ],
+                )
+              ],
+            ),
+            const SizedBox(
+              height: 20,
+            ),
             SettingsElement(
               iconData: Icons.timelapse,
               title: 'Pedidos pendientes',
