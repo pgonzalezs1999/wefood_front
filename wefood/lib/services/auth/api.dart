@@ -955,8 +955,26 @@ class Api {
     } catch(error) { rethrow; }
   }
 
+  static Future<bool> checkChangePasswordCode({
+    required String part1,
+    required String part2,
+    required String part3,
+    required String code,
+  }) async {
+    try {
+      final response = await Middleware.endpoint(
+        name: 'checkChangePasswordCode/${part1.toString()}/${part2.toString()}/${part3.toString()}/${code.toString()}',
+        type: HttpType.get,
+        needsAccessToken: false,
+      );
+      return Utils.controlBool(response['message']);
+    } catch(error) { rethrow; }
+  }
+
   static Future<String> updatePassword({
-    required String id,
+    required String email1,
+    required String email2,
+    required String email3,
     required String verificationCode,
     required String password,
   }) async {
@@ -966,7 +984,9 @@ class Api {
         type: HttpType.post,
         needsAccessToken: false,
         body: {
-          'id': id.toString(),
+          'email1': email1.toString(),
+          'email2': email2.toString(),
+          'email3': email3.toString(),
           'verification_code': verificationCode.toString(),
           'password': password.toString(),
         },

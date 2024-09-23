@@ -28,6 +28,5 @@ export 'package:wefood/views/login.dart';
 export 'package:wefood/views/register_business.dart';
 export 'package:wefood/views/register_user.dart';
 export 'package:wefood/views/change_password_ask_screen.dart';
-export 'package:wefood/views/change_password_set_screen.dart';
 export 'package:wefood/views/update_required.dart';
 export 'package:wefood/main.dart';

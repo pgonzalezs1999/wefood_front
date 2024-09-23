@@ -50,40 +50,6 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
 
-  void _navigateToChangePasswordSetScreen({
-    required Uri appLink,
-  }) {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => ChangePasswordSetScreen(
-        appLink: appLink,
-      )),
-    );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    AppLinksSubscription.setOnAppLinkReceivedCallback((uri) {
-      _handleAppLink(uri);
-    });
-    AppLinksSubscription.start();
-  }
-
-  void _handleAppLink(Uri uri) {
-    if(uri.path.contains('changePassword')) {
-      _navigateToChangePasswordSetScreen(
-        appLink: uri,
-      );
-    }
-  }
-
-  @override
-  void dispose() {
-    AppLinksSubscription.cancel();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     Color wefoodPrimaryColor = const Color(0xFF392FAA);
