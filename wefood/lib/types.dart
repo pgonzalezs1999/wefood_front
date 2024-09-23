@@ -52,3 +52,13 @@ enum PaymentOption {
   bankApp,
   agents,
 }
+
+enum EditPersonalInfo {
+  none,
+  realName,
+  businessName,
+  businessDescription,
+  username,
+  email,
+  phone,
+}

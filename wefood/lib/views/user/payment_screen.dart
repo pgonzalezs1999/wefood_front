@@ -238,7 +238,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     text: TextSpan(
                       children: [
                         TextSpan(
-                          text: 'Vas a pagar el importe de S/ ${widget.price}. ',
+                          text: 'Vas a pagar el importe de S/ ${widget.price.toStringAsFixed(2)}. ',
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                             color: const Color(0xFF004181),
                             fontWeight: FontWeight.w900,
@@ -544,8 +544,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                     setState(() {
                                       if(status == 'completed') {
                                         feedback = '';
-                                        Navigator.pop(context);
-                                        Navigator.pop(context);
+                                        Navigator.of(context).pop();
+                                        Navigator.of(context).pop();
                                         showDialog(
                                           context: context,
                                           builder: (BuildContext context) {
@@ -558,7 +558,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                           }
                                         );
                                       } else {
-                                        Navigator.pop(context);
+                                        Navigator.of(context).pop();
                                         showDialog(
                                           context: context,
                                           builder: (BuildContext context) {
@@ -573,9 +573,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                     });
                                   },
                                   onError: (error) {
-                                    Navigator.pop(context);
-                                    Navigator.pop(context);
-                                    Navigator.pop(context);
+                                    Navigator.of(context).pop();
+                                    Navigator.of(context).pop();
+                                    Navigator.of(context).pop();
                                     showDialog(
                                       context: context,
                                       builder: (BuildContext context) {
@@ -593,9 +593,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                   }
                                 );
                               }).onError((error, stackTrace) {
-                                Navigator.pop(context);
-                                Navigator.pop(context);
-                                Navigator.pop(context);
+                                Navigator.of(context).pop();
+                                Navigator.of(context).pop();
+                                Navigator.of(context).pop();
                                 showDialog(
                                   context: context,
                                   builder: (BuildContext context) {

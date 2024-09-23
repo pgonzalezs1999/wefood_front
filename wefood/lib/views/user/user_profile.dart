@@ -9,6 +9,7 @@ import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/commands/clear_data.dart';
 import 'package:wefood/commands/contact_support.dart';
 import 'package:wefood/commands/share_app.dart';
+import 'package:wefood/commands/wefood_show_dialog.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api.dart';
@@ -24,6 +25,21 @@ class UserProfile extends StatefulWidget {
 }
 
 class _UserProfileState extends State<UserProfile> {
+
+  void _navigateToEditPersonalData({
+    required EditPersonalInfo field,
+  }) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => EditPersonalData(
+        editPersonalInfo: field,
+      )),
+    ).whenComplete(() {
+      setState(() {
+        _refreshPersonalInfo();
+      });
+    });
+  }
 
   void _navigateToMain() {
     Navigator.pushReplacement(
@@ -144,11 +160,15 @@ class _UserProfileState extends State<UserProfile> {
     });
   }
 
+  _refreshPersonalInfo() {
+    auxRealName = context.read<UserInfoCubit>().state.user.realName ?? '';
+    auxRealSurname = context.read<UserInfoCubit>().state.user.realSurname ?? '';
+    auxUsername = context.read<UserInfoCubit>().state.user.username ?? '';
+  }
+
   @override
   void initState() {
-    auxRealName = (context.read<UserInfoCubit>().state.user.realName != null) ? context.read<UserInfoCubit>().state.user.realName! : '';
-    auxRealSurname = (context.read<UserInfoCubit>().state.user.realSurname != null) ? context.read<UserInfoCubit>().state.user.realSurname! : '';
-    auxUsername = (context.read<UserInfoCubit>().state.user.username != null) ? context.read<UserInfoCubit>().state.user.username! : '';
+    _refreshPersonalInfo();
     _getProfileImage();
     super.initState();
   }
@@ -172,70 +192,63 @@ class _UserProfileState extends State<UserProfile> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               GestureDetector(
-                onTap: () async {
-                  showDialog(
-                    context: context,
-                    builder: (_) {
-                      return WefoodPopup(
-                        context: _,
-                        image: context.read<UserInfoCubit>().state.image,
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            TextButton(
-                              child: const Text('ESCOGER FOTO DE LA GALERÍA'),
-                              onPressed: () async {
-                                _pickImageFrom(
-                                  imageSource: ImageSource.gallery,
-                                );
-                              },
-                            ),
-                            TextButton(
-                              onPressed: () async {
-                                _pickImageFrom(
-                                  imageSource: ImageSource.camera,
-                                );
-                              },
-                              child: const Text('SACAR FOTO CON LA CÁMARA'),
-                            ),
-                            if(context.read<UserInfoCubit>().state.image != null) TextButton(
-                              child: const Text('ELIMINAR FOTO'),
-                              onPressed: () {
-                                callRequestWithLoading(
-                                  closePreviousPopup: true,
+                onTap: () => wefoodShowDialog(
+                  context: context,
+                  image: context.read<UserInfoCubit>().state.image,
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextButton(
+                        child: const Text('ESCOGER FOTO DE LA GALERÍA'),
+                        onPressed: () async {
+                          _pickImageFrom(
+                            imageSource: ImageSource.gallery,
+                          );
+                        },
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          _pickImageFrom(
+                            imageSource: ImageSource.camera,
+                          );
+                        },
+                        child: const Text('SACAR FOTO CON LA CÁMARA'),
+                      ),
+                      if(context.read<UserInfoCubit>().state.image != null) TextButton(
+                        child: const Text('ELIMINAR FOTO'),
+                        onPressed: () {
+                          callRequestWithLoading(
+                            closePreviousPopup: true,
+                            context: context,
+                            request: () async {
+                              return await Api.removeImage(
+                                idUser: context.read<UserInfoCubit>().state.user.id!,
+                                meaning: 'profile',
+                              );
+                            },
+                            onSuccess: (_) {
+                              showDialog(
                                   context: context,
-                                  request: () async {
-                                    return await Api.removeImage(
-                                      idUser: context.read<UserInfoCubit>().state.user.id!,
-                                      meaning: 'profile',
-                                    );
-                                  },
-                                  onSuccess: (_) {
-                                    showDialog(
+                                  builder: (BuildContext context) {
+                                    return WefoodPopup(
                                       context: context,
-                                      builder: (BuildContext context) {
-                                        return WefoodPopup(
-                                          context: context,
-                                          title: 'Imagen eliminada correctamente',
-                                          cancelButtonTitle: 'OK',
-                                        );
-                                      }
+                                      title: 'Imagen eliminada correctamente',
+                                      cancelButtonTitle: 'OK',
                                     );
-                                    context.read<UserInfoCubit>().removePicture();
-                                    setState(() {
-                                      context.read<UserInfoCubit>().state;
-                                    });
-                                  },
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                        cancelButtonTitle: 'SALIR',
-                      );
-                    },
-                  );
-                },
+                                  }
+                              );
+                              context.read<UserInfoCubit>().removePicture();
+                              setState(() {
+                                context.read<UserInfoCubit>().state;
+                              });
+                            },
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                  cancelButtonTitle: 'SALIR',
+                ),
                 child: Container(
                   margin: EdgeInsets.only(
                     right: MediaQuery.of(context).size.width * 0.05,
@@ -295,109 +308,7 @@ class _UserProfileState extends State<UserProfile> {
                           ),
                         ],
                       ),
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (_) {
-                            return StatefulBuilder(
-                              builder: (_, setState) {
-                                return WefoodPopup(
-                                  context: context,
-                                  title: 'Cambiar nombre',
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      WefoodInput(
-                                        labelText: 'Nombre',
-                                        initialText: context.read<UserInfoCubit>().state.user.realName,
-                                        feedbackWidget: (auxRealName.length < 2)
-                                          ? const FeedbackMessage(
-                                            message: 'Debe tener 2 caracteres o más',
-                                            isError: true,
-                                          )
-                                          : (auxRealName.length > 30)
-                                            ? const FeedbackMessage(
-                                              message: 'Debe tener 2 caracteres o más',
-                                              isError: true,
-                                            )
-                                            : null,
-                                        onChanged: (String value) {
-                                          setState(() {
-                                            auxRealName = value;
-                                          });
-                                        },
-                                      ),
-                                      const SizedBox(
-                                        height: 20,
-                                      ),
-                                      WefoodInput(
-                                        labelText: 'Apellidos',
-                                        initialText: context.read<UserInfoCubit>().state.user.realSurname,
-                                        feedbackWidget: (auxRealSurname.length < 2)
-                                          ? const FeedbackMessage(
-                                            message: 'Debe tener 2 caracteres o más',
-                                            isError: true,
-                                          )
-                                          : (auxRealSurname.length > 30)
-                                            ? const FeedbackMessage(
-                                              message: 'Debe tener 2 caracteres o más',
-                                              isError: true,
-                                            )
-                                            : null,
-                                        onChanged: (String value) {
-                                          setState(() {
-                                            auxRealSurname = value;
-                                          });
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                  cancelButtonTitle: 'CANCELAR',
-                                  actions: [
-                                    if(2 <= auxRealName.length && auxRealName.length <= 30 && 2 <= auxRealSurname.length && auxRealSurname.length <= 30) TextButton(
-                                      child: const Text('CONFIRMAR'),
-                                      onPressed: () {
-                                        callRequestWithLoading(
-                                          closePreviousPopup: true,
-                                          context: context,
-                                          request: () async {
-                                            return await Api.updateRealName(
-                                              name: auxRealName,
-                                              surname: auxRealSurname
-                                            );
-                                          },
-                                          onSuccess: (_) {
-                                            showDialog(
-                                              context: context,
-                                              barrierDismissible: false,
-                                              builder: (BuildContext context) {
-                                                return StatefulBuilder(builder: (context, setState) {
-                                                  return WefoodPopup(
-                                                    context: context,
-                                                    title: '¡Nombre cambiado correctamente!',
-                                                    cancelButtonTitle: 'OK',
-                                                  );
-                                                });
-                                              },
-                                            );
-                                          },
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                        ).then((_) {
-                          setState(() {
-                            context.read<UserInfoCubit>().setRealName(
-                              realName: auxRealName,
-                              realSurname: auxRealSurname,
-                            );
-                          });
-                        });
-                      },
+                      onTap: () => _navigateToEditPersonalData(field: EditPersonalInfo.realName),
                     ),
                     const SizedBox(
                       height: 10,
@@ -415,129 +326,7 @@ class _UserProfileState extends State<UserProfile> {
                           ),
                         ],
                       ),
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (_) {
-                            return StatefulBuilder(
-                              builder: (_, setState) {
-                                return WefoodPopup(
-                                  context: context,
-                                  title: 'Cambiar nombre de usuario',
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      WefoodInput(
-                                        labelText: 'Nombre de usuario',
-                                        initialText: context.read<UserInfoCubit>().state.user.username,
-                                        feedbackWidget: (auxUsername.length < 5)
-                                          ? const FeedbackMessage(
-                                            message: 'Debe tener 5 caracteres o más',
-                                            isError: true,
-                                          )
-                                          : (auxUsername.length > 50)
-                                            ? const FeedbackMessage(
-                                              message: 'Debe tener 50 caracteres o más',
-                                              isError: true,
-                                            )
-                                            : (usernameAvailabilityStatus == LoadingStatus.loading)
-                                              ? const ReducedLoadingIcon()
-                                              : (usernameAvailable == true)
-                                                ? const FeedbackMessage(
-                                                  message: '¡Libre!',
-                                                  isError: false,
-                                                )
-                                                : (auxUsername == context.read<UserInfoCubit>().state.user.username)
-                                                  ? const FeedbackMessage(
-                                                    message: 'Nombre actual',
-                                                    isError: true,
-                                                  )
-                                                  : const FeedbackMessage(
-                                                    message: 'No disponible',
-                                                    isError: true,
-                                                  ),
-                                        onChanged: (String value) {
-                                          setState(() {
-                                            usernameAvailabilityStatus = LoadingStatus.loading;
-                                          });
-                                          Timer(
-                                            const Duration(seconds: 1),
-                                            () {
-                                              if(value == auxUsername) {
-                                                if(2 <= value.length && value.length <= 50) {
-                                                  if(value == context.read<UserInfoCubit>().state.user.username) {
-                                                    setState(() {
-                                                      usernameAvailable = false;
-                                                      usernameAvailabilityStatus = LoadingStatus.error;
-                                                    });
-                                                  } else {
-                                                    Api.checkUsernameAvailability(
-                                                      username: value,
-                                                    ).then((bool availability) {
-                                                      setState(() {
-                                                        usernameAvailable = availability;
-                                                        usernameAvailabilityStatus = LoadingStatus.successful;
-                                                      });
-                                                    }).onError((Object error, StackTrace stackTrace) {
-                                                      setState(() {
-                                                        usernameAvailable = false;
-                                                        usernameAvailabilityStatus = LoadingStatus.error;
-                                                      });
-                                                    });
-                                                  }
-                                                }
-                                              }
-                                            }
-                                          );
-                                          setState(() {
-                                            auxUsername = value;
-                                          });
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                  cancelButtonTitle: 'CANCELAR',
-                                  actions: [
-                                    if(usernameAvailable) TextButton(
-                                      child: const Text('CONFIRMAR'),
-                                      onPressed: () {
-                                        callRequestWithLoading(
-                                          closePreviousPopup: true,
-                                          context: context,
-                                          request: () async {
-                                            return await Api.updateUsername(
-                                              username: auxUsername,
-                                            );
-                                          },
-                                          onSuccess: (_) {
-                                            showDialog(
-                                              context: context,
-                                              barrierDismissible: false,
-                                              builder: (BuildContext context) {
-                                                return StatefulBuilder(builder: (context, setState) {
-                                                  return WefoodPopup(
-                                                    context: context,
-                                                    title: '¡Nombre de usuario cambiado correctamente!',
-                                                    cancelButtonTitle: 'OK',
-                                                  );
-                                                });
-                                              }
-                                            );
-                                          },
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                );
-                              }
-                            );
-                          },
-                        ).then((_) {
-                          setState(() {
-                            context.read<UserInfoCubit>().setUsername(auxUsername);
-                          });
-                        });
-                      },
+                      onTap: () => _navigateToEditPersonalData(field: EditPersonalInfo.username),
                     ),
                   ],
                 ),
@@ -610,38 +399,31 @@ class _UserProfileState extends State<UserProfile> {
             SettingsElement(
               iconData: Icons.logout,
               title: 'Cerrar sesión',
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (_) {
-                    return WefoodPopup(
-                      context: _,
-                      title: '¿Seguro que quieres cerrar sesión?',
-                      actions: <TextButton>[
-                        TextButton(
-                          onPressed: () async {
-                            callRequestWithLoading(
-                              context: context,
-                              request: () async {
-                                return await Api.logout();
-                              },
-                              onSuccess: (_) async {
-                                await clearData(context);
-                                _navigateToMain();
-                              },
-                              onError: (error) async {
-                                await clearData(context);
-                                _navigateToMain();
-                              },
-                            );
-                          },
-                          child: const Text('SÍ'),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              }
+              onTap: () => wefoodShowDialog(
+                context: context,
+                title: '¿Seguro que quieres cerrar sesión?',
+                actions: <TextButton>[
+                  TextButton(
+                    onPressed: () async {
+                      callRequestWithLoading(
+                        context: context,
+                        request: () async {
+                          return await Api.logout();
+                        },
+                        onSuccess: (_) async {
+                          await clearData(context);
+                          _navigateToMain();
+                        },
+                        onError: (error) async {
+                          await clearData(context);
+                          _navigateToMain();
+                        },
+                      );
+                    },
+                    child: const Text('SÍ'),
+                  ),
+                ],
+              ),
             ),
             SettingsElement(
               iconData: Icons.business,
@@ -665,10 +447,10 @@ class _UserProfileState extends State<UserProfile> {
                         TextButton(
                           onPressed: () {
                             Api.signOut(context).then((_) {
-                              Navigator.pop(context);
+                              Navigator.of(context).pop();
                               _navigateToMain();
                             }).onError((error, stackTrace) {
-                              Navigator.pop(context);
+                              Navigator.of(context).pop();
                               showDialog(
                                 context: context,
                                 builder: (BuildContext context) {

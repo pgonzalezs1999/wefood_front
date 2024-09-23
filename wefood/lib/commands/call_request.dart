@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wefood/components/components.dart';
-import 'package:wefood/services/loading/loading_test.dart';
+import 'package:wefood/services/loading/wefood_popup_v2.dart';
 
 callRequestWithLoading({
   required BuildContext context,
@@ -10,15 +10,16 @@ callRequestWithLoading({
   bool closePreviousPopup = false,
 }) {
   if(closePreviousPopup == true) {
-    Navigator.pop(context);
+    Navigator.of(context).pop();
   }
-  LoadingTest.instance().show(context: context);
+  WefoodPopUpV2.instance().show(context: context);
   request().then((dynamic response) {
     onSuccess(response);
-    LoadingTest.instance().hide();
+    WefoodPopUpV2.instance().hide();
   }).catchError((error, stackTrace) {
     if(onError != null) {
       onError(error);
+      WefoodPopUpV2.instance().hide();
     } else {
       showDialog(
         context: context,
@@ -31,7 +32,7 @@ callRequestWithLoading({
           );
         }
       );
+      WefoodPopUpV2.instance().hide();
     }
-    LoadingTest.instance().hide();
   });
 }

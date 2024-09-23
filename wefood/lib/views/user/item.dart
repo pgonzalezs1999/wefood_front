@@ -566,12 +566,32 @@ class _ItemState extends State<Item> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        if(info!.available != null) if(info!.available! > 0) Text('${info!.available} de ${info!.product.amount} disponibles'),
-                        if(info!.available != null) if(info!.available! <= 0) const Text('¡Agotado!'),
-                        if(info!.available != null) if(info!.available! > 0) ElevatedButton(
-                          child: const Text('COMPRAR'),
+                        if(info!.available != null && info!.available! > 0) Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            const Text('Elegir:'),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            DropdownButton<int>(
+                              value: selectedAmount,
+                              items: _amountOptions(info!.available!),
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedAmount = value!;
+                                });
+                              },
+                            ),
+                            Text(' pack${(selectedAmount > 1) ? 's' : ''} por S/. ${(selectedAmount * info!.product.price!).toStringAsFixed(2)}'),
+                          ],
+                        ),
+                        if(info!.available != null) const SizedBox(
+                          height: 10,
+                        ),
+                        if(info!.available != null && info!.available! <= 0) const Text('¡Agotado!'),
+                        if(info!.available != null && info!.available! > 0) ElevatedButton(
+                          child: Text('COMPRAR  $selectedAmount'),
                           onPressed: () {
-                            // TODO -> ESTO ES TEMPORAL HASTA QUE SE ARREGLEN LOS POPUPS !!!
                             Navigator.push(
                               context,
                               MaterialPageRoute(builder: (context) => PaymentScreen(
@@ -582,66 +602,6 @@ class _ItemState extends State<Item> {
                             ).whenComplete(() {
                               _retrieveData();
                             });
-                            /*showDialog(
-                              context: context,
-                              builder: (_) {
-                                return StatefulBuilder(
-                                  builder: (_, privateSetState) {
-                                    return WefoodPopup(
-                                      context: context,
-                                      title: 'Comprar producto',
-                                      content: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: <Widget>[
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: <Widget>[
-                                              const Text('Cantidad:'),
-                                              const SizedBox(
-                                                width: 10,
-                                              ),
-                                              DropdownButton<int>(
-                                                value: selectedAmount,
-                                                items: _amountOptions(info!.available!),
-                                                onChanged: (value) {
-                                                  privateSetState(() {
-                                                    selectedAmount = value!;
-                                                  });
-                                                },
-                                              ),
-                                              const Text(' packs'),
-                                            ],
-                                          ),
-                                          if(info!.product.price != null) Align(
-                                            alignment: Alignment.center,
-                                            child: Text('Precio total:  ${(info!.product.price! * selectedAmount).toStringAsFixed(2)} Sol/.'),
-                                          ),
-                                        ],
-                                      ),
-                                      cancelButtonTitle: 'CANCELAR',
-                                      actions: [
-                                        TextButton(
-                                          child: const Text('COMPRAR'),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(builder: (context) => PaymentScreen(
-                                                price: info!.product.price! * selectedAmount,
-                                                itemId: widget.productExpanded.item.id!,
-                                                amount: selectedAmount,
-                                              )),
-                                            ).whenComplete(() {
-                                              _retrieveData();
-                                            });
-                                          },
-                                        ),
-                                      ],
-                                    );
-                                  }
-                                );
-                              },
-                            );*/
                           },
                         ),
                       ],

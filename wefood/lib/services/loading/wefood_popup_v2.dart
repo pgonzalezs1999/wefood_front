@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:wefood/services/loading/loading_test_controller.dart';
+import 'package:wefood/services/loading/wefood_popup_controller_v2.dart';
 
-class LoadingTest {
-  LoadingTest._shareInstance();
-  static final LoadingTest _shared = LoadingTest._shareInstance();
-  factory LoadingTest.instance() => _shared;
+class WefoodPopUpV2 {
+  WefoodPopUpV2._shareInstance();
+  static final WefoodPopUpV2 _shared = WefoodPopUpV2._shareInstance();
+  factory WefoodPopUpV2.instance() => _shared;
 
-  LoadingTestController? _controller;
+  WefoodPopUpV2Controller? _controller;
 
   void show({
     required BuildContext context,
@@ -28,7 +28,7 @@ class LoadingTest {
     _controller = null;
   }
 
-  LoadingTestController? showOverlay({
+  WefoodPopUpV2Controller? showOverlay({
     required BuildContext context,
     required String text,
   }) {
@@ -85,7 +85,7 @@ class LoadingTest {
 
     state.insert(overlay);
 
-    return LoadingTestController(
+    return WefoodPopUpV2Controller(
       close: () {
         textController.close();
         overlay.remove();

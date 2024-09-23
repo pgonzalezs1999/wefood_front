@@ -286,12 +286,12 @@ class _BusinessEditDirectionsState extends State<BusinessEditDirections> {
                           description: finalDirections,
                           cancelButtonTitle: 'OK',
                           cancelButtonBehaviour: () {
-                            Navigator.pop(context);
+                            Navigator.of(context).pop();
                           },
                         );
                       }
                     ).then((onValue) {
-                      Navigator.pop(context);
+                      Navigator.of(context).pop();
                     });
                   });
                 } catch(e) {

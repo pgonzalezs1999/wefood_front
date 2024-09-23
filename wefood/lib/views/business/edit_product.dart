@@ -175,7 +175,7 @@ class _EditProductState extends State<EditProduct> {
         setState(() {
           isSubmitting = false;
         });
-        Navigator.pop(context);
+        Navigator.of(context).pop();
         String title = '¡Producto modificado correctamente!';
         String? description;
         int dayOfWeekToday = DateTime.now().weekday - 1;
@@ -264,7 +264,7 @@ class _EditProductState extends State<EditProduct> {
             context.read<BusinessBreakfastCubit>().set(product);
           });
         }
-        Navigator.pop(context);
+        Navigator.of(context).pop();
         showDialog(
           context: context,
           barrierDismissible: false,
@@ -318,7 +318,7 @@ class _EditProductState extends State<EditProduct> {
               if(current < lastFilled) TextButton(
                 child: const Text('ELIMINAR IMAGEN'),
                 onPressed: () {
-                  Navigator.pop(context);
+                  Navigator.of(context).pop();
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
@@ -348,7 +348,7 @@ class _EditProductState extends State<EditProduct> {
                                     images[images.length-1] = null;
                                     lastFilled = lastFilled - 1;
                                   });
-                                  Navigator.pop(context);
+                                  Navigator.of(context).pop();
                                   showDialog(
                                     context: context,
                                     builder: (BuildContext context) {
@@ -927,7 +927,7 @@ class _EditProductState extends State<EditProduct> {
                 ElevatedButton(
                   onPressed: () async {
                     FocusScope.of(context).unfocus();
-                    Navigator.pop(context);
+                    Navigator.of(context).pop();
                   },
                   child: const Text('CANCELAR'),
                 ),
@@ -1008,7 +1008,7 @@ class _EditProductState extends State<EditProduct> {
                                   } else {
                                     context.read<BusinessDinnerCubit>().set(null);
                                   }
-                                  Navigator.pop(context);
+                                  Navigator.of(context).pop();
                                   showDialog(
                                     context: context,
                                     builder: (context) {

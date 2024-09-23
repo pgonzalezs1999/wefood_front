@@ -113,7 +113,7 @@ class _CommentState extends State<Comment> {
                                   if(widget.onDelete != null) {
                                     widget.onDelete!();
                                   }
-                                  Navigator.pop(context);
+                                  Navigator.of(context).pop();
                                   showDialog(
                                     context: context,
                                     builder: (BuildContext context) {

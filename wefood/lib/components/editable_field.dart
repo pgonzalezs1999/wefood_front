@@ -160,7 +160,7 @@ class _EditableFieldState extends State<EditableField> {
                     actions: <Widget>[
                       TextButton(
                         onPressed: () {
-                          Navigator.pop(context);
+                          Navigator.of(context).pop();
                         },
                         child: const Text('CANCELAR'),
                       ),
@@ -171,7 +171,7 @@ class _EditableFieldState extends State<EditableField> {
                           });
                           final response = await widget.onSave(newFirst, newSecond);
                           if(response['error'] == null) {
-                            Navigator.pop(context);
+                            Navigator.of(context).pop();
                           } else {
                             setState(() {
                               errorFeedback = response['error'];

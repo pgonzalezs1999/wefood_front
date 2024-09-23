@@ -9,9 +9,11 @@ import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/commands/clear_data.dart';
 import 'package:wefood/commands/contact_support.dart';
 import 'package:wefood/commands/share_app.dart';
+import 'package:wefood/commands/wefood_show_dialog.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api.dart';
+import 'package:wefood/types.dart';
 import 'package:wefood/views/views.dart';
 
 class BusinessProfile extends StatefulWidget {
@@ -22,6 +24,19 @@ class BusinessProfile extends StatefulWidget {
 }
 
 class _BusinessProfileState extends State<BusinessProfile> {
+
+  void _navigateToEditPersonalData({
+    required EditPersonalInfo field,
+  }) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => EditPersonalData(
+        editPersonalInfo: field,
+      )),
+    ).whenComplete(() {
+      setState(() { });
+    });
+  }
 
   void _navigateToBusinessEditDirections() async {
     await Navigator.push(
@@ -110,7 +125,7 @@ class _BusinessProfileState extends State<BusinessProfile> {
             context.read<UserInfoCubit>().state;
             imageRoute = imageModel.route;
           });
-          Navigator.pop(context);
+          Navigator.of(context).pop();
           showDialog(
             context: context,
             builder: (BuildContext context) {
@@ -120,7 +135,7 @@ class _BusinessProfileState extends State<BusinessProfile> {
               );
             }
           ).then((_) {
-            Navigator.pop(context);
+            Navigator.of(context).pop();
           });
         });
       }
@@ -128,7 +143,7 @@ class _BusinessProfileState extends State<BusinessProfile> {
   }
 
   _removePicture() {
-    Navigator.pop(context);
+    Navigator.of(context).pop();
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -142,7 +157,7 @@ class _BusinessProfileState extends State<BusinessProfile> {
       setState(() {
         context.read<UserInfoCubit>().state;
       });
-      Navigator.pop(context);
+      Navigator.of(context).pop();
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -154,7 +169,7 @@ class _BusinessProfileState extends State<BusinessProfile> {
         }
       );
     }).onError(() {
-      Navigator.pop(context);
+      Navigator.of(context).pop();
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -274,57 +289,63 @@ class _BusinessProfileState extends State<BusinessProfile> {
             ]
             : <Widget>[
               GestureDetector(
-                onTap: () async {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return StatefulBuilder(builder: (context, StateSetter setState) {
-                        return AlertDialog(
-                          content: Container(
-                            padding: EdgeInsets.symmetric(
-                              vertical: MediaQuery.of(context).size.height * 0.01,
-                            ),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                TextButton(
-                                  onPressed: () async {
-                                    _pickImageFrom(
-                                      source: ImageSource.gallery,
+                onTap: () => wefoodShowDialog(
+                  context: context,
+                  image: context.read<UserInfoCubit>().state.image,
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextButton(
+                        child: const Text('ESCOGER FOTO DE LA GALERÍA'),
+                        onPressed: () async {
+                          _pickImageFrom(
+                            source: ImageSource.gallery,
+                          );
+                        },
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          _pickImageFrom(
+                            source: ImageSource.camera,
+                          );
+                        },
+                        child: const Text('SACAR FOTO CON LA CÁMARA'),
+                      ),
+                      if(context.read<UserInfoCubit>().state.image != null) TextButton(
+                        child: const Text('ELIMINAR FOTO'),
+                        onPressed: () {
+                          callRequestWithLoading(
+                            closePreviousPopup: true,
+                            context: context,
+                            request: () async {
+                              return await Api.removeImage(
+                                idUser: context.read<UserInfoCubit>().state.user.id!,
+                                meaning: 'profile',
+                              );
+                            },
+                            onSuccess: (_) {
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return WefoodPopup(
+                                      context: context,
+                                      title: 'Imagen eliminada correctamente',
+                                      cancelButtonTitle: 'OK',
                                     );
-                                  },
-                                  child: const Text('ESCOGER FOTO DE LA GALERÍA'),
-                                ),
-                                TextButton(
-                                  onPressed: () async {
-                                    _pickImageFrom(
-                                      source: ImageSource.camera,
-                                    );
-                                  },
-                                  child: const Text('SACAR FOTO CON LA CÁMARA'),
-                                ),
-                                TextButton(
-                                  onPressed: () async {
-                                    _removePicture();
-                                  },
-                                  child: const Text('ELIMINAR FOTO'),
-                                ),
-                              ],
-                            ),
-                          ),
-                          actions: <Widget>[
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: const Text('SALIR'),
-                            ),
-                          ],
-                        );
-                      });
-                    },
-                  );
-                },
+                                  }
+                              );
+                              context.read<UserInfoCubit>().removePicture();
+                              setState(() {
+                                context.read<UserInfoCubit>().state;
+                              });
+                            },
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                  cancelButtonTitle: 'SALIR',
+                ),
                 child: Container(
                   margin: EdgeInsets.only(
                     right: MediaQuery.of(context).size.width * 0.05,
@@ -371,36 +392,38 @@ class _BusinessProfileState extends State<BusinessProfile> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    EditableField(
-                      feedbackText: (context.read<UserInfoCubit>().state.business.name != null) ? 'Nombre: ${context.read<UserInfoCubit>().state.business.name!}' : 'Añade tu nombre',
-                      firstTopic: 'nombre',
-                      firstInitialValue: (context.read<UserInfoCubit>().state.business.name != null) ? context.read<UserInfoCubit>().state.business.name! : '',
-                      firstMinimumLength: 6,
-                      firstMaximumLength: 100,
-                      onSave: (newValue, newSecondValue) async {
-                        dynamic response = await Api.updateBusinessName(
-                          name: newValue,
-                        );
-                        setState(() {});
-                        return response;
-                      },
+                    GestureDetector(
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Text(
+                              'Nombre: ${context.read<UserInfoCubit>().state.business.name}',
+                            ),
+                          ),
+                          const Icon(
+                            Icons.edit,
+                          ),
+                        ],
+                      ),
+                      onTap: () => _navigateToEditPersonalData(field: EditPersonalInfo.businessName),
                     ),
                     const SizedBox(
                       height: 10,
                     ),
-                    EditableField(
-                      feedbackText: 'Descripción: ${context.read<UserInfoCubit>().state.business.description}',
-                      firstTopic: 'descripción',
-                      firstInitialValue: context.read<UserInfoCubit>().state.business.description ?? '',
-                      firstMinimumLength: 6,
-                      firstMaximumLength: 255,
-                      onSave: (newValue, newSecondValue) async {
-                        dynamic response = await Api.updateBusinessDescription(
-                          description: newValue,
-                        );
-                        setState(() {});
-                        return response;
-                      },
+                    GestureDetector(
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Text(
+                              'Descripción: ${context.read<UserInfoCubit>().state.business.description}',
+                            ),
+                          ),
+                          const Icon(
+                            Icons.edit,
+                          ),
+                        ],
+                      ),
+                      onTap: () => _navigateToEditPersonalData(field: EditPersonalInfo.businessDescription),
                     ),
                     const SizedBox(
                       height: 10,
@@ -489,38 +512,31 @@ class _BusinessProfileState extends State<BusinessProfile> {
             SettingsElement(
               iconData: Icons.logout,
               title: 'Cerrar sesión',
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return WefoodPopup(
-                      context: context,
-                      title: '¿Seguro que quieres cerrar sesión?',
-                      actions: <TextButton>[
-                        TextButton(
-                          onPressed: () async {
-                            callRequestWithLoading(
-                              context: context,
-                              request: () async {
-                                return await Api.logout();
-                              },
-                              onSuccess: (_) async {
-                                await clearData(context);
-                                _navigateToMain();
-                              },
-                              onError: (error) async {
-                                await clearData(context);
-                                _navigateToMain();
-                              },
-                            );
-                          },
-                          child: const Text('SÍ'),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              }
+              onTap: () => wefoodShowDialog(
+                context: context,
+                title: '¿Seguro que quieres cerrar sesión?',
+                actions: <TextButton>[
+                  TextButton(
+                    onPressed: () async {
+                      callRequestWithLoading(
+                        context: context,
+                        request: () async {
+                          return await Api.logout();
+                        },
+                        onSuccess: (_) async {
+                          await clearData(context);
+                          _navigateToMain();
+                        },
+                        onError: (error) async {
+                          await clearData(context);
+                          _navigateToMain();
+                        },
+                      );
+                    },
+                    child: const Text('SÍ'),
+                  ),
+                ],
+              ),
             ),
             SettingsElement(
               iconData: Icons.business,
@@ -544,10 +560,10 @@ class _BusinessProfileState extends State<BusinessProfile> {
                         TextButton(
                           onPressed: () {
                             Api.signOut(context).then((_) {
-                              Navigator.pop(context);
+                              Navigator.of(context).pop();
                               _navigateToMain();
                             }).onError((error, StackTrace stackTrace) {
-                              Navigator.pop(context);
+                              Navigator.of(context).pop();
                               showDialog(
                                 context: context,
                                 builder: (BuildContext context) {

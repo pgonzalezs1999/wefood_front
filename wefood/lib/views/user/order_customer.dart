@@ -184,9 +184,9 @@ class _OrderCustomerState extends State<OrderCustomer> {
                                             cancelButtonTitle: 'OK',
                                             cancelButtonBehaviour: () async {
                                               setState(() {
-                                                Navigator.pop(context);
-                                                Navigator.pop(context);
-                                                Navigator.pop(context);
+                                                Navigator.of(context).pop();
+                                                Navigator.of(context).pop();
+                                                Navigator.of(context).pop();
                                               });
                                             },
                                           );

@@ -91,7 +91,7 @@ launchContact({
           TextButton(
             child: const Text('OK'),
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.of(context).pop();
             },
           )
         ],

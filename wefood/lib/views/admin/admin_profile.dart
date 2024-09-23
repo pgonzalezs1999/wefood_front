@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/commands/clear_data.dart';
 import 'package:wefood/commands/share_app.dart';
+import 'package:wefood/commands/wefood_show_dialog.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/main.dart';
 import 'package:wefood/services/auth/api.dart';
@@ -78,38 +79,31 @@ class _AdminProfileState extends State<AdminProfile> {
             SettingsElement(
               iconData: Icons.logout,
               title: 'Cerrar sesión',
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return WefoodPopup(
-                      context: context,
-                      title: '¿Seguro que quieres cerrar sesión?',
-                      actions: <TextButton>[
-                        TextButton(
-                          onPressed: () async {
-                            callRequestWithLoading(
-                              context: context,
-                              request: () async {
-                                return await Api.logout();
-                              },
-                              onSuccess: (_) async {
-                                await clearData(context);
-                                _navigateToMain();
-                              },
-                              onError: (error) async {
-                                await clearData(context);
-                                _navigateToMain();
-                              },
-                            );
-                          },
-                          child: const Text('SÍ'),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              }
+              onTap: () => wefoodShowDialog(
+                context: context,
+                title: '¿Seguro que quieres cerrar sesión?',
+                actions: <TextButton>[
+                  TextButton(
+                    onPressed: () async {
+                      callRequestWithLoading(
+                        context: context,
+                        request: () async {
+                          return await Api.logout();
+                        },
+                        onSuccess: (_) async {
+                          await clearData(context);
+                          _navigateToMain();
+                        },
+                        onError: (error) async {
+                          await clearData(context);
+                          _navigateToMain();
+                        },
+                      );
+                    },
+                    child: const Text('SÍ'),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
