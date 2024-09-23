@@ -5,11 +5,11 @@ typedef CloseLoadingScreen = bool Function();
 typedef UpdateLoadingScreen = bool Function(String text);
 
 @immutable
-class WefoodPopUpV2Controller {
+class LoadingModernController {
   final CloseLoadingScreen close; // to close our dialog
   final UpdateLoadingScreen update; // to update any text with in our dialog if needed
 
-  const WefoodPopUpV2Controller({
+  const LoadingModernController({
     required this.close,
     required this.update,
   });

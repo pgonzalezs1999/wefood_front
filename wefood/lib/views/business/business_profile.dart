@@ -126,14 +126,9 @@ class _BusinessProfileState extends State<BusinessProfile> {
             imageRoute = imageModel.route;
           });
           Navigator.of(context).pop();
-          showDialog(
+          wefoodShowDialog(
             context: context,
-            builder: (BuildContext context) {
-              return WefoodPopup(
-                context: context,
-                title: '¡Imagen añadida correctamente!',
-              );
-            }
+            title: '¡Imagen añadida correctamente!',
           ).then((_) {
             Navigator.of(context).pop();
           });
@@ -158,28 +153,18 @@ class _BusinessProfileState extends State<BusinessProfile> {
         context.read<UserInfoCubit>().state;
       });
       Navigator.of(context).pop();
-      showDialog(
+      wefoodShowDialog(
         context: context,
-        builder: (BuildContext context) {
-          return WefoodPopup(
-            context: context,
-            title: 'Imagen eliminada correctamente',
-            cancelButtonTitle: 'OK',
-          );
-        }
+        title: 'Imagen eliminada correctamente',
+        cancelButtonTitle: 'OK',
       );
     }).onError(() {
       Navigator.of(context).pop();
-      showDialog(
+      wefoodShowDialog(
         context: context,
-        builder: (BuildContext context) {
-          return WefoodPopup(
-            context: context,
-            title: 'Ha ocurrido un error',
-            description: 'Por favor, inténtelo de nuevo más tarde',
-            cancelButtonTitle: 'OK',
-          );
-        }
+        title: 'Ha ocurrido un error',
+        description: 'Por favor, inténtelo de nuevo más tarde',
+        cancelButtonTitle: 'OK',
       );
     });
   }
@@ -324,15 +309,10 @@ class _BusinessProfileState extends State<BusinessProfile> {
                               );
                             },
                             onSuccess: (_) {
-                              showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return WefoodPopup(
-                                      context: context,
-                                      title: 'Imagen eliminada correctamente',
-                                      cancelButtonTitle: 'OK',
-                                    );
-                                  }
+                              wefoodShowDialog(
+                                context: context,
+                                title: 'Imagen eliminada correctamente',
+                                cancelButtonTitle: 'OK',
                               );
                               context.read<UserInfoCubit>().removePicture();
                               setState(() {
@@ -549,39 +529,29 @@ class _BusinessProfileState extends State<BusinessProfile> {
               iconData: Icons.delete_outline,
               title: 'Darme de baja',
               onTap: () {
-                showDialog(
+                wefoodShowDialog(
                   context: context,
-                  builder: (BuildContext context) {
-                    return WefoodPopup(
-                      context: context,
-                      title: '¿Seguro que quieres darte de baja?',
-                      description: 'Perderás toda tu información y no podrás recuperarla más adelante.',
-                      actions: <TextButton>[
-                        TextButton(
-                          onPressed: () {
-                            Api.signOut(context).then((_) {
-                              Navigator.of(context).pop();
-                              _navigateToMain();
-                            }).onError((error, StackTrace stackTrace) {
-                              Navigator.of(context).pop();
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return WefoodPopup(
-                                    context: context,
-                                    title: 'Ha ocurrido un error',
-                                    description: 'Por favor, inténtelo de nuevo más tarde',
-                                    cancelButtonTitle: 'OK',
-                                  );
-                                },
-                              );
-                            });
-                          },
-                          child: const Text('SÍ'),
-                        ),
-                      ],
-                    );
-                  },
+                  title: '¿Seguro que quieres darte de baja?',
+                  description: 'Perderás toda tu información y no podrás recuperarla más adelante.',
+                  actions: <TextButton>[
+                    TextButton(
+                      onPressed: () {
+                        Api.signOut(context).then((_) {
+                          Navigator.of(context).pop();
+                          _navigateToMain();
+                        }).onError((error, StackTrace stackTrace) {
+                          Navigator.of(context).pop();
+                          wefoodShowDialog(
+                            context: context,
+                            title: 'Ha ocurrido un error',
+                            description: 'Por favor, inténtelo de nuevo más tarde',
+                            cancelButtonTitle: 'OK',
+                          );
+                        });
+                      },
+                      child: const Text('SÍ'),
+                    ),
+                  ],
                 );
               },
             ),

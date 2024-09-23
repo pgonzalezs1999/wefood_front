@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:wefood/blocs/blocs.dart';
+import 'package:wefood/commands/wefood_show_dialog.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
 import 'package:wefood/services/auth/api.dart';
@@ -277,19 +278,14 @@ class _BusinessEditDirectionsState extends State<BusinessEditDirections> {
                         typedLatLng!.longitude
                       ),
                     );
-                    showDialog(
+                    wefoodShowDialog(
                       context: context,
-                      builder: (BuildContext context) {
-                        return WefoodPopup(
-                          context: context,
-                          title: 'Dirección guardada como',
-                          description: finalDirections,
-                          cancelButtonTitle: 'OK',
-                          cancelButtonBehaviour: () {
-                            Navigator.of(context).pop();
-                          },
-                        );
-                      }
+                      title: 'Dirección guardada como',
+                      description: finalDirections,
+                      cancelButtonTitle: 'OK',
+                      cancelButtonBehaviour: () {
+                        Navigator.of(context).pop();
+                      },
                     ).then((onValue) {
                       Navigator.of(context).pop();
                     });

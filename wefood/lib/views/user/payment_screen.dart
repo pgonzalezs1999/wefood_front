@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/commands/scroll_to_bottom.dart';
+import 'package:wefood/commands/wefood_show_dialog.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
 import 'package:wefood/models/models.dart';
@@ -51,7 +52,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
   @override
   void initState() {
     _getBankCards(savedBankCards);
-    // _autofillForm();
     _getOpenpayDeviceSessionId();
     super.initState();
   }
@@ -100,19 +100,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
       }
     }
     return result;
-  }
-
-  void _autofillForm() {
-    currentBankCard.ownerName = 'Matthew Daniel Herrera Ortega';
-    currentBankCard.cardNumber = 4111111111111111;
-    currentBankCard.expirationMonth = 05;
-    currentBankCard.expirationYear = 29;
-    currentCvv2 = '232';
-    ownerController.text = currentBankCard.ownerName ?? '';
-    cardNumberController.text = currentBankCard.cardNumber.toString();
-    expirationMonthController.text = currentBankCard.expirationMonth.toString();
-    expirationYearController.text = currentBankCard.expirationYear.toString();
-    cvvController.text = currentCvv2.toString();
   }
 
   _getOpenpayDeviceSessionId() async {
@@ -546,28 +533,18 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                         feedback = '';
                                         Navigator.of(context).pop();
                                         Navigator.of(context).pop();
-                                        showDialog(
+                                        wefoodShowDialog(
                                           context: context,
-                                          builder: (BuildContext context) {
-                                            return WefoodPopup(
-                                              context: context,
-                                              title: '¡Producto comprado!',
-                                              description: 'Cuando llegue al establecimiento, enseñe el QR que encontrará en \nPerfil -> Pedidos pendientes.\n¡Que aproveche!',
-                                              cancelButtonTitle: 'OK',
-                                            );
-                                          }
+                                          title: '¡Producto comprado!',
+                                          description: 'Cuando llegue al establecimiento, enseñe el QR que encontrará en \nPerfil -> Pedidos pendientes.\n¡Que aproveche!',
+                                          cancelButtonTitle: 'OK',
                                         );
                                       } else {
                                         Navigator.of(context).pop();
-                                        showDialog(
+                                        wefoodShowDialog(
                                           context: context,
-                                          builder: (BuildContext context) {
-                                            return WefoodPopup(
-                                              context: context,
-                                              title: 'Pago rechazado', // status, // 'Pago rechazado',
-                                              cancelButtonTitle: 'OK',
-                                            );
-                                          }
+                                          title: 'Pago rechazado', // status, // 'Pago rechazado',
+                                          cancelButtonTitle: 'OK',
                                         );
                                       }
                                     });
@@ -576,19 +553,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                     Navigator.of(context).pop();
                                     Navigator.of(context).pop();
                                     Navigator.of(context).pop();
-                                    showDialog(
+                                    print('---------------------------');
+                                    print(error);
+                                    print('---------------------------');
+                                    wefoodShowDialog(
                                       context: context,
-                                      builder: (BuildContext context) {
-                                        print('---------------------------');
-                                        print(error);
-                                        print('---------------------------');
-                                        return WefoodPopup(
-                                          context: context,
-                                          title: 'Ha ocurrido un error al realizar el pago',
-                                          description: 'Por favor, inténtelo de nuevo más tarde: $error',
-                                          cancelButtonTitle: 'OK',
-                                        );
-                                      }
+                                      title: 'Ha ocurrido un error al realizar el pago',
+                                      description: 'Por favor, inténtelo de nuevo más tarde: $error',
+                                      cancelButtonTitle: 'OK',
                                     );
                                   }
                                 );
@@ -596,15 +568,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 Navigator.of(context).pop();
                                 Navigator.of(context).pop();
                                 Navigator.of(context).pop();
-                                showDialog(
+                                wefoodShowDialog(
                                   context: context,
-                                  builder: (BuildContext context) {
-                                    return WefoodPopup(
-                                      context: context,
-                                      title: 'Pago rechazado',
-                                      cancelButtonTitle: 'OK',
-                                    );
-                                  }
+                                  title: 'Pago rechazado',
+                                  cancelButtonTitle: 'OK',
                                 );
                               });
                             }

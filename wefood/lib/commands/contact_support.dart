@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:wefood/components/components.dart';
+import 'package:wefood/commands/wefood_show_dialog.dart';
 import 'package:wefood/environment.dart';
 
 launchContact({
@@ -58,29 +58,24 @@ launchContact({
                 launchUrl(uri).then((response) {
                   if(kDebugMode) { print('Abriendo WhatsApp'); }
                 }).onError((error, stackTrace) {
-                  showDialog(
+                  wefoodShowDialog(
                     context: context,
-                    builder: (BuildContext context) {
-                      return WefoodPopup(
-                        context: context,
-                        title: 'No se ha podido abrir WhatsApp',
-                        description: 'Esto suele deberse a problemas de conexión, o a que no tenga la aplicación de WhatsApp instalada. Si el error persiste, por favor escríbanos a',
-                        content: Column(
-                          children: <Widget>[
-                            TextButton(
-                              onPressed: () async {
-                                String subject = 'Consulta sobre la aplicación WeFood';
-                                await launchUrl(
-                                  Uri.parse('mailto:${Environment.supportEmail}?subject=$subject&body=$message'),
-                                );
-                              },
-                              child: const Text(Environment.supportEmail),
-                            ),
-                          ],
+                    title: 'No se ha podido abrir WhatsApp',
+                    description: 'Esto suele deberse a problemas de conexión, o a que no tenga la aplicación de WhatsApp instalada. Si el error persiste, por favor escríbanos a',
+                    content: Column(
+                      children: <Widget>[
+                        TextButton(
+                          onPressed: () async {
+                            String subject = 'Consulta sobre la aplicación WeFood';
+                            await launchUrl(
+                              Uri.parse('mailto:${Environment.supportEmail}?subject=$subject&body=$message'),
+                            );
+                          },
+                          child: const Text(Environment.supportEmail),
                         ),
-                        cancelButtonTitle: 'OK',
-                      );
-                    }
+                      ],
+                    ),
+                    cancelButtonTitle: 'OK',
                   );
                 });
               },

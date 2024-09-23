@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:wefood/commands/wefood_show_dialog.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api.dart';
@@ -129,28 +130,23 @@ class _WaitingVerificationState extends State<WaitingVerification> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return WefoodPopup(
-                          context: context,
-                          title: '¿Seguro que quiere cancelar la solicitud?',
-                          description: 'Tendrá que volver a rellenar todos los datos',
-                          actions: <TextButton>[
-                            TextButton(
-                              onPressed: () async {
-                                await Api.cancelValidation(
-                                    username: (await UserSecureStorage().read(key: 'username'))!
-                                );
-                                await UserSecureStorage().delete(key: 'username');
-                                await UserSecureStorage().delete(key: 'password');
-                                _navigateToLogin();
-                              },
-                              child: const Text('SÍ'),
-                            ),
-                          ],
-                        );
-                      }
+                  wefoodShowDialog(
+                    context: context,
+                    title: '¿Seguro que quiere cancelar la solicitud?',
+                    description: 'Tendrá que volver a rellenar todos los datos',
+                    actions: <TextButton>[
+                      TextButton(
+                        onPressed: () async {
+                          await Api.cancelValidation(
+                            username: (await UserSecureStorage().read(key: 'username'))!
+                          );
+                          await UserSecureStorage().delete(key: 'username');
+                          await UserSecureStorage().delete(key: 'password');
+                          _navigateToLogin();
+                        },
+                        child: const Text('SÍ'),
+                      ),
+                    ],
                   );
                 },
                 child: const Text('CANCELAR ALTA'),

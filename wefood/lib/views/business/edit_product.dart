@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/commands/call_request.dart';
+import 'package:wefood/commands/wefood_show_dialog.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
 import 'package:wefood/models/models.dart';
@@ -129,18 +130,12 @@ class _EditProductState extends State<EditProduct> {
                 width: MediaQuery.of(context).size.width * 0.5,
               );
             });
-            showDialog(
+            wefoodShowDialog(
               context: context,
-              barrierDismissible: false,
-              builder: (BuildContext context) {
-                return WefoodPopup(
-                  context: context,
-                  title: '¡Foto actualizada correctamente!',
-                  cancelButtonTitle: 'OK',
-                );
-              }
+              title: '¡Foto actualizada correctamente!',
+              cancelButtonTitle: 'OK',
             );
-          },
+          }
         );
       }
     });
@@ -205,18 +200,11 @@ class _EditProductState extends State<EditProduct> {
             });
           }
         }
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          useRootNavigator: false,
-          builder: ((BuildContext context) {
-            return WefoodPopup(
-              context: context,
-              title: title,
-              description: description,
-              cancelButtonTitle: 'OK',
-            );
-          }),
+        wefoodShowDialog(
+           context: context,
+          title: title,
+          description: description,
+          cancelButtonTitle: 'OK',
         );
       },
     );
@@ -265,17 +253,10 @@ class _EditProductState extends State<EditProduct> {
           });
         }
         Navigator.of(context).pop();
-        showDialog(
+        wefoodShowDialog(
           context: context,
-          barrierDismissible: false,
-          useRootNavigator: false,
-          builder: ((BuildContext context) {
-            return WefoodPopup(
-              context: context,
-              title: '¡Producto creado correctamente!',
-              cancelButtonTitle: 'OK',
-            );
-          }),
+          title: '¡Producto creado correctamente!',
+          cancelButtonTitle: 'OK',
         );
       },
     );
@@ -288,92 +269,75 @@ class _EditProductState extends State<EditProduct> {
         lastFilled = i+1;
       }
     }
-    showDialog(
+    wefoodShowDialog(
       context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return WefoodPopup(
-          context: context,
-          image: images[current],
-          content: Column(
-            children: <TextButton>[
-              TextButton(
-                child: Text('${(current < lastFilled) ? 'CAMBIAR' : 'AÑADIR'} DESDE LA CÁMARA'),
-                onPressed: () async {
-                  _pickImageFrom(
-                    source: ImageSource.camera,
-                    position: (current <= lastFilled) ? current+1 : lastFilled+1,
-                  );
-                },
-              ),
-              TextButton(
-                child: Text('${(current < lastFilled) ? 'CAMBIAR' : 'AÑADIR'} DE LA GALERÍA'),
-                onPressed: () async {
-                  _pickImageFrom(
-                    source: ImageSource.gallery,
-                    position: (current <= lastFilled) ? current+1 : lastFilled+1,
-                  );
-                },
-              ),
-              if(current < lastFilled) TextButton(
-                child: const Text('ELIMINAR IMAGEN'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return WefoodPopup(
-                        image: images[current],
-                        context: context,
-                        title: '¿Eliminar imagen?',
-                        actions: <TextButton>[
-                          TextButton(
-                            child: const Text('SÍ'),
-                            onPressed: () {
-                              callRequestWithLoading(
-                                context: context,
-                                request: () async {
-                                  return await Api.removeImage(
-                                    idUser: context.read<UserInfoCubit>().state.user.id!,
-                                    meaning: '${Utils.productTypeToChar(widget.productType).toLowerCase()}${current+1}',
-                                  );
-                                },
-                                onSuccess: (_) {
-                                  for(int i = current; i < images.length - 1; i++) {
-                                    setState(() {
-                                      images[i] = images[i+1];
-                                    });
-                                  }
-                                  setState(() {
-                                    images[images.length-1] = null;
-                                    lastFilled = lastFilled - 1;
-                                  });
-                                  Navigator.of(context).pop();
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return WefoodPopup(
-                                        context: context,
-                                        title: '¡Imagen eliminada correctamente!',
-                                        cancelButtonTitle: 'OK',
-                                      );
-                                    }
-                                  );
-                                },
-                              );
-                            },
-                          ),
-                        ],
-                      );
-                    }
-                  );
-                },
-              ),
-            ],
+      image: images[current],
+      content: Column(
+        children: <TextButton>[
+          TextButton(
+            child: Text('${(current < lastFilled) ? 'CAMBIAR' : 'AÑADIR'} DESDE LA CÁMARA'),
+            onPressed: () async {
+              _pickImageFrom(
+                source: ImageSource.camera,
+                position: (current <= lastFilled) ? current+1 : lastFilled+1,
+              );
+            },
           ),
-          cancelButtonTitle: 'CANCELAR',
-        );
-      }
+          TextButton(
+            child: Text('${(current < lastFilled) ? 'CAMBIAR' : 'AÑADIR'} DE LA GALERÍA'),
+            onPressed: () async {
+              _pickImageFrom(
+                source: ImageSource.gallery,
+                position: (current <= lastFilled) ? current+1 : lastFilled+1,
+              );
+            },
+          ),
+          if(current < lastFilled) TextButton(
+            child: const Text('ELIMINAR IMAGEN'),
+            onPressed: () {
+              Navigator.of(context).pop();
+              wefoodShowDialog(
+                context: context,
+                title: '¿Eliminar imagen?',
+                actions: <TextButton>[
+                  TextButton(
+                    child: const Text('SÍ'),
+                    onPressed: () {
+                      callRequestWithLoading(
+                        context: context,
+                        request: () async {
+                          return await Api.removeImage(
+                            idUser: context.read<UserInfoCubit>().state.user.id!,
+                            meaning: '${Utils.productTypeToChar(widget.productType).toLowerCase()}${current+1}',
+                          );
+                        },
+                        onSuccess: (_) {
+                          for(int i = current; i < images.length - 1; i++) {
+                            setState(() {
+                              images[i] = images[i+1];
+                            });
+                          }
+                          setState(() {
+                            images[images.length-1] = null;
+                            lastFilled = lastFilled - 1;
+                          });
+                          Navigator.of(context).pop();
+                          wefoodShowDialog(
+                            context: context,
+                            title: '¡Imagen eliminada correctamente!',
+                            cancelButtonTitle: 'OK',
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ],
+              );
+            }
+          ),
+        ],
+      ),
+      cancelButtonTitle: 'CANCELAR',
     );
   }
 
@@ -977,64 +941,53 @@ class _EditProductState extends State<EditProduct> {
                 child: const Text('ELIMINAR PRODUCTO'),
                 onPressed: () async {
                   FocusScope.of(context).unfocus();
-                  showDialog(
+                  wefoodShowDialog(
                     context: context,
-                    useRootNavigator: false,
-                    builder: ((_) {
-                      return WefoodPopup(
-                        context: _,
-                        title: '¿Eliminar producto?',
-                        description: 'No podrás deshacer esta acción',
-                        cancelButtonTitle: 'CANCELAR',
-                        actions: <TextButton>[
-                          TextButton(
-                            child: const Text('OK'),
-                            onPressed: () {
-                              callRequestWithLoading(
-                                closePreviousPopup: true,
-                                context: context,
-                                request: () async {
-                                  return await Api.deleteProduct(
-                                    type: (widget.productType == ProductType.breakfast) ? 'B'
-                                      : (widget.productType == ProductType.lunch) ? 'L'
-                                      : (widget.productType == ProductType.dinner) ? 'D' : '',
-                                  );
-                                },
-                                onSuccess: (_) {
-                                  if (widget.productType == ProductType.breakfast) {
-                                    context.read<BusinessBreakfastCubit>().set(null);
-                                  } else if (widget.productType == ProductType.lunch) {
-                                    context.read<BusinessLunchCubit>().set(null);
-                                  } else {
-                                    context.read<BusinessDinnerCubit>().set(null);
-                                  }
-                                  Navigator.of(context).pop();
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return WefoodPopup(
-                                        context: context,
-                                        title: 'Producto eliminado correctamente',
-                                        cancelButtonTitle: 'OK',
-                                      );
-                                    }
-                                  );
-                                },
-                                onError: (requestError) {
-                                  setState(() {
-                                    error =
-                                    'Ha ocurrido un error eliminar el producto. Por favor, inténtelo de nuevo más tarde';
-                                  });
-                                  scrollToBottom(
-                                    scrollController: scrollController,
-                                  );
-                                }
+                    title: '¿Eliminar producto?',
+                    description: 'No podrás deshacer esta acción',
+                    cancelButtonTitle: 'CANCELAR',
+                    actions: <TextButton>[
+                      TextButton(
+                        child: const Text('OK'),
+                        onPressed: () {
+                          callRequestWithLoading(
+                            closePreviousPopup: true,
+                            context: context,
+                            request: () async {
+                              return await Api.deleteProduct(
+                                type: (widget.productType == ProductType.breakfast) ? 'B'
+                                  : (widget.productType == ProductType.lunch) ? 'L'
+                                  : (widget.productType == ProductType.dinner) ? 'D' : '',
                               );
                             },
-                          ),
-                        ],
-                      );
-                    }),
+                            onSuccess: (_) {
+                              if (widget.productType == ProductType.breakfast) {
+                                context.read<BusinessBreakfastCubit>().set(null);
+                              } else if (widget.productType == ProductType.lunch) {
+                                context.read<BusinessLunchCubit>().set(null);
+                              } else {
+                                context.read<BusinessDinnerCubit>().set(null);
+                              }
+                              Navigator.of(context).pop();
+                              wefoodShowDialog(
+                                context: context,
+                                title: 'Producto eliminado correctamente',
+                                cancelButtonTitle: 'OK',
+                              );
+                            },
+                            onError: (requestError) {
+                              setState(() {
+                                error =
+                                'Ha ocurrido un error eliminar el producto. Por favor, inténtelo de nuevo más tarde';
+                              });
+                              scrollToBottom(
+                                scrollController: scrollController,
+                              );
+                            }
+                          );
+                        },
+                      ),
+                    ],
                   );
                 },
               ),

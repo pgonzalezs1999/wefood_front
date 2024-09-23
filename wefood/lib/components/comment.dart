@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/commands/call_request.dart';
+import 'package:wefood/commands/wefood_show_dialog.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api.dart';
@@ -92,45 +93,35 @@ class _CommentState extends State<Comment> {
                   Icons.delete,
                 ),
                 onTap: () {
-                  showDialog(
+                  wefoodShowDialog(
                     context: context,
-                    builder: (BuildContext context) {
-                      return WefoodPopup(
-                        context: context,
-                        title: '¿Eliminar comentario?',
-                        actions: <TextButton>[
-                          TextButton(
-                            child: const Text('SÍ'),
-                            onPressed: () {
-                              callRequestWithLoading(
-                                context: context,
-                                request: () async {
-                                  return await Api.deleteComment(
-                                    idBusiness: widget.comment.comment.idBusiness!,
-                                  );
-                                },
-                                onSuccess: (_) {
-                                  if(widget.onDelete != null) {
-                                    widget.onDelete!();
-                                  }
-                                  Navigator.of(context).pop();
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return WefoodPopup(
-                                        context: context,
-                                        title: '¡Comentario eliminado correctamente!',
-                                        cancelButtonTitle: 'OK',
-                                      );
-                                    }
-                                  );
-                                },
+                    title: '¿Eliminar comentario?',
+                    actions: <TextButton>[
+                      TextButton(
+                        child: const Text('SÍ'),
+                        onPressed: () {
+                          callRequestWithLoading(
+                            context: context,
+                            request: () async {
+                              return await Api.deleteComment(
+                                idBusiness: widget.comment.comment.idBusiness!,
                               );
                             },
-                          )
-                        ],
-                      );
-                    },
+                            onSuccess: (_) {
+                              if(widget.onDelete != null) {
+                                widget.onDelete!();
+                              }
+                              Navigator.of(context).pop();
+                              wefoodShowDialog(
+                                context: context,
+                                title: '¡Comentario eliminado correctamente!',
+                                cancelButtonTitle: 'OK',
+                              );
+                            },
+                          );
+                        },
+                      )
+                    ],
                   );
                 },
               ),

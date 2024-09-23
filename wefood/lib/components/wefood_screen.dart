@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:wefood/commands/wefood_show_dialog.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
 
@@ -41,22 +42,17 @@ class _WefoodScreenState extends State<WefoodScreen> {
   void _onPopInvoked(bool param) {
     if(widget.canPop == false) {
       FocusScope.of(context).unfocus();
-      showDialog(
+      wefoodShowDialog(
         context: context,
-        builder: (BuildContext context) {
-          return WefoodPopup(
-            context: context,
-            title: '¿Cerrar WeFood?',
-            actions: <TextButton>[
-              TextButton(
-                onPressed: () {
-                  SystemChannels.platform.invokeMethod('SystemNavigator.pop');
-                },
-                child: const Text('SÍ'),
-              ),
-            ],
-          );
-        }
+        title: '¿Cerrar WeFood?',
+        actions: <TextButton>[
+          TextButton(
+            onPressed: () {
+              SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+            },
+            child: const Text('SÍ'),
+          ),
+        ],
       );
     }
   }

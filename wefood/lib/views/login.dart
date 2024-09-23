@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wefood/commands/call_request.dart';
+import 'package:wefood/commands/wefood_show_dialog.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
 import 'package:wefood/models/models.dart';
@@ -179,16 +180,11 @@ class _LoginState extends State<Login> {
                     title = 'Usuario o contraseña incorrectos';
                     description = null;
                   }
-                  showDialog(
+                  wefoodShowDialog(
                     context: context,
-                    builder: (BuildContext context) {
-                      return WefoodPopup(
-                        context: context,
-                        title: title,
-                        description: description,
-                        cancelButtonTitle: 'OK',
-                      );
-                    }
+                    title: title,
+                    description: description,
+                    cancelButtonTitle: 'OK',
                   );
                 }
               },
@@ -196,16 +192,11 @@ class _LoginState extends State<Login> {
                 setState(() {
                   authenticating = LoadingStatus.error;
                 });
-                showDialog(
+                wefoodShowDialog(
                   context: context,
-                  builder: (BuildContext context) {
-                    return WefoodPopup(
-                      context: context,
-                      title: (error.runtimeType == TimeoutException) ? 'No se ha podido conectar con el servidor' : 'Ha ocurrido un error',
-                      description: 'Por favor, inténtelo de nuevo más tarde. Si el error consiste, póngase en contacto con soporte.',
-                      cancelButtonTitle: 'OK',
-                    );
-                  }
+                  title: (error.runtimeType == TimeoutException) ? 'No se ha podido conectar con el servidor' : 'Ha ocurrido un error',
+                  description: 'Por favor, inténtelo de nuevo más tarde. Si el error consiste, póngase en contacto con soporte.',
+                  cancelButtonTitle: 'OK',
                 );
               }
             );

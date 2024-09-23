@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/commands/utils.dart';
+import 'package:wefood/commands/wefood_show_dialog.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/services/auth/api.dart';
 
@@ -168,14 +169,9 @@ class _BusinessBankDataState extends State<BusinessBankData> {
                       bankOwnerName: bankOwnerName,
                       interbankAccount: interbankAccount,
                     );
-                    showDialog(
+                    wefoodShowDialog(
                       context: context,
-                      builder: (BuildContext context) {
-                        return WefoodPopup(
-                          context: context,
-                          title: '¡Datos actualizados correctamente!',
-                        );
-                      }
+                      title: '¡Datos actualizados correctamente!',
                     );
                   },
                 );

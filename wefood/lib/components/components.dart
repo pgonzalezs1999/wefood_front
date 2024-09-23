@@ -1,7 +1,6 @@
 export 'package:wefood/components/back_arrow.dart';
 export 'package:wefood/components/wefood_navigation_screen.dart';
 export 'package:wefood/components/settings_element.dart';
-export 'package:wefood/components/wefood_popup.dart';
 export 'package:wefood/components/wefood_screen.dart';
 export 'package:wefood/components/loading_icon.dart';
 export 'package:wefood/components/choosable_numeric_input.dart';

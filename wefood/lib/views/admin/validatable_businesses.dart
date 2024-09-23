@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/commands/utils.dart';
+import 'package:wefood/commands/wefood_show_dialog.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/components/components.dart';
@@ -141,86 +142,66 @@ class _ValidatableBusinessesState extends State<ValidatableBusinesses> {
                           ElevatedButton(
                             child: const Text('RECHAZAR'),
                             onPressed: () async {
-                              showDialog(
+                              wefoodShowDialog(
                                 context: context,
-                                builder: (_) {
-                                  return WefoodPopup(
-                                    context: _,
-                                    title: '¿Rechazar establecimiento?',
-                                    actions: <TextButton>[
-                                      TextButton(
-                                        onPressed: () async {
-                                          callRequestWithLoading(
-                                            closePreviousPopup: true,
-                                            context: context,
-                                            request: () async {
-                                              return await Api.refuseBusiness(
-                                                id: item.business.id!,
-                                              );
-                                            },
-                                            onSuccess: (value) async {
-                                              showDialog(
-                                                context: context,
-                                                builder: (BuildContext context) {
-                                                  return WefoodPopup(
-                                                    context: context,
-                                                    title: 'Establecimiento rechazado correctamente',
-                                                    cancelButtonTitle: 'OK',
-                                                  );
-                                                }
-                                              );
-                                              _retrieveData();
-                                            },
+                                title: '¿Rechazar establecimiento?',
+                                actions: <TextButton>[
+                                  TextButton(
+                                    onPressed: () async {
+                                      callRequestWithLoading(
+                                        closePreviousPopup: true,
+                                        context: context,
+                                        request: () async {
+                                          return await Api.refuseBusiness(
+                                            id: item.business.id!,
                                           );
                                         },
-                                        child: const Text('SÍ'),
-                                      ),
-                                    ],
-                                  );
-                                },
+                                        onSuccess: (value) async {
+                                          wefoodShowDialog(
+                                            context: context,
+                                            title: 'Establecimiento rechazado correctamente',
+                                            cancelButtonTitle: 'OK',
+                                          );
+                                          _retrieveData();
+                                        },
+                                      );
+                                    },
+                                    child: const Text('SÍ'),
+                                  ),
+                                ],
                               );
                             },
                           ),
                           ElevatedButton(
                             child: const Text('ACEPTAR'),
                             onPressed: () async {
-                              showDialog(
+                              wefoodShowDialog(
                                 context: context,
-                                builder: (_) {
-                                  return WefoodPopup(
-                                    context: _,
-                                    title: '¿Aceptar establecimiento?',
-                                    actions: <TextButton>[
-                                      TextButton(
-                                        child: const Text('SÍ'),
-                                        onPressed: () async {
-                                          callRequestWithLoading(
-                                            closePreviousPopup: true,
-                                            context: context,
-                                            request: () async {
-                                              return await Api.validateBusiness(
-                                                id: item.business.id!,
-                                              );
-                                            },
-                                            onSuccess: (_) {
-                                              _removeItem(item.business.id!);
-                                              showDialog(
-                                                context: context,
-                                                builder: (BuildContext context) {
-                                                  return WefoodPopup(
-                                                    context: context,
-                                                    title: '¡Negocio validado!',
-                                                    cancelButtonTitle: 'OK',
-                                                  );
-                                                }
-                                              );
-                                            },
+                                title: '¿Aceptar establecimiento?',
+                                actions: <TextButton>[
+                                  TextButton(
+                                    child: const Text('SÍ'),
+                                    onPressed: () async {
+                                      callRequestWithLoading(
+                                        closePreviousPopup: true,
+                                        context: context,
+                                        request: () async {
+                                          return await Api.validateBusiness(
+                                            id: item.business.id!,
                                           );
                                         },
-                                      ),
-                                    ],
-                                  );
-                                }
+                                        onSuccess: (_) {
+                                          _removeItem(item.business.id!);
+                                          wefoodShowDialog(
+                                            context: context,
+                                            title: '¡Negocio validado!',
+                                            cancelButtonTitle: 'OK',
+                                          );
+                                        }
+                                      );
+                                    },
+                                  ),
+                                ],
                               );
                             },
                           ),

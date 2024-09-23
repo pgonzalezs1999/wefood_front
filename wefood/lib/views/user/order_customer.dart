@@ -4,6 +4,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/commands/utils.dart';
+import 'package:wefood/commands/wefood_show_dialog.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api.dart';
@@ -153,52 +154,42 @@ class _OrderCustomerState extends State<OrderCustomer> {
                   ElevatedButton(
                     child: const Text('CONFIRMAR ENTREGA'),
                     onPressed: () async {
-                      showDialog(
+                      wefoodShowDialog(
                         context: context,
-                        builder: (_) {
-                          return WefoodPopup(
-                            context: _,
-                            title: '¿Confirmar recogida?',
-                            description: 'Asegúrese de que el encargado está de acuerdo en confirmar el pedido de esta forma, ya que no se podrá deshacer esta acción',
-                            cancelButtonTitle: 'CANCELAR',
-                            actions: <TextButton>[
-                              TextButton(
-                                child: const Text('CONFIRMAR'),
-                                onPressed: () {
-                                  callRequestWithLoading(
-                                    closePreviousPopup: true,
+                        title: '¿Confirmar recogida?',
+                        description: 'Asegúrese de que el encargado está de acuerdo en confirmar el pedido de esta forma, ya que no se podrá deshacer esta acción',
+                        cancelButtonTitle: 'CANCELAR',
+                        actions: <TextButton>[
+                          TextButton(
+                            child: const Text('CONFIRMAR'),
+                            onPressed: () {
+                              callRequestWithLoading(
+                                closePreviousPopup: true,
+                                context: context,
+                                request: () async {
+                                  return await Api.completeOrderCustomer(
+                                    idOrder: widget.orderId,
+                                  );
+                                },
+                                onSuccess: (_) {
+                                  wefoodShowDialog(
                                     context: context,
-                                    request: () async {
-                                      return await Api.completeOrderCustomer(
-                                        idOrder: widget.orderId,
-                                      );
-                                    },
-                                    onSuccess: (_) {
-                                      showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return WefoodPopup(
-                                            context: context,
-                                            title: '¡Producto recogido!',
-                                            description: '¡Muchas gracias por confiar en WeFood! ¡Esperamos volver a verle pronto!',
-                                            cancelButtonTitle: 'OK',
-                                            cancelButtonBehaviour: () async {
-                                              setState(() {
-                                                Navigator.of(context).pop();
-                                                Navigator.of(context).pop();
-                                                Navigator.of(context).pop();
-                                              });
-                                            },
-                                          );
-                                        }
-                                      );
+                                    title: '¡Producto recogido!',
+                                    description: '¡Muchas gracias por confiar en WeFood! ¡Esperamos volver a verle pronto!',
+                                    cancelButtonTitle: 'OK',
+                                    cancelButtonBehaviour: () async {
+                                      setState(() {
+                                        Navigator.of(context).pop();
+                                        Navigator.of(context).pop();
+                                        Navigator.of(context).pop();
+                                      });
                                     },
                                   );
                                 },
-                              ),
-                            ],
-                          );
-                        }
+                              );
+                            },
+                          ),
+                        ],
                       );
                     },
                   ),

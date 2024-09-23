@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/commands/clear_data.dart';
+import 'package:wefood/commands/wefood_show_dialog.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/app_links/app_links_subscription.dart';
@@ -240,32 +241,20 @@ class _MyHomePageState extends State<MyHomePage> {
                     _navigateToLogin();
                   }
                 }).onError((error, stackTrace) {
-                  showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (BuildContext context) {
-                        return WefoodPopup(
-                          context: context,
-                          title: 'No se ha podido conectar con el servidor',
-                          description: 'Por favor, inicie sesión de nuevo',
-                          cancelButtonTitle: 'OK',
-                        );
-                      }
+                  wefoodShowDialog(
+                    context: context,
+                    title: 'No se ha podido conectar con el servidor',
+                    description: 'Por favor, inicie sesión de nuevo',
+                    cancelButtonTitle: 'OK',
                   );
                   _navigateToLogin();
                 });
               } else {
-                showDialog(
-                    context: context,
-                    barrierDismissible: false,
-                    builder: (BuildContext context) {
-                      return WefoodPopup(
-                        context: context,
-                        title: 'Ha caducado la sesión',
-                        description: 'Por favor, inicie sesión de nuevo',
-                        cancelButtonTitle: 'OK',
-                      );
-                    }
+                wefoodShowDialog(
+                  context: context,
+                  title: 'Ha caducado la sesión',
+                  description: 'Por favor, inicie sesión de nuevo',
+                  cancelButtonTitle: 'OK',
                 );
                 _navigateToLogin();
               }

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/commands/utils.dart';
+import 'package:wefood/commands/wefood_show_dialog.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
 import 'package:wefood/models/models.dart';
@@ -141,79 +142,59 @@ class _PendingOrdersBusinessState extends State<PendingOrdersBusiness> {
           if(_orderIsPending(qrOrderId) == true) {
             setState(() {
               _toggleCamera(false);
-              showDialog(
+              wefoodShowDialog(
                 context: context,
-                builder: (_) {
-                  return WefoodPopup(
-                    context: _,
-                    title: '¿Confirmar el pedido ${Utils.numberToHexadecimal(qrOrderId)}',
-                    cancelButtonTitle: 'CANCELAR',
-                    actions: [
-                      TextButton(
-                        child: const Text('CONFIRMAR'),
-                        onPressed: () {
-                          callRequestWithLoading(
-                            closePreviousPopup: true,
-                            context: context,
-                            request: () async {
-                              return await Api.completeOrderBusiness(
-                                idOrder: qrOrderId,
-                              );
-                            },
-                            onSuccess: (_) {
-                              _setPendingList(
-                                cubit: pendingOrdersBusinessCubit,
-                              ).then((_) {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return WefoodPopup(
-                                      context: context,
-                                      title: '¡Pedido confirmado!',
-                                      description: 'Ya puede entregarle el paquete a su cliente. En los próximos dís recibirá el dinero correspondiente',
-                                      cancelButtonTitle: 'OK',
-                                    );
-                                  }
-                                );
-                              });
-                            },
+                title: '¿Confirmar el pedido ${Utils.numberToHexadecimal(qrOrderId)}',
+                cancelButtonTitle: 'CANCELAR',
+                actions: [
+                  TextButton(
+                    child: const Text('CONFIRMAR'),
+                    onPressed: () {
+                      callRequestWithLoading(
+                        closePreviousPopup: true,
+                        context: context,
+                        request: () async {
+                          return await Api.completeOrderBusiness(
+                            idOrder: qrOrderId,
                           );
                         },
-                      ),
-                    ],
-                  );
-                },
-              );
-            });
+                        onSuccess: (_) {
+                          _setPendingList(
+                            cubit: pendingOrdersBusinessCubit,
+                          ).then((_) {
+                            wefoodShowDialog(
+                              context: context,
+                              title: '¡Pedido confirmado!',
+                              description: 'Ya puede entregarle el paquete a su cliente. En los próximos dís recibirá el dinero correspondiente',
+                              cancelButtonTitle: 'OK',
+                            );
+                          }
+                        );
+                      });
+                    }),
+                  ],
+                );
+              },
+            );
           } else {
             setState(() {
               _toggleCamera(false);
-              showDialog(
+              wefoodShowDialog(
                 context: context,
-                builder: (context) {
-                  return WefoodPopup(
-                    context: context,
-                    title: 'Producto ya confirmado',
-                    description: 'El pedido escaneado ya ha sido confirmado.',
-                    cancelButtonTitle: 'OK',
-                  );
-                },
+                title: 'Producto ya confirmado',
+                description: 'El pedido escaneado ya ha sido confirmado.',
+                cancelButtonTitle: 'OK',
               );
             });
           }
         } else {
           setState(() {
             _toggleCamera(false);
-            showDialog(
+            wefoodShowDialog(
               context: context,
-              builder: (context) {
-                return WefoodPopup(
-                  context: context,
-                  title: 'Código incorrecto',
-                  description: 'Parece que el QR leído no corresponde a su negocio. Si se trata de un error, por favor, pídale a su cliente que confirme la recogida desde su cuenta.',
-                  cancelButtonTitle: 'OK',
-                );
-              },
+              title: 'Código incorrecto',
+              description: 'Parece que el QR leído no corresponde a su negocio. Si se trata de un error, por favor, pídale a su cliente que confirme la recogida desde su cuenta.',
+              cancelButtonTitle: 'OK',
             );
           });
         }

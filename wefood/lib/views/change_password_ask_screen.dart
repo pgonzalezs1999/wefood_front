@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:wefood/commands/call_request.dart';
+import 'package:wefood/commands/wefood_show_dialog.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/types.dart';
@@ -103,16 +104,11 @@ class _ChangePasswordAskScreenState extends State<ChangePasswordAskScreen> {
           codeSent = true;
         });
         _startTimeForResend();
-        showDialog(
+        wefoodShowDialog(
           context: context,
-          builder: (BuildContext context) {
-            return WefoodPopup(
-              context: context,
-              title: 'Correo enviado',
-              description: 'Si existe algún usuario asociado a esa dirección, recibirá un correo para establecer una nueva contraseña',
-              cancelButtonTitle: 'OK',
-            );
-          }
+          title: 'Correo enviado',
+          description: 'Si existe algún usuario asociado a esa dirección, recibirá un correo para establecer una nueva contraseña',
+          cancelButtonTitle: 'OK',
         );
       },
     );
@@ -241,18 +237,13 @@ class _ChangePasswordAskScreenState extends State<ChangePasswordAskScreen> {
                         });
                       },
                       onError: (String message) {
-                        showDialog(
+                        wefoodShowDialog(
                           context: context,
-                          builder: (BuildContext context) {
-                            return WefoodPopup(
-                              context: context,
-                              title: 'Ha ocurrido un error',
-                              description: 'Por favor, inténtelo de nuevo más tarde',
-                              cancelButtonTitle: 'OK',
-                            );
-                          }
+                          title: 'Ha ocurrido un error',
+                          description: 'Por favor, inténtelo de nuevo más tarde',
+                          cancelButtonTitle: 'OK',
                         );
-                      },
+                      }
                     );
                   },
                   child: const Text('VERIFICAR'),
@@ -381,16 +372,11 @@ class _ChangePasswordAskScreenState extends State<ChangePasswordAskScreen> {
                   _navigateToMain();
                 },
                 onError: (String message) {
-                  showDialog(
+                  wefoodShowDialog(
                     context: context,
-                    builder: (BuildContext context) {
-                      return WefoodPopup(
-                        context: context,
-                        title: 'Ha ocurrido un error',
-                        description: 'Por favor, inténtelo de nuevo más tarde',
-                        cancelButtonTitle: 'OK',
-                      );
-                    }
+                    title: 'Ha ocurrido un error',
+                    description: 'Por favor, inténtelo de nuevo más tarde',
+                    cancelButtonTitle: 'OK',
                   );
                 },
               );

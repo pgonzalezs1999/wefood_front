@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wefood/commands/utils.dart';
-import 'package:wefood/components/components.dart';
+import 'package:wefood/commands/wefood_show_dialog.dart';
 
 class ScheduleSetter extends StatefulWidget {
 
@@ -61,31 +61,21 @@ class _ScheduleSetterState extends State<ScheduleSetter> {
                       widget.endTime,
                     )) {
                       if(Utils.timesOfDayDifferenceInMinutes(selectedTime, widget.endTime) >= (12 * 60)) {
-                        showDialog(
+                        wefoodShowDialog(
                           context: context,
-                          builder: (BuildContext context) {
-                            return WefoodPopup(
-                              context: context,
-                              title: 'Datos incorrectos',
-                              description: 'Por motivos de higiene, no permitimos que el periodo de recogida supere las 12h',
-                              cancelButtonTitle: 'OK',
-                            );
-                          }
+                          title: 'Datos incorrectos',
+                          description: 'Por motivos de higiene, no permitimos que el periodo de recogida supere las 12h',
+                          cancelButtonTitle: 'OK',
                         );
                       } else {
                         widget.onChangeStartTime(selectedTime);
                       }
                     } else {
-                      showDialog(
+                      wefoodShowDialog(
                         context: context,
-                        builder: (BuildContext context) {
-                          return WefoodPopup(
-                            context: context,
-                            title: 'Datos incorrectos',
-                            description: 'La hora "desde las" tiene que ser más temprano que la hora "hasta las"',
-                            cancelButtonTitle: 'OK',
-                          );
-                        }
+                        title: 'Datos incorrectos',
+                        description: 'La hora "desde las" tiene que ser más temprano que la hora "hasta las"',
+                        cancelButtonTitle: 'OK',
                       );
                     }
                   }
@@ -121,31 +111,21 @@ class _ScheduleSetterState extends State<ScheduleSetter> {
                       selectedTime,
                     )) {
                       if(Utils.timesOfDayDifferenceInMinutes(widget.startTime, selectedTime) >= (12 * 60)) {
-                        showDialog(
+                        wefoodShowDialog(
                           context: context,
-                          builder: (BuildContext context) {
-                            return WefoodPopup(
-                              context: context,
-                              title: 'Datos incorrectos',
-                              description: 'Por motivos de higiene, no permitimos que el periodo de recogida supere las 12h',
-                              cancelButtonTitle: 'OK',
-                            );
-                          }
+                          title: 'Datos incorrectos',
+                          description: 'Por motivos de higiene, no permitimos que el periodo de recogida supere las 12h',
+                          cancelButtonTitle: 'OK',
                         );
                       } else {
                         widget.onChangeEndTime(selectedTime);
                       }
                     } else {
-                      showDialog(
+                      wefoodShowDialog(
                         context: context,
-                        builder: (BuildContext context) {
-                          return WefoodPopup(
-                            context: context,
-                            title: 'Datos incorrectos',
-                            description: 'La hora "desde las" tiene que ser más temprano que la hora "hasta las"',
-                            cancelButtonTitle: 'OK',
-                          );
-                        }
+                        title: 'Datos incorrectos',
+                        description: 'La hora "desde las" tiene que ser más temprano que la hora "hasta las"',
+                        cancelButtonTitle: 'OK',
                       );
                     }
                   }

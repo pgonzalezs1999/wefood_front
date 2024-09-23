@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/commands/call_request.dart';
+import 'package:wefood/commands/wefood_show_dialog.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
 import 'package:wefood/models/models.dart';
@@ -315,15 +316,10 @@ class _BusinessScreenState extends State<BusinessScreen> {
                               if(await canLaunchUrl(url)) {
                                 await launchUrl(url);
                               } else {
-                                showDialog(
+                                wefoodShowDialog(
                                   context: context,
-                                  builder: (BuildContext context) {
-                                    return WefoodPopup(
-                                      context: context,
-                                      title: 'No se ha podido abrir Google Maps',
-                                      cancelButtonTitle: 'OK',
-                                    );
-                                  }
+                                  title: 'No se ha podido abrir Google Maps',
+                                  cancelButtonTitle: 'OK',
                                 );
                               }
                             },
@@ -406,15 +402,10 @@ class _BusinessScreenState extends State<BusinessScreen> {
                               Api.getCommentsFromBusiness(
                                 idBusiness: widget.businessExpanded.business.id!,
                               ).then((List<CommentExpandedModel> comments) {
-                                showDialog(
+                                wefoodShowDialog(
                                   context: context,
-                                  builder: (BuildContext context) {
-                                    return WefoodPopup(
-                                      context: context,
-                                      title: '¡Comentario añadido correctamente!',
-                                      cancelButtonTitle: 'OK',
-                                    );
-                                  }
+                                  title: '¡Comentario añadido correctamente!',
+                                  cancelButtonTitle: 'OK',
                                 );
                                 setState(() {
                                   commentList = comments.map((CommentExpandedModel c) => Comment(

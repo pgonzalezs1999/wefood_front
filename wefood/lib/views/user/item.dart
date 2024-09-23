@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/commands/utils.dart';
+import 'package:wefood/commands/wefood_show_dialog.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
 import 'package:wefood/models/models.dart';
@@ -111,16 +112,11 @@ class _ItemState extends State<Item> {
         });
       },
       onError: (error) {
-        showDialog(
+        wefoodShowDialog(
           context: context,
-          builder: (BuildContext context) {
-            return WefoodPopup(
-              context: context,
-              title: 'Ha ocurrido un error al cargar el negocio',
-              description: 'Por favor, inténtelo de nuevo más tarde: $error',
-              cancelButtonTitle: 'OK',
-            );
-          }
+          title: 'Ha ocurrido un error al cargar el negocio',
+          description: 'Por favor, inténtelo de nuevo más tarde: $error',
+          cancelButtonTitle: 'OK',
         );
       }
     );
@@ -522,15 +518,10 @@ class _ItemState extends State<Item> {
                               if(await canLaunchUrl(url)) {
                                 await launchUrl(url);
                               } else {
-                                showDialog(
+                                wefoodShowDialog(
                                   context: context,
-                                  builder: (BuildContext context) {
-                                    return WefoodPopup(
-                                      context: context,
-                                      title: 'No se ha podido abrir Google Maps',
-                                      cancelButtonTitle: 'OK',
-                                    );
-                                  }
+                                  title: 'No se ha podido abrir Google Maps',
+                                  cancelButtonTitle: 'OK',
                                 );
                               }
                             },
