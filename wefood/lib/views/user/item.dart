@@ -571,7 +571,18 @@ class _ItemState extends State<Item> {
                         if(info!.available != null) if(info!.available! > 0) ElevatedButton(
                           child: const Text('COMPRAR'),
                           onPressed: () {
-                            showDialog(
+                            // TODO -> ESTO ES TEMPORAL HASTA QUE SE ARREGLEN LOS POPUPS !!!
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => PaymentScreen(
+                                price: info!.product.price! * selectedAmount,
+                                itemId: widget.productExpanded.item.id!,
+                                amount: 1,
+                              )),
+                            ).whenComplete(() {
+                              _retrieveData();
+                            });
+                            /*showDialog(
                               context: context,
                               builder: (_) {
                                 return StatefulBuilder(
@@ -612,7 +623,7 @@ class _ItemState extends State<Item> {
                                         TextButton(
                                           child: const Text('COMPRAR'),
                                           onPressed: () {
-                                            Navigator.pop;
+                                            Navigator.of(context).pop();
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(builder: (context) => PaymentScreen(
@@ -630,7 +641,7 @@ class _ItemState extends State<Item> {
                                   }
                                 );
                               },
-                            );
+                            );*/
                           },
                         ),
                       ],

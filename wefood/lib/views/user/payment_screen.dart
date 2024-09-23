@@ -564,7 +564,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                           builder: (BuildContext context) {
                                             return WefoodPopup(
                                               context: context,
-                                              title: status, // 'Pago rechazado',
+                                              title: 'Pago rechazado', // status, // 'Pago rechazado',
                                               cancelButtonTitle: 'OK',
                                             );
                                           }
