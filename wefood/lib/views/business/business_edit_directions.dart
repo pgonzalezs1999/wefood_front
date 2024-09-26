@@ -57,8 +57,8 @@ class _BusinessEditDirectionsState extends State<BusinessEditDirections> {
     if(permissionStatus.isGranted) {
       Position position = await Geolocator.getCurrentPosition(
         // desiredAccuracy: LocationAccuracy.best,
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.best,
+        locationSettings: LocationSettings(
+          accuracy: LocationAccuracy.high,
         )
       );
       setState(() {

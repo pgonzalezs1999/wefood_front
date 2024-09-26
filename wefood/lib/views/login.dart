@@ -68,6 +68,23 @@ class _LoginState extends State<Login> {
     }
   }
 
+  void _handleFirstUsage() {
+    UserSecureStorage().read(key: 'isFirstUsage').then((String? response) {
+      if(response == null) {
+        wefoodShowDialog(
+          context: context,
+          title: 'Acceso a ubicación',
+          description: 'WeFood solicitará acceder a tu ubicación mientras uses el aplicativo para mejorar la experiencia de uso. Es tu decisión permitirla o no, y esta decisión podrá modificarse en cualquier momento. Para más información, consulta nuestros términos y condiciones',
+          cancelButtonTitle: 'OK',
+        );
+        UserSecureStorage().write(
+          key: 'isFirstUsage',
+          value: 'false',
+        );
+      }
+    });
+  }
+
   @override
   void initState() {
     debugPrint('HA LLEGADO A LOGIN()');
@@ -79,6 +96,7 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
+    _handleFirstUsage();
     return WefoodScreen(
       canPop: false,
       bodyCrossAxisAlignment: CrossAxisAlignment.center,

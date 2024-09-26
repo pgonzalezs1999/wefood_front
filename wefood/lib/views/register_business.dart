@@ -83,7 +83,7 @@ class _RegisterBusinessState extends State<RegisterBusiness> {
     PermissionStatus permissionStatus = await Permission.location.request();
     if(permissionStatus.isGranted) {
       Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.best,
+        desiredAccuracy: LocationAccuracy.high,
       );
       setState(() {
         userLocation = LatLng(position.latitude, position.longitude);

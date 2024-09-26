@@ -42,7 +42,7 @@ class _UserExploreState extends State<UserExplore> {
   _getUserLocation() {
     if(context.read<UserLocationCubit>().state == null) {
       Permission.location.request().then((PermissionStatus permissionStatus) {
-        if(permissionStatus.isGranted) {
+        if(permissionStatus != PermissionStatus.permanentlyDenied) {
           Geolocator.getCurrentPosition(
             locationSettings: const LocationSettings(
               accuracy: LocationAccuracy.best,

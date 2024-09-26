@@ -38,7 +38,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> {
       Permission.location.request().then((PermissionStatus permissionStatus) {
         if(permissionStatus.isGranted) {
           Geolocator.getCurrentPosition(
-            desiredAccuracy: LocationAccuracy.best,
+            desiredAccuracy: LocationAccuracy.high,
           ).then((Position position) {
              setState(() {
                cameraPosition = LatLng(position.latitude, position.longitude);
