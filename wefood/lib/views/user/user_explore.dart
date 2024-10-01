@@ -5,7 +5,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/commands/call_request.dart';
-import 'package:wefood/commands/wefood_show_dialog.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/models/models.dart';
@@ -21,7 +20,7 @@ class UserExplore extends StatefulWidget {
 
 class _UserExploreState extends State<UserExplore> {
   LatLng userLocation = const LatLng(-12.5, -77);
-  bool? locationDenied;
+  bool locationDenied = true;
   Widget recommendedList = const SkeletonItemButtonList();
   Widget nearbyList =  const SkeletonItemButtonList(
     horizontalScroll: true,
@@ -46,13 +45,6 @@ class _UserExploreState extends State<UserExplore> {
       Permission.locationWhenInUse.request().then((PermissionStatus permissionStatus) {
         // If permission granted (permanently or not)...
         if(permissionStatus != PermissionStatus.permanentlyDenied && permissionStatus != PermissionStatus.denied) {
-      // TODO PROBAR CON ESTO
-      //Geolocator.checkPermission().then((LocationPermission permissionStatus) {
-        //if(permissionStatus != LocationPermission.denied && permissionStatus != LocationPermission.deniedForever) {
-      // TODO PROBAR CON ESTO
-
-
-          print('PERMISSION: $permissionStatus');
           setState(() {
             locationDenied = false;
             recommendedList = const SkeletonItemButtonList();
@@ -91,12 +83,14 @@ class _UserExploreState extends State<UserExplore> {
   }
 
   _refreshData() async {
-    setState(() {
-      context.read<NearbyItemsCubit>().set(List<ProductExpandedModel>.empty());
-      context.read<RecommendedItemsCubit>().set(List<ProductExpandedModel>.empty());
-    });
-    _retrieveRecommended();
-    _retrieveNearby();
+    if(locationDenied == false) {
+      setState(() {
+        context.read<NearbyItemsCubit>().set(List<ProductExpandedModel>.empty());
+        context.read<RecommendedItemsCubit>().set(List<ProductExpandedModel>.empty());
+      });
+      _retrieveRecommended();
+      _retrieveNearby();
+    }
   }
 
   _retrieveRecommended() async {
@@ -296,8 +290,10 @@ class _UserExploreState extends State<UserExplore> {
     _retrieveFavourites();
     return WefoodNavigationScreen(
       children: <Widget>[
-        if(locationDenied == null) Text('locationDenied = $locationDenied'),
         if(locationDenied == true) Container(
+          margin: EdgeInsets.symmetric(
+            vertical: MediaQuery.of(context).size.height * 0.2,
+          ),
           padding: const EdgeInsets.symmetric(
             vertical: 30,
           ),
@@ -359,7 +355,9 @@ class _UserExploreState extends State<UserExplore> {
                       ),
                       hintText: 'Busca tu próxima comida',
                       hintStyle: TextStyle(
-                        color: Theme.of(context).primaryColor.withOpacity(0.5),
+                        color: Theme.of(context).primaryColor.withValues(
+                          alpha: 0.5,
+                        ),
                       ),
                       border: OutlineInputBorder(
                         borderSide: BorderSide(
