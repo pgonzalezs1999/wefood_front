@@ -19,4 +19,7 @@ class Environment {
   static const String openpayApiUrl = 'https://${Environment.openpayIsSandbox ? 'sandbox-' : ''}api.openpay.pe/v1/${Environment.openpayMerchantId}/';
 
   static const double minimumPrice = 5;
+
+  static const String linkToDownloadGooglePlay = 'https://play.google.com/store/apps/details?id=com.wefoodcompany.wefood';
+  static const String linkToDownloadAppleStore = 'https://play.google.com/store/apps/details?id=com.wefoodcompany.wefood'; // TODO cambiar esto
 }

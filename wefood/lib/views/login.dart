@@ -13,11 +13,8 @@ import 'package:wefood/views/views.dart';
 
 class Login extends StatefulWidget {
 
-  final Uri? appLink;
-
   const Login({
     super.key,
-    this.appLink,
   });
 
   @override
@@ -73,8 +70,8 @@ class _LoginState extends State<Login> {
       if(response == null) {
         wefoodShowDialog(
           context: context,
-          title: 'Acceso a ubicación',
-          description: 'WeFood solicitará acceder a tu ubicación mientras uses el aplicativo para mejorar la experiencia de uso. Es tu decisión permitirla o no, y esta decisión podrá modificarse en cualquier momento. Para más información, consulta nuestros términos y condiciones',
+          hideImage: true,
+          description: 'WeFood solicitará acceder a tu ubicación personalizar tu experiencia. Para más información, consulta nuestros términos y condiciones',
           cancelButtonTitle: 'OK',
         );
         UserSecureStorage().write(
@@ -87,7 +84,6 @@ class _LoginState extends State<Login> {
 
   @override
   void initState() {
-    debugPrint('HA LLEGADO A LOGIN()');
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _popUntilFirst();
     });

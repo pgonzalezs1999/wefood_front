@@ -8,13 +8,13 @@ import 'package:wefood/commands/clear_data.dart';
 import 'package:wefood/commands/wefood_show_dialog.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/models/models.dart';
-import 'package:wefood/services/app_links/app_links_subscription.dart';
 import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/views/views.dart';
 import 'commands/call_request.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const BlocsProvider());
 }
 
@@ -161,7 +161,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String? accessToken;
   DateTime? accessTokenExpiresAt;
   int? accessTokenMinutesLeft;
-  late Timer _timer;
+  Timer? _timer;
   int _selectedScreenIndex = 0;
 
   List<String> feedback = [
@@ -174,9 +174,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _navigateToLogin() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => Login(
-        appLink: AppLinksSubscription.getUri(),
-      )),
+      MaterialPageRoute(builder: (context) => const Login()),
     );
   }
 
@@ -205,6 +203,7 @@ class _MyHomePageState extends State<MyHomePage> {
           break;
         case 2:
           optionalUpdateAvailable = true;
+          // TODO gestionar esto más adelante
           setState(() {
             completedActions++;
           });
@@ -288,7 +287,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   UserSecureStorage().write(key: 'accessToken', value: auth.accessToken!);
                 },
                 onError: (error) {
-                  _timer.cancel();
+                  _timer?.cancel();
                   clearData(context);
                   _navigateToMain();
                 }
@@ -316,7 +315,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void dispose() {
-    _timer.cancel();
+    _timer?.cancel();
     super.dispose();
   }
 

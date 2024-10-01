@@ -35,10 +35,12 @@ class _MapSearchScreenState extends State<MapSearchScreen> {
         cameraPosition = context.read<UserLocationCubit>().state!;
       });
     } else {
-      Permission.location.request().then((PermissionStatus permissionStatus) {
+      Permission.locationWhenInUse.request().then((PermissionStatus permissionStatus) {
         if(permissionStatus.isGranted) {
-          Geolocator.getCurrentPosition(
-            desiredAccuracy: LocationAccuracy.high,
+          Geolocator. getCurrentPosition(
+            locationSettings: const LocationSettings(
+              accuracy: LocationAccuracy.high,
+            ),
           ).then((Position position) {
              setState(() {
                cameraPosition = LatLng(position.latitude, position.longitude);
@@ -235,7 +237,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> {
                           },
                         ),
                       ],
-                    )
+                    ),
                   ),
                 ),
               ],

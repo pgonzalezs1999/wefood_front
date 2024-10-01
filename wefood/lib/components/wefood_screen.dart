@@ -78,11 +78,7 @@ class _WefoodScreenState extends State<WefoodScreen> {
         if(widget.title != null) const SizedBox(
           height: 20,
         ),
-      ] + widget.body + [
-        SizedBox(
-          height: (widget.ignoreVerticalPadding == true) ? 0 : MediaQuery.of(context).size.height * 0.5,
-        ),
-      ],
+      ] + widget.body,
     );
 
     return PopScope(

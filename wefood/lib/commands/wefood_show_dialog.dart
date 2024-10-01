@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 wefoodShowDialog({
   required BuildContext context,
+  bool hideImage = false,
   Image? image,
   String? title,
   String? description,
@@ -21,7 +22,10 @@ wefoodShowDialog({
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Container(
+            const SizedBox(
+              height: 30,
+            ),
+            if(hideImage == false) Container(
               margin: EdgeInsets.symmetric(
                 vertical: MediaQuery.of(context).size.height * 0.05,
               ),

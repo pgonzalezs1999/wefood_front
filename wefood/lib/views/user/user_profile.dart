@@ -116,7 +116,6 @@ class _UserProfileState extends State<UserProfile> {
     ImagePicker().pickImage(source: imageSource).then((XFile? returnedImage) {
       if(returnedImage != null) {
         callRequestWithLoading(
-          closePreviousPopup: true,
           context: context,
           request: () async {
             return await Api.uploadImage(
@@ -126,6 +125,7 @@ class _UserProfileState extends State<UserProfile> {
             );
           },
           onSuccess: (ImageModel imageModel) {
+            Navigator.of(context).pop();
             if(imageModel.route != null) {
               setState(() {
                 context.read<UserInfoCubit>().setPicture(

@@ -53,7 +53,7 @@ class _BusinessEditDirectionsState extends State<BusinessEditDirections> {
   }
 
   _getUserLocation() async {
-    PermissionStatus permissionStatus = await Permission.location.request();
+    PermissionStatus permissionStatus = await Permission.locationWhenInUse.request();
     if(permissionStatus.isGranted) {
       Position position = await Geolocator.getCurrentPosition(
         // desiredAccuracy: LocationAccuracy.best,

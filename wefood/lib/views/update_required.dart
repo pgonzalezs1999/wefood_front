@@ -1,4 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:wefood/environment.dart';
 import 'package:wefood/views/views.dart';
 
 class UpdateRequired extends StatefulWidget {
@@ -12,16 +15,29 @@ class UpdateRequired extends StatefulWidget {
 }
 
 class _UpdateRequiredState extends State<UpdateRequired> {
-  bool _showButton = false;
 
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(const Duration(seconds: 10), () {
-      setState(() {
-        _showButton = true;
+  void _navigateToMain() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const MyApp()),
+    );
+  }
+
+  void _launchStore() async {
+    String url = '';
+    if(Platform.isAndroid) {
+      url = Environment.linkToDownloadGooglePlay;
+    } else if(Platform.isIOS) {
+      url = Environment.linkToDownloadAppleStore;
+    }
+    Uri uri = Uri.parse(url);
+    if(await canLaunchUrl(uri)) {
+      launchUrl(uri).whenComplete(() {
+        _navigateToMain();
       });
-    });
+    } else {
+      throw 'No se pudo abrir la URL $url';
+    }
   }
 
   @override
@@ -50,14 +66,9 @@ class _UpdateRequiredState extends State<UpdateRequired> {
               const SizedBox(
                 height: 30,
               ),
-              if(_showButton) ElevatedButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const MyHomePage()),
-                  );
-                },
-                child: const Text('YA HE ACTUALIZADO'),
+              ElevatedButton(
+                onPressed: () => _launchStore(),
+                child: const Text('ACTUALIZAR'),
               ),
             ],
           ),

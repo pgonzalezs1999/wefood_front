@@ -5,6 +5,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:wefood/blocs/blocs.dart';
 import 'package:wefood/commands/call_request.dart';
+import 'package:wefood/commands/wefood_show_dialog.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/models/models.dart';
@@ -20,6 +21,7 @@ class UserExplore extends StatefulWidget {
 
 class _UserExploreState extends State<UserExplore> {
   LatLng userLocation = const LatLng(-12.5, -77);
+  bool? locationDenied;
   Widget recommendedList = const SkeletonItemButtonList();
   Widget nearbyList =  const SkeletonItemButtonList(
     horizontalScroll: true,
@@ -41,11 +43,26 @@ class _UserExploreState extends State<UserExplore> {
 
   _getUserLocation() {
     if(context.read<UserLocationCubit>().state == null) {
-      Permission.location.request().then((PermissionStatus permissionStatus) {
-        if(permissionStatus != PermissionStatus.permanentlyDenied) {
+      Permission.locationWhenInUse.request().then((PermissionStatus permissionStatus) {
+        // If permission granted (permanently or not)...
+        if(permissionStatus != PermissionStatus.permanentlyDenied && permissionStatus != PermissionStatus.denied) {
+      // TODO PROBAR CON ESTO
+      //Geolocator.checkPermission().then((LocationPermission permissionStatus) {
+        //if(permissionStatus != LocationPermission.denied && permissionStatus != LocationPermission.deniedForever) {
+      // TODO PROBAR CON ESTO
+
+
+          print('PERMISSION: $permissionStatus');
+          setState(() {
+            locationDenied = false;
+            recommendedList = const SkeletonItemButtonList();
+            nearbyList =  const SkeletonItemButtonList(
+              horizontalScroll: true,
+            );
+          });
           Geolocator.getCurrentPosition(
             locationSettings: const LocationSettings(
-              accuracy: LocationAccuracy.best,
+              accuracy: LocationAccuracy.high,
             ),
           ).then((Position position) {
             LatLng newPosition = LatLng(position.latitude, position.longitude);
@@ -57,19 +74,16 @@ class _UserExploreState extends State<UserExplore> {
             });
             _refreshData();
           });
-        } else {
-          LatLng newPosition = const LatLng(-12.1, -77);
-          context.read<UserLocationCubit>().set(
-            location: newPosition,
-          );
+        } else { // Denied (permanently or not
           setState(() {
-            userLocation = newPosition;
+            locationDenied = true;
           });
           _refreshData();
         }
       });
     } else {
       setState(() {
+        locationDenied = false;
         userLocation = context.read<UserLocationCubit>().state!;
       });
       _refreshData();
@@ -282,152 +296,188 @@ class _UserExploreState extends State<UserExplore> {
     _retrieveFavourites();
     return WefoodNavigationScreen(
       children: <Widget>[
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            GestureDetector(
-              child: const Icon(
-                Icons.map,
+        if(locationDenied == null) Text('locationDenied = $locationDenied'),
+        if(locationDenied == true) Container(
+          padding: const EdgeInsets.symmetric(
+            vertical: 30,
+          ),
+          child: Card(
+            elevation: 2,
+            child: Container(
+              padding: const EdgeInsets.all(30),
+              child: Column(
+                children: <Widget>[
+                  const Text(
+                    'Para poder recomendarte ofertas cercanas, necesitamos que nos des permiso para acceder a tu ubicación',
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      openAppSettings().then((bool value) {
+                        _getUserLocation();
+                      });
+                    },
+                    child: const Text('ABRIR AJUSTES'),
+                  ),
+                ],
               ),
-              onTap: () {
-                _navigateToMapScreen();
-              },
             ),
-            const SizedBox(
-              width: 15,
-            ),
-            Expanded(
-              child: TextFormField(
-                controller: _searchController,
-                keyboardType: TextInputType.visiblePassword,
-                onChanged: (String value) {
-                  setState(() {
-                    _searchController.text;
-                  });
-                },
-                decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 20,
+          ),
+        ),
+        if(locationDenied == false) Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  child: const Icon(
+                    Icons.map,
                   ),
-                  hintText: 'Busca tu próxima comida',
-                  hintStyle: TextStyle(
-                    color: Theme.of(context).primaryColor.withOpacity(0.5),
-                  ),
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Theme.of(context).primaryColor,
-                    ),
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                  suffixIcon: (_searchController.text != '') ? Container(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        SizedBox(
-                          height: 40,
-                          width: 35,
-                          child: GestureDetector(
-                            child: const Icon(
-                              Icons.search,
-                            ),
-                            onTap: () async {
-                              callRequestWithLoading(
-                                context: context,
-                                request: () async {
-                                  return await Api.searchItemsByText(
-                                    text: _searchController.text,
+                  onTap: () {
+                    _navigateToMapScreen();
+                  },
+                ),
+                const SizedBox(
+                  width: 15,
+                ),
+                Expanded(
+                  child: TextFormField(
+                    controller: _searchController,
+                    keyboardType: TextInputType.visiblePassword,
+                    onChanged: (String value) {
+                      setState(() {
+                        _searchController.text;
+                      });
+                    },
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                      ),
+                      hintText: 'Busca tu próxima comida',
+                      hintStyle: TextStyle(
+                        color: Theme.of(context).primaryColor.withOpacity(0.5),
+                      ),
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Theme.of(context).primaryColor,
+                        ),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      suffixIcon: (_searchController.text != '') ? Container(
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            SizedBox(
+                              height: 40,
+                              width: 35,
+                              child: GestureDetector(
+                                child: const Icon(
+                                  Icons.search,
+                                ),
+                                onTap: () async {
+                                  callRequestWithLoading(
+                                    context: context,
+                                    request: () async {
+                                      return await Api.searchItemsByText(
+                                        text: _searchController.text,
+                                      );
+                                    },
+                                    onSuccess: (List<ProductExpandedModel> items) {
+                                      _navigateToSearchedFilters(
+                                        text: _searchController.text,
+                                        items: items,
+                                      );
+                                    },
                                   );
                                 },
-                                onSuccess: (List<ProductExpandedModel> items) {
-                                  _navigateToSearchedFilters(
-                                    text: _searchController.text,
-                                    items: items,
-                                  );
-                                },
-                              );
-                            },
-                          ),
-                        ),
-                        SizedBox(
-                          height: 40,
-                          width: 35,
-                          child: GestureDetector(
-                            child: const Icon(
-                              Icons.cancel_outlined,
+                              ),
                             ),
-                            onTap: () {
-                              setState(() {
-                                _searchController.text = '';
-                              });
-                            },
-                          ),
+                            SizedBox(
+                              height: 40,
+                              width: 35,
+                              child: GestureDetector(
+                                child: const Icon(
+                                  Icons.cancel_outlined,
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    _searchController.text = '';
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ) : null,
                     ),
-                  ) : null,
+                  ),
+                ),
+                const SizedBox(
+                  height: 60,
+                  width: 10,
+                ),
+                GestureDetector(
+                  child: const Icon(
+                    Icons.filter_list,
+                  ),
+                  onTap: () => _navigateToSearchFilters(),
+                ),
+              ],
+            ),
+            _exploreTitle('Recomendados'),
+            recommendedList,
+            _exploreTitle('Cerca de tí'),
+            nearbyList,
+            _exploreTitle('Ofertas de tus favoritos'),
+            if(context.read<FavouriteItemsCubit>().state == null) Container(
+              margin: const EdgeInsets.only(
+                left: 10,
+              ),
+              child: const SkeletonItemButtonList(
+                horizontalScroll: true,
+              ),
+            ),
+            if(errorOnFavourites == true) Container(
+              margin: EdgeInsets.symmetric(
+                vertical: MediaQuery.of(context).size.height * 0.05,
+              ),
+              child: const Text('No se han podido obtener los productos favoritos'),
+            ),
+            if(context.read<FavouriteItemsCubit>().state != null && context.read<FavouriteItemsCubit>().state!.isEmpty) Align(
+              alignment: Alignment.center,
+              child: Card(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 30,
+                    vertical: 20,
+                  ),
+                  child: const Text(
+                    '¡Añade negocios a favoritos para tener acceso a sus productos fácilmente!',
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ),
             ),
-            const SizedBox(
-              height: 60,
-              width: 10,
-            ),
-            GestureDetector(
-              child: const Icon(
-                Icons.filter_list,
+            if(context.read<FavouriteItemsCubit>().state != null && context.read<FavouriteItemsCubit>().state!.isNotEmpty) SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: context.read<FavouriteItemsCubit>().state!.map((ProductExpandedModel i) => ItemButton(
+                  horizontalScroll: true,
+                  productExpanded: i,
+                  comebackBehaviour: () async {
+                    await _retrieveFavourites();
+                  },
+                )).toList(),
               ),
-              onTap: () => _navigateToSearchFilters(),
             ),
           ],
-        ),
-        _exploreTitle('Recomendados'),
-        recommendedList,
-        _exploreTitle('Cerca de tí'),
-        nearbyList,
-        _exploreTitle('Ofertas de tus favoritos'),
-        if(context.read<FavouriteItemsCubit>().state == null) Container(
-          margin: const EdgeInsets.only(
-            left: 10,
-          ),
-          child: const SkeletonItemButtonList(
-            horizontalScroll: true,
-          ),
-        ),
-        if(errorOnFavourites == true) Container(
-          margin: EdgeInsets.symmetric(
-            vertical: MediaQuery.of(context).size.height * 0.05,
-          ),
-          child: const Text('No se han podido obtener los productos favoritos'),
-        ),
-        if(context.read<FavouriteItemsCubit>().state != null && context.read<FavouriteItemsCubit>().state!.isEmpty) Align(
-          alignment: Alignment.center,
-          child: Card(
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 30,
-                vertical: 20,
-              ),
-              child: const Text(
-                '¡Añade negocios a favoritos para tener acceso a sus productos fácilmente!',
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-        ),
-        if(context.read<FavouriteItemsCubit>().state != null && context.read<FavouriteItemsCubit>().state!.isNotEmpty) SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: context.read<FavouriteItemsCubit>().state!.map((ProductExpandedModel i) => ItemButton(
-              horizontalScroll: true,
-              productExpanded: i,
-              comebackBehaviour: () async {
-                await _retrieveFavourites();
-              },
-            )).toList(),
-          ),
         ),
       ],
     );
