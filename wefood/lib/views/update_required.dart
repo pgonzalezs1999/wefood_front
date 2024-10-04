@@ -67,7 +67,7 @@ class _UpdateRequiredState extends State<UpdateRequired> {
                 height: 30,
               ),
               ElevatedButton(
-                onPressed: () => _launchStore(),
+                onPressed: _launchStore,
                 child: const Text('ACTUALIZAR'),
               ),
             ],

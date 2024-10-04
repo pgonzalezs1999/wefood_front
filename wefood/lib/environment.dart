@@ -1,6 +1,4 @@
 class Environment {
-  static const int appVersion = 1;
-
   static const String serverUrl = 'https://api.wefoodcompany.com';
   static const String apiUrl = '$serverUrl/api/auth/';
   static const String storageUrl = '$serverUrl/storage/';
@@ -22,4 +20,8 @@ class Environment {
 
   static const String linkToDownloadGooglePlay = 'https://play.google.com/store/apps/details?id=com.wefoodcompany.wefood';
   static const String linkToDownloadAppleStore = 'https://play.google.com/store/apps/details?id=com.wefoodcompany.wefood'; // TODO cambiar esto
+
+  static const int appVersion = 2;
+  // 1: Publishing
+  // 2: Location permissions working on release mode
 }

@@ -216,6 +216,8 @@ class _MyHomePageState extends State<MyHomePage> {
           // TODO Poner solo un texto que lo explique, y un boton para volver a ejecutar el Main();
           break;
       }
+    }).onError((error, stackTrace) {
+      _navigateToLogin();
     });
   }
 

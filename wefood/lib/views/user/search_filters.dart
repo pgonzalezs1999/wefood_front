@@ -75,6 +75,9 @@ class _SearchFiltersState extends State<SearchFilters> {
           runSpacing: 30,
           crossAxisAlignment: WrapCrossAlignment.start,
           children: [
+            Text(
+              'Se buscarán establecimientos cercanos a tí, y que además cumplan con los siguientes requisitos:'
+            ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
