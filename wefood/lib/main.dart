@@ -194,6 +194,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _checkForUpdates() {
     Api.checkForUpdates().then((int response) {
+      print('CHECK_FOR_UPDATES: $response');
       switch(response) {
         case 1:
           setState(() {
@@ -217,17 +218,25 @@ class _MyHomePageState extends State<MyHomePage> {
           break;
       }
     }).onError((error, stackTrace) {
+      print('ERROR EN CHECK_FOR_UPDATES: $error');
       _navigateToLogin();
     });
   }
 
   void _getAccessToken() {
+    print('ENTRA EN GET_ACCESS_TOKEN');
     UserSecureStorage().read(key: 'accessToken').then((String? accessToken) {
+      print('ACCESS_TOKEN: $accessToken');
       UserSecureStorage().readDateTime(key: 'accessTokenExpiresAt').then((DateTime? expiresAt) {
+        print('ACCESS_TOKEN_EXPIRES_AT: $accessTokenExpiresAt');
         UserSecureStorage().read(key: 'username').then((String? username) {
+          print('USERNAME: $username');
           UserSecureStorage().read(key: 'password').then((String? password) {
+            print('PASSWORD: $password');
             if(accessToken != null && accessToken != '' && expiresAt != null) {
+              print('(accessToken != null && accessToken != '' && expiresAt != null): ${accessToken != null && accessToken != '' && expiresAt != null}');
               if(expiresAt.difference(DateTime.now()) > const Duration(milliseconds: 0)) {
+                print('expiresAt.difference(DateTime.now()) > const Duration(milliseconds: 0): ${expiresAt.difference(DateTime.now()) > const Duration(milliseconds: 0)}');
                 Api.login(
                   context: context,
                   username: username!,

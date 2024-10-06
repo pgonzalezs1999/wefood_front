@@ -7,6 +7,7 @@ import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
 import 'package:wefood/models/models.dart';
 import 'package:wefood/services/auth/api.dart';
+import 'package:wefood/services/loading/loading_modern.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/types.dart';
 import 'package:wefood/views/views.dart';
@@ -65,7 +66,7 @@ class _LoginState extends State<Login> {
     }
   }
 
-  void _handleFirstUsage() {
+  _handleFirstUsage() {
     UserSecureStorage().read(key: 'isFirstUsage').then((String? response) {
       if(response == null) {
         wefoodShowDialog(
@@ -212,6 +213,7 @@ class _LoginState extends State<Login> {
                   description: 'Por favor, inténtelo de nuevo más tarde. Si el error consiste, póngase en contacto con soporte.',
                   cancelButtonTitle: 'OK',
                 );
+                LoadingModern.instance().hide();
               }
             );
           },
