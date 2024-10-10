@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:wefood/commands/clear_data.dart';
 import 'package:wefood/commands/utils.dart';
 import 'package:wefood/environment.dart';
-import 'package:wefood/models/models.dart';
+import 'package:wefood/models.dart';
 import 'package:wefood/services/auth/middleware.dart';
 import 'package:wefood/types.dart';
 import 'dart:convert';

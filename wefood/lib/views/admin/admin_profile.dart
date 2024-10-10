@@ -4,7 +4,6 @@ import 'package:wefood/commands/clear_data.dart';
 import 'package:wefood/commands/share_app.dart';
 import 'package:wefood/commands/wefood_show_dialog.dart';
 import 'package:wefood/components/components.dart';
-import 'package:wefood/main.dart';
 import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/views/views.dart';
 

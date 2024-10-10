@@ -11,8 +11,10 @@ wefoodShowDialog({
   Function()? cancelButtonBehaviour,
   List<TextButton>? actions,
   Function? onClose,
+  bool barrierDismissible = false,
 }) {
   showDialog(
+    barrierDismissible: barrierDismissible,
     context: context,
     builder: (context) => AlertDialog(
       content: Container(

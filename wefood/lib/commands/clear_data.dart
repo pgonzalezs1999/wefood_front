@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:wefood/blocs/blocs.dart';
+import 'package:wefood/blocs.dart';
 import 'package:wefood/services/secure_storage.dart';
 
 clearData(BuildContext context) async {

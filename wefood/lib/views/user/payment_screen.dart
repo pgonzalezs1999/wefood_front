@@ -6,7 +6,7 @@ import 'package:wefood/commands/scroll_to_bottom.dart';
 import 'package:wefood/commands/wefood_show_dialog.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
-import 'package:wefood/models/models.dart';
+import 'package:wefood/models.dart';
 import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/types.dart';

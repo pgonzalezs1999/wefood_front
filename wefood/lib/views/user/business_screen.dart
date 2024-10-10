@@ -2,12 +2,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:wefood/blocs/blocs.dart';
+import 'package:wefood/blocs.dart';
 import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/commands/wefood_show_dialog.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
-import 'package:wefood/models/models.dart';
+import 'package:wefood/models.dart';
 import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/types.dart';
 

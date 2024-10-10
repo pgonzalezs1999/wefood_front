@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:wefood/blocs/blocs.dart';
+import 'package:wefood/blocs.dart';
 import 'package:wefood/components/components.dart';
-import 'package:wefood/models/models.dart';
+import 'package:wefood/models.dart';
 import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/types.dart';
 import 'package:wefood/views/business/business_bank_data.dart';
@@ -53,7 +53,6 @@ class _BusinessRetributionsState extends State<BusinessRetributions> {
   @override
   void initState() {
     _retrieveData();
-    BusinessModel.printInfo(context.read<UserInfoCubit>().state.business);
     super.initState();
   }
 

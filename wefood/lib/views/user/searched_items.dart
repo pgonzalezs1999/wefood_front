@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wefood/components/components.dart';
-import 'package:wefood/models/models.dart';
+import 'package:wefood/models.dart';
 
 class SearchedItems extends StatefulWidget {
 

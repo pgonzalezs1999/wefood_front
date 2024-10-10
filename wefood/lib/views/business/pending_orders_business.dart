@@ -6,9 +6,9 @@ import 'package:wefood/commands/utils.dart';
 import 'package:wefood/commands/wefood_show_dialog.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
-import 'package:wefood/models/models.dart';
+import 'package:wefood/models.dart';
 import 'package:wefood/services/auth/api.dart';
-import 'package:wefood/blocs/blocs.dart';
+import 'package:wefood/blocs.dart';
 
 class PendingOrdersBusiness extends StatefulWidget {
   const PendingOrdersBusiness({super.key});

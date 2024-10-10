@@ -4,7 +4,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 import 'package:wefood/commands/call_request.dart';
 import 'package:wefood/commands/utils.dart';
 import 'package:wefood/commands/wefood_show_dialog.dart';
-import 'package:wefood/models/models.dart';
+import 'package:wefood/models.dart';
 import 'package:wefood/services/auth/api.dart';
 import 'package:wefood/components/components.dart';
 

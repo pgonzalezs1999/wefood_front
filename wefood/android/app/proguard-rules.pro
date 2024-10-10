@@ -1,14 +1,17 @@
-# No modificar las clases de modelos JSON
 -keepclassmembers class **.model.** { *; }
-
-# No modificar clases que interactúan con el framework de Flutter
 -keep class io.flutter.** { *; }
 -keep class io.flutter.plugins.** { *; }
-
-# No optimices clases de bibliotecas que utilicen Reflection (muchas APIs como Firebase usan esto)
+-keep class com.wefoodcompany.wefood.api.** { *; }
+-keep class com.wefoodcompany.wefood.middleware.** { *; }
+-keep class com.wefoodcompany.wefood.models.** { *; }
+-keepclassmembers class com.wefoodcompany.wefood.models.** { *; }
+-keep class com.wefoodcompany.wefood.blocs.** { *; }
+-keep class com.wefoodcompany.wefood.loading_modern_controller.** { *; }
 -keepattributes *Annotation*
 -keep class ** { *; }
 -dontwarn **
-
-# No elimines clases usadas en login (si usas alguna librería de autenticación)
--keep class com.example.myapp.auth.** { *; }
+-keep class com.wefoodcompany.wefood.** { *; }
+-keepclassmembers class com.wefoodcompany.wefood.** { *; }
+-keep class com.wefoodcompany.wefood.auth.** { *; }
+-keep class okhttp3.** { *; }
+-keep class retrofit2.** { *; }

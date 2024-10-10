@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:wefood/blocs/blocs.dart';
+import 'package:wefood/blocs.dart';
 import 'package:wefood/commands/wefood_show_dialog.dart';
 import 'package:wefood/components/components.dart';
 import 'package:wefood/environment.dart';
