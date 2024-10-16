@@ -26,9 +26,26 @@ class Api {
         },
         needsAccessToken: false,
       );
-      AuthModel authModel = AuthModel.fromJson(response);
-      return authModel;
-    } catch(error) { rethrow; }
+
+      if (response != null) {
+        AuthModel authModel = AuthModel.fromJson(response);
+        return authModel;
+      } else {
+        throw Exception('Respuesta del servidor no válida');
+      }
+    } catch (error) {
+      // Only for debugging endpoint
+      // if (error is http.ClientException) {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     SnackBar(content: Text('Error de conexión: ${error.message}')),
+      //   );
+      // } else {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     SnackBar(content: Text('Error: ${error.toString()}')),
+      //   );
+      // }
+      rethrow; 
+    }
   }
 
   static Future<String> logout() async {
@@ -38,7 +55,9 @@ class Api {
         type: HttpType.get,
       );
       return response['message'];
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future signOut(BuildContext context) async {
@@ -49,7 +68,9 @@ class Api {
       ).then((_) {
         clearData(context);
       });
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<UserModel> getProfile() async {
@@ -60,7 +81,9 @@ class Api {
       );
       UserModel userModel = UserModel.fromJson(response['message']);
       return userModel;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<BusinessExpandedModel> getSessionBusiness() async {
@@ -69,9 +92,12 @@ class Api {
         name: 'getSessionBusiness',
         type: HttpType.get,
       );
-      BusinessExpandedModel businessModel = BusinessExpandedModel.fromJson(response);
+      BusinessExpandedModel businessModel =
+          BusinessExpandedModel.fromJson(response);
       return businessModel;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static updateUsername({
@@ -83,10 +109,11 @@ class Api {
           type: HttpType.post,
           body: {
             'username': username,
-          }
-      );
+          });
       return response;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static updateRealName({
@@ -95,15 +122,16 @@ class Api {
   }) async {
     try {
       dynamic response = await Middleware.endpoint(
-        name: 'updateRealName',
-        type: HttpType.post,
-        body: {
-          'real_name': name,
-          'real_surname': surname,
-        }
-      );
+          name: 'updateRealName',
+          type: HttpType.post,
+          body: {
+            'real_name': name,
+            'real_surname': surname,
+          });
       return response;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static updateBusinessName({
@@ -115,10 +143,11 @@ class Api {
           type: HttpType.post,
           body: {
             'name': name.toString(),
-          }
-      );
+          });
       return response;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static updateBusinessDescription({
@@ -130,10 +159,11 @@ class Api {
           type: HttpType.post,
           body: {
             'description': description.toString(),
-          }
-      );
+          });
       return response;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static updateBusinessDirections({
@@ -151,10 +181,11 @@ class Api {
             'country': country.toString(),
             'longitude': longitude.toString(),
             'latitude': latitude.toString(),
-          }
-      );
+          });
       return response;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<List<ProductExpandedModel>> getFavouriteItems() async {
@@ -163,9 +194,14 @@ class Api {
         name: 'getFavouriteItems',
         type: HttpType.get,
       );
-      List<ProductExpandedModel> products = (response['products'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();
+      List<ProductExpandedModel> products =
+          (response['products'] as List<dynamic>)
+              .map((product) => ProductExpandedModel.fromJson(product))
+              .toList();
       return products;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<List<ProductExpandedModel>> getNearbyBusinesses({
@@ -179,11 +215,14 @@ class Api {
           body: {
             'longitude': longitude.toString(),
             'latitude': latitude.toString(),
-          }
-      );
-      List<ProductExpandedModel> products = (response['items'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();
+          });
+      List<ProductExpandedModel> products = (response['items'] as List<dynamic>)
+          .map((product) => ProductExpandedModel.fromJson(product))
+          .toList();
       return products;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<List<ProductExpandedModel>> getNearbyItems({
@@ -192,16 +231,19 @@ class Api {
   }) async {
     try {
       dynamic response = await Middleware.endpoint(
-        name: 'getNearbyItems',
-        type: HttpType.post,
-        body: {
-          'longitude': longitude.toString(),
-          'latitude': latitude.toString(),
-        }
-      );
-      List<ProductExpandedModel> products = (response['items'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();
+          name: 'getNearbyItems',
+          type: HttpType.post,
+          body: {
+            'longitude': longitude.toString(),
+            'latitude': latitude.toString(),
+          });
+      List<ProductExpandedModel> products = (response['items'] as List<dynamic>)
+          .map((product) => ProductExpandedModel.fromJson(product))
+          .toList();
       return products;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<List<ProductExpandedModel>> getRecommendedItems({
@@ -215,11 +257,14 @@ class Api {
           body: {
             'longitude': longitude.toString(),
             'latitude': latitude.toString(),
-          }
-      );
-      List<ProductExpandedModel> products = (response['items'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();
+          });
+      List<ProductExpandedModel> products = (response['items'] as List<dynamic>)
+          .map((product) => ProductExpandedModel.fromJson(product))
+          .toList();
       return products;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<ProductExpandedModel> getProduct({
@@ -232,7 +277,9 @@ class Api {
       );
       ProductExpandedModel product = ProductExpandedModel.fromJson(response);
       return product;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<ProductExpandedModel> getItem({
@@ -245,7 +292,9 @@ class Api {
       );
       ProductExpandedModel product = ProductExpandedModel.fromJson(response);
       return product;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<FavouriteModel> addFavourite({
@@ -253,15 +302,16 @@ class Api {
   }) async {
     try {
       dynamic response = await Middleware.endpoint(
-        name: 'addFavourite',
-        type: HttpType.post,
-        body: {
-          'id_business': idBusiness.toString(),
-        }
-      );
+          name: 'addFavourite',
+          type: HttpType.post,
+          body: {
+            'id_business': idBusiness.toString(),
+          });
       FavouriteModel favourite = FavouriteModel.fromJson(response);
       return favourite;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<FavouriteModel> removeFavourite({
@@ -269,15 +319,16 @@ class Api {
   }) async {
     try {
       dynamic response = await Middleware.endpoint(
-        name: 'removeFavourite',
-        type: HttpType.post,
-        body: {
-          'id_business': idBusiness.toString(),
-        }
-      );
+          name: 'removeFavourite',
+          type: HttpType.post,
+          body: {
+            'id_business': idBusiness.toString(),
+          });
       FavouriteModel favourite = FavouriteModel.fromJson(response['favourite']);
       return favourite;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<bool> checkUsernameAvailability({
@@ -285,14 +336,15 @@ class Api {
   }) async {
     try {
       dynamic response = await Middleware.endpoint(
-        name: 'checkUsernameAvailability',
-        type: HttpType.post,
-        body: {
-          'username': username,
-        }
-      );
+          name: 'checkUsernameAvailability',
+          type: HttpType.post,
+          body: {
+            'username': username,
+          });
       return response['availability'];
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<bool> checkEmailAvailability({
@@ -300,14 +352,15 @@ class Api {
   }) async {
     try {
       dynamic response = await Middleware.endpoint(
-        name: 'checkEmailAvailability',
-        type: HttpType.post,
-        body: {
-          'email': email.toString(),
-        }
-      );
+          name: 'checkEmailAvailability',
+          type: HttpType.post,
+          body: {
+            'email': email.toString(),
+          });
       return response['availability'];
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<bool> checkPhoneAvailability({
@@ -315,14 +368,15 @@ class Api {
   }) async {
     try {
       dynamic response = await Middleware.endpoint(
-        name: 'checkPhoneAvailability',
-        type: HttpType.post,
-        body: {
-          'phone': phone.toString(),
-        }
-      );
+          name: 'checkPhoneAvailability',
+          type: HttpType.post,
+          body: {
+            'phone': phone.toString(),
+          });
       return response['availability'];
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<bool> checkTaxIdAvailability({
@@ -334,10 +388,11 @@ class Api {
           type: HttpType.post,
           body: {
             'tax_id': taxId.toString(),
-          }
-      );
+          });
       return response['availability'];
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<List<CountryModel>> getAllCountries() async {
@@ -347,9 +402,13 @@ class Api {
         type: HttpType.get,
         needsAccessToken: false,
       );
-      List<CountryModel> countries = (response['message'] as List<dynamic>).map((country) => CountryModel.fromJson(country)).toList();
+      List<CountryModel> countries = (response['message'] as List<dynamic>)
+          .map((country) => CountryModel.fromJson(country))
+          .toList();
       return countries;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<UserModel> signIn({
@@ -358,17 +417,16 @@ class Api {
     required String password,
   }) async {
     try {
-      dynamic response = await Middleware.endpoint(
-        name: 'signIn',
-        type: HttpType.post,
-        body: {
-          'username': username.toString(),
-          'email': email.toString(),
-          'password': password.toString(),
-        }
-      );
+      dynamic response =
+          await Middleware.endpoint(name: 'signIn', type: HttpType.post, body: {
+        'username': username.toString(),
+        'email': email.toString(),
+        'password': password.toString(),
+      });
       return UserModel.fromJson(response['user']);
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future createBusiness({
@@ -386,23 +444,24 @@ class Api {
   }) async {
     try {
       await Middleware.endpoint(
-        name: 'createBusiness',
-        type: HttpType.post,
-        body: {
-          'email': email.toString(),
-          'password': password.toString(),
-          'phone_prefix': phonePrefix.toString(),
-          'phone': phone.toString(),
-          'name': businessName.toString(),
-          'description': businessDescription.toString(),
-          'tax_id': taxId.toString(),
-          'directions': directions.toString(),
-          'country': country.toString(),
-          'longitude': longitude.toString(),
-          'latitude': latitude.toString(),
-        }
-      );
-    } catch(error) { rethrow; }
+          name: 'createBusiness',
+          type: HttpType.post,
+          body: {
+            'email': email.toString(),
+            'password': password.toString(),
+            'phone_prefix': phonePrefix.toString(),
+            'phone': phone.toString(),
+            'name': businessName.toString(),
+            'description': businessDescription.toString(),
+            'tax_id': taxId.toString(),
+            'directions': directions.toString(),
+            'country': country.toString(),
+            'longitude': longitude.toString(),
+            'latitude': latitude.toString(),
+          });
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<bool> checkValidity({
@@ -416,9 +475,13 @@ class Api {
           'username': username.toString(),
         },
       );
-      bool validity = (response['validity'] == 1 || response['validity'] == '1' || response['validity'] == true);
+      bool validity = (response['validity'] == 1 ||
+          response['validity'] == '1' ||
+          response['validity'] == true);
       return validity;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future cancelValidation({
@@ -432,10 +495,12 @@ class Api {
           'username': username.toString(),
         },
       );
-      if(response['message'] == null) {
+      if (response['message'] == null) {
         throw Exception(response['error']);
       }
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<BusinessProductsResumeModel> getBusinessProductsResume() async {
@@ -444,9 +509,12 @@ class Api {
         name: 'businessProductsResume',
         type: HttpType.get,
       );
-      BusinessProductsResumeModel result = BusinessProductsResumeModel.fromJson(response);
+      BusinessProductsResumeModel result =
+          BusinessProductsResumeModel.fromJson(response);
       return result;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<ProductModel> updateProduct({
@@ -496,7 +564,9 @@ class Api {
       );
       ProductModel result = ProductModel.fromJson(response['product']);
       return result;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<void> deleteProduct({
@@ -504,16 +574,17 @@ class Api {
   }) async {
     try {
       final response = await Middleware.endpoint(
-        name: 'deleteProduct',
-        type: HttpType.post,
-        body: {
-          'type': type.toString(),
-        }
-      );
-      if(response['message'] == null) {
+          name: 'deleteProduct',
+          type: HttpType.post,
+          body: {
+            'type': type.toString(),
+          });
+      if (response['message'] == null) {
         throw Exception();
       }
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<ProductModel> createProduct({
@@ -563,7 +634,9 @@ class Api {
       );
       ProductModel result = ProductModel.fromJson(response['product']);
       return result;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<List<BusinessExpandedModel>> getValidatableBusinesses() async {
@@ -572,9 +645,14 @@ class Api {
         name: 'getValidatableBusinesses',
         type: HttpType.get,
       );
-      List<BusinessExpandedModel> result = (response['results'] as List<dynamic>).map((business) => BusinessExpandedModel.fromJson(business)).toList();
+      List<BusinessExpandedModel> result =
+          (response['results'] as List<dynamic>)
+              .map((business) => BusinessExpandedModel.fromJson(business))
+              .toList();
       return result;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<void> validateBusiness({
@@ -582,17 +660,18 @@ class Api {
   }) async {
     try {
       final response = await Middleware.endpoint(
-        name: 'validateBusiness',
-        type: HttpType.post,
-        body: {
-          'id': id.toString(),
-        }
-      );
-      if(response['message'] != null) {
+          name: 'validateBusiness',
+          type: HttpType.post,
+          body: {
+            'id': id.toString(),
+          });
+      if (response['message'] != null) {
       } else {
         throw Exception('ERROR WHILE VALIDATING BUSINESS');
       }
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<void> refuseBusiness({
@@ -604,26 +683,31 @@ class Api {
           type: HttpType.post,
           body: {
             'id': id.toString(),
-          }
-      );
-      if(response['message'] == null) {
+          });
+      if (response['message'] == null) {
         throw Exception('ERROR WHILE REFUSING BUSINESS');
       }
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<List<ProductExpandedModel>> getPendingOrdersCustomer() async {
     try {
       final response = await Middleware.endpoint(
-          name: 'getPendingOrdersCustomer',
-          type: HttpType.get,
+        name: 'getPendingOrdersCustomer',
+        type: HttpType.get,
       );
-      if(response['results'] == null) {
+      if (response['results'] == null) {
         throw Exception('ERROR WHILE GETTING PENDING ITEMS');
       }
-      List<ProductExpandedModel> result = (response['results'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();
+      List<ProductExpandedModel> result = (response['results'] as List<dynamic>)
+          .map((product) => ProductExpandedModel.fromJson(product))
+          .toList();
       return result;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<List<OrderModel>> getPendingOrdersBusiness() async {
@@ -632,12 +716,16 @@ class Api {
         name: 'getPendingOrdersBusiness',
         type: HttpType.get,
       );
-      if(response['orders'] == null) {
+      if (response['orders'] == null) {
         throw Exception('ERROR WHILE GETTING PENDING ITEMS');
       }
-      List<OrderModel> result = (response['orders'] as List<dynamic>).map((order) => OrderModel.fromJson(order)).toList();
+      List<OrderModel> result = (response['orders'] as List<dynamic>)
+          .map((order) => OrderModel.fromJson(order))
+          .toList();
       return result;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<void> completeOrderCustomer({
@@ -645,16 +733,17 @@ class Api {
   }) async {
     try {
       final response = await Middleware.endpoint(
-        name: 'completeOrderCustomer',
-        type: HttpType.post,
-        body: {
-          'id_order': idOrder.toString(),
-        }
-      );
-      if(response['message'] == null) {
+          name: 'completeOrderCustomer',
+          type: HttpType.post,
+          body: {
+            'id_order': idOrder.toString(),
+          });
+      if (response['message'] == null) {
         throw Exception('ERROR WHILE GETTING PENDING ITEMS');
       }
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<void> completeOrderBusiness({
@@ -666,12 +755,13 @@ class Api {
           type: HttpType.post,
           body: {
             'id_order': idOrder.toString(),
-          }
-      );
-      if(response['message'] == null) {
+          });
+      if (response['message'] == null) {
         throw Exception();
       }
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<ImageModel> getImage({
@@ -680,16 +770,15 @@ class Api {
   }) async {
     try {
       final response = await Middleware.endpoint(
-        name: 'getImage',
-        type: HttpType.post,
-        body: {
-          'id_user': idUser.toString(),
-          'meaning': meaning.toString(),
-        }
-      );
+          name: 'getImage',
+          type: HttpType.post,
+          body: {
+            'id_user': idUser.toString(),
+            'meaning': meaning.toString(),
+          });
       ImageModel imageModel = ImageModel.fromJson(response['image']);
       return imageModel;
-    } catch(error) {
+    } catch (error) {
       return ImageModel.empty();
     }
   }
@@ -712,15 +801,16 @@ class Api {
       final responseBody = jsonDecode(response.body);
       ImageModel imageModel = ImageModel.fromJson(responseBody['image']);
       return imageModel;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
-  static Future<List<ProductExpandedModel>> searchItemsByFilters({
-    required double longitude,
-    required double latitude,
-    required double distance,
-    required Filters filters
-  }) async {
+  static Future<List<ProductExpandedModel>> searchItemsByFilters(
+      {required double longitude,
+      required double latitude,
+      required double distance,
+      required Filters filters}) async {
     try {
       final response = await Middleware.endpoint(
         name: 'searchItemsByFilters',
@@ -734,15 +824,21 @@ class Api {
           'dessert': filters.dessert ? "1" : "0",
           'junk': filters.junk ? "1" : "0",
           'price': (filters.maximumPrice ?? 99999).toString(),
-          'starting_hour': Utils.timeOfDayToSqlTimeString(filters.startTime ?? const TimeOfDay(hour: 0, minute: 0)),
-          'ending_hour': Utils.timeOfDayToSqlTimeString(filters.endTime ?? const TimeOfDay(hour: 23, minute: 59)),
+          'starting_hour': Utils.timeOfDayToSqlTimeString(
+              filters.startTime ?? const TimeOfDay(hour: 0, minute: 0)),
+          'ending_hour': Utils.timeOfDayToSqlTimeString(
+              filters.endTime ?? const TimeOfDay(hour: 23, minute: 59)),
           'only_today': filters.onlyToday ? "1" : "0",
           'only_available': filters.onlyAvailable ? "1" : "0",
         },
       );
-      List<ProductExpandedModel> products = (response['items'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();
+      List<ProductExpandedModel> products = (response['items'] as List<dynamic>)
+          .map((product) => ProductExpandedModel.fromJson(product))
+          .toList();
       return products;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<List<ProductExpandedModel>> searchItemsByText({
@@ -756,9 +852,13 @@ class Api {
           'text': text,
         },
       );
-      List<ProductExpandedModel> products = (response['items'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();
+      List<ProductExpandedModel> products = (response['items'] as List<dynamic>)
+          .map((product) => ProductExpandedModel.fromJson(product))
+          .toList();
       return products;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static removeImage({
@@ -774,7 +874,9 @@ class Api {
           'meaning': meaning.toString(),
         },
       );
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future getOrderHistoryCustomer() async {
@@ -783,25 +885,29 @@ class Api {
         name: 'getOrderHistoryCustomer',
         type: HttpType.get,
       );
-      List<ProductExpandedModel> orders = (response['orders'] as List<dynamic>).map((product) => ProductExpandedModel.fromJson(product)).toList();
+      List<ProductExpandedModel> orders = (response['orders'] as List<dynamic>)
+          .map((product) => ProductExpandedModel.fromJson(product))
+          .toList();
       return orders;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
-  static Future<BusinessExpandedModel> getBusiness({
-    required int idBusiness
-  }) async {
+  static Future<BusinessExpandedModel> getBusiness(
+      {required int idBusiness}) async {
     try {
       final response = await Middleware.endpoint(
-        name: 'getBusiness',
-        type: HttpType.post,
-        body: {
-          'id_business': idBusiness.toString(),
-        }
-      );
+          name: 'getBusiness',
+          type: HttpType.post,
+          body: {
+            'id_business': idBusiness.toString(),
+          });
       BusinessExpandedModel business = BusinessExpandedModel.fromJson(response);
       return business;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future addComment({
@@ -814,7 +920,7 @@ class Api {
         'id_business': idBusiness.toString(),
         'rate': rate.toString(),
       };
-      if(message != null) {
+      if (message != null) {
         body['message'] = message;
       }
       await Middleware.endpoint(
@@ -822,7 +928,9 @@ class Api {
         type: HttpType.post,
         body: body,
       );
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<List<CommentExpandedModel>> getCommentsFromBusiness({
@@ -830,15 +938,19 @@ class Api {
   }) async {
     try {
       final response = await Middleware.endpoint(
-        name: 'getCommentsFromBusiness',
-        type: HttpType.post,
-        body: {
-          'id_business': idBusiness.toString(),
-        }
-      );
-      List<CommentExpandedModel> comments = (response['comments'] as List<dynamic>).map((comment) => CommentExpandedModel.fromJson(comment)).toList();
+          name: 'getCommentsFromBusiness',
+          type: HttpType.post,
+          body: {
+            'id_business': idBusiness.toString(),
+          });
+      List<CommentExpandedModel> comments =
+          (response['comments'] as List<dynamic>)
+              .map((comment) => CommentExpandedModel.fromJson(comment))
+              .toList();
       return comments;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future deleteComment({
@@ -846,13 +958,14 @@ class Api {
   }) async {
     try {
       await Middleware.endpoint(
-        name: 'deleteComment',
-        type: HttpType.post,
-        body: {
-          'id_business': idBusiness.toString(),
-        }
-      );
-    } catch(error) { rethrow; }
+          name: 'deleteComment',
+          type: HttpType.post,
+          body: {
+            'id_business': idBusiness.toString(),
+          });
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<String> openpayGetToken({
@@ -876,14 +989,16 @@ class Api {
         uri,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Basic ${base64Encode(utf8.encode('${Environment.openpaySecretKey}:'))}',
+          'Authorization':
+              'Basic ${base64Encode(utf8.encode('${Environment.openpaySecretKey}:'))}',
         },
         body: body,
       );
-      String formattedRespose = jsonDecode(utf8.decode(response.bodyBytes))['id'];
+      String formattedRespose =
+          jsonDecode(utf8.decode(response.bodyBytes))['id'];
       print('RESPONSE DE $uri: $formattedRespose');
       return formattedRespose;
-    } catch(error) {
+    } catch (error) {
       rethrow;
     }
   }
@@ -909,9 +1024,9 @@ class Api {
       );
       print('RESPONSE DEL API.OPENPAY_PAYMENT: $response');
       return (response['status'] != null)
-        ? response['status']
-        : response['details']['description'];
-    } catch(error) {
+          ? response['status']
+          : response['details']['description'];
+    } catch (error) {
       rethrow;
     }
   }
@@ -922,9 +1037,12 @@ class Api {
         name: 'createRetribution',
         type: HttpType.post,
       );
-      RetributionModel result = RetributionModel.fromJson(response['retribution']);
+      RetributionModel result =
+          RetributionModel.fromJson(response['retribution']);
       return result;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<List<RetributionModel>> getRetributionsFromBusiness({
@@ -935,9 +1053,14 @@ class Api {
         name: 'getRetributionsFromBusiness/$id',
         type: HttpType.get,
       );
-      List<RetributionModel> result = (response['retributions'] as List<dynamic>).map((ret) => RetributionModel.fromJson(ret)).toList();
+      List<RetributionModel> result =
+          (response['retributions'] as List<dynamic>)
+              .map((ret) => RetributionModel.fromJson(ret))
+              .toList();
       return result;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<String> emailChangePassword({
@@ -952,7 +1075,9 @@ class Api {
         needsAccessToken: false,
       );
       return response['message'];
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<bool> checkChangePasswordCode({
@@ -963,12 +1088,15 @@ class Api {
   }) async {
     try {
       final response = await Middleware.endpoint(
-        name: 'checkChangePasswordCode/${part1.toString()}/${part2.toString()}/${part3.toString()}/${code.toString()}',
+        name:
+            'checkChangePasswordCode/${part1.toString()}/${part2.toString()}/${part3.toString()}/${code.toString()}',
         type: HttpType.get,
         needsAccessToken: false,
       );
       return Utils.controlBool(response['message']);
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<String> updatePassword({
@@ -992,7 +1120,9 @@ class Api {
         },
       );
       return response['message'];
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<int> checkForUpdates() async {
@@ -1003,7 +1133,9 @@ class Api {
         needsAccessToken: false,
       ); // 0 = error; 1 = OK; 2 = optional update; 3 = needed update
       return int.tryParse(response['message']) ?? 0;
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 
   static Future<String> updateBankInfo({
@@ -1029,6 +1161,8 @@ class Api {
       );
       print('RESPONSE DEL API_UPDATE_BANK_INFO: $response');
       return response['message'];
-    } catch(error) { rethrow; }
+    } catch (error) {
+      rethrow;
+    }
   }
 }

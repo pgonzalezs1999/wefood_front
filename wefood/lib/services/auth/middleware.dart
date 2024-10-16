@@ -5,17 +5,17 @@ import 'package:http/http.dart' as http;
 import 'package:wefood/environment.dart';
 import 'package:wefood/services/secure_storage.dart';
 import 'package:wefood/types.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class Middleware {
-
   static const Duration timeOutDuration = Duration(seconds: 20);
 
-  static Future get({ required Uri url,  required auth }) async {
+  static Future get({required Uri url, required auth}) async {
     try {
-      final response = await http.get(
-        url,
-        headers: auth
-      ).timeout(timeOutDuration, onTimeout: () {
+      final response = await http
+          .get(url, headers: auth)
+          .timeout(timeOutDuration, onTimeout: () {
         throw TimeoutException('TimeoutException');
       });
       return response;
@@ -24,13 +24,15 @@ class Middleware {
     }
   }
 
-  static Future post({ required Uri url,  required auth,  body, }) async {
+  static Future post({
+    required Uri url,
+    required auth,
+    body,
+  }) async {
     try {
-      final response = await http.post(
-        url,
-        headers: auth,
-        body: body
-      ).timeout(timeOutDuration, onTimeout: () {
+      final response = await http
+          .post(url, headers: auth, body: body)
+          .timeout(timeOutDuration, onTimeout: () {
         throw TimeoutException('TimeoutException');
       });
       return response;
@@ -46,7 +48,10 @@ class Middleware {
     file,
   }) async {
     try {
-      var request = http.MultipartRequest('POST', Uri.parse(url),);
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse(url),
+      );
       request.headers.addAll(auth);
       request.fields.addAll(body);
       final sendFile = await http.MultipartFile.fromPath(
@@ -71,21 +76,26 @@ class Middleware {
     bool needsAccessToken = true,
   }) async {
     String? accessToken = await UserSecureStorage().read(key: 'accessToken');
-    final auth = needsAccessToken ? { 'Authorization': 'Bearer $accessToken' } : null;
+    final auth =
+        needsAccessToken ? {'Authorization': 'Bearer $accessToken'} : null;
     final String fullUrl = '${Environment.apiUrl}$name';
     final Uri uri = Uri.parse(fullUrl);
     dynamic response;
     try {
-      switch(type) {
+      switch (type) {
         case HttpType.get:
-          if(kDebugMode) { print('HACIENDO GET DE: $uri'); }
+          if (kDebugMode) {
+            print('HACIENDO GET DE: $uri');
+          }
           response = await get(
             url: uri,
             auth: auth,
           );
           return jsonDecode(utf8.decode(response.bodyBytes));
         case HttpType.post:
-          if(kDebugMode) { print('HACIENDO POST DE: $uri CON BODY: $body'); }
+          if (kDebugMode) {
+            print('HACIENDO POST DE: $uri CON BODY: $body');
+          }
           response = await post(
             url: uri,
             body: body,
@@ -93,7 +103,9 @@ class Middleware {
           );
           return jsonDecode(utf8.decode(response.bodyBytes));
         case HttpType.multipartPost:
-          if(kDebugMode) { print('HACIENDO MULTIPART_POST DE: $fullUrl CON BODY: $body'); }
+          if (kDebugMode) {
+            print('HACIENDO MULTIPART_POST DE: $fullUrl CON BODY: $body');
+          }
           response = await multipartPost(
             url: fullUrl,
             body: body,
@@ -104,7 +116,20 @@ class Middleware {
         default:
           throw Exception("Unsupported HTTP method");
       }
-    } catch(error) {
+    } on PlatformException catch (e) {
+      //Fix SSL bug when FlutterSecureStorage fails decrypting previous SSL key pair
+      await FlutterSecureStorage().deleteAll();
+      if (kDebugMode) {
+        print('Excepción encontrada, limpiando datos y reintentando...$e');
+      }
+      return endpoint(
+        name: name,
+        type: type,
+        body: body,
+        file: file,
+        needsAccessToken: needsAccessToken,
+      );
+    } catch (error) {
       rethrow;
     }
   }
